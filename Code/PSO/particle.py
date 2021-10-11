@@ -1,17 +1,26 @@
 import numpy as np
 
 
-def initialize_position(shape):
+def initialize_position_random(shape):
     return np.random.random(shape).flatten()
 
 
+def initialize_position(target, max_distance):
+    return np.random.uniform(-max_distance, max_distance, target.shape).flatten()
+
+
 class Particle:
-    def __init__(self, id, target_image, target_label, targeted, model, init=None):
+    def __init__(self, id, target_image, target_label, targeted, model, init=None, rndm=True):
         self.id = id
         if init is not None:
             self.position = init
         else:
-            self.position = initialize_position(target_image.shape)
+            if rndm:
+                self.position = initialize_position_random(target_image.shape)
+            else:
+                self.max_distance = 1
+                self.position = initialize_position(target_image, self.max_distance)
+        self.fitness = np.infty
         self.shape = target_image.shape
         self.velocity = np.random.normal(0, 0.1, target_image.shape).flatten()
         self.personal_best_position = self.position
@@ -29,7 +38,7 @@ class Particle:
         Greater than functionality based on the personal best fitness values. Useful for sorting
         :param other: The particle to compare to
         """
-        return self.personal_best_fitness < other.personal_best_fitness
+        return self.fitness < other.fitness
 
     # Indirection in case different fitness functions need to be tested
     def calculate_fitness(self):
@@ -62,7 +71,7 @@ class Particle:
                         + c2 * np.random.random(self.shape).flatten() * distance_from_swarm_best
 
     def update_personal_best(self):
-        fitness = self.calculate_fitness()
-        if fitness < self.personal_best_fitness:
-            self.personal_best_fitness = fitness
+        self.fitness = self.calculate_fitness()
+        if self.fitness < self.personal_best_fitness:
+            self.personal_best_fitness = self.fitness
             self.personal_best_position = self.position
