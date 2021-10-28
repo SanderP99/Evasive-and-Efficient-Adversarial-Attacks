@@ -15,8 +15,8 @@ class Particle:
 
         # BA parameters
         self.position = None
-        self.delta = 0.9
-        self.eps = 0.01
+        self.delta = 0.1
+        self.eps = 1.
 
         # PSO parameters
         self.fitness = np.infty

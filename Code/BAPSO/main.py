@@ -18,6 +18,7 @@ if __name__ == '__main__':
         particle.update_velocity(0)
         particle.update_position()
         particle.update_best_fitness()
-        if i % 20 == 0:
-            plt.imshow(particle.best_position.reshape((28, 28, 1)), cmap=plt.get_cmap('gray'))
+        if i % 10 == 0:
+            plt.imshow(particle.position.reshape((28, 28, 1)), cmap=plt.get_cmap('gray'))
             plt.show()
+            print("Prediction: ", np.argmax(model.predict(particle.position.reshape(1, 28, 28, 1))))

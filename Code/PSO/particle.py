@@ -10,16 +10,17 @@ def initialize_position(target, max_distance):
 
 
 class Particle:
-    def __init__(self, id, target_image, target_label, targeted, model, init=None, rndm=True):
+    def __init__(self, id, target_image, target_label, targeted, model, init=None, noise=True):
         self.id = id
         if init is not None:
             self.position = init
         else:
-            if rndm:
+            if not noise:
                 self.position = initialize_position_random(target_image.shape)
             else:
-                self.max_distance = 1
+                self.max_distance = 5
                 self.position = initialize_position(target_image, self.max_distance)
+        self.noise = noise
         self.fitness = np.infty
         self.shape = target_image.shape
         self.velocity = np.random.normal(0, 0.1, target_image.shape).flatten()
@@ -45,8 +46,12 @@ class Particle:
         return self.fitness_function()
 
     def fitness_function(self):
-        distance = np.linalg.norm(self.target_image - self.position)
-        prediction = np.argmax(self.model.predict(self.position.reshape((1,) + self.shape)))
+        if not self.noise:
+            distance = np.linalg.norm(self.target_image - self.position)
+            prediction = np.argmax(self.model.predict(self.position.reshape((1,) + self.shape)))
+        else:
+            distance = np.linalg.norm(self.position)
+            prediction = np.argmax(self.model.predict((self.target_image + self.position).reshape((1,) + self.shape)))
         if self.targeted:
             # Label needs to be the same as target
             if self.target_label == prediction:
@@ -64,11 +69,12 @@ class Particle:
     def update_position(self):
         self.position = np.clip(self.position + self.velocity, 0, 1)
 
-    def update_velocity(self, swarm_best_position, c1=2, c2=2):
+    def update_velocity(self, swarm_best_position, c1=2, c2=2, v=0.95):
         distance_from_personal_best = self.personal_best_position - self.position
         distance_from_swarm_best = swarm_best_position - self.position
         self.velocity = self.velocity + c1 * np.random.random(self.shape).flatten() * distance_from_personal_best \
-                        + c2 * np.random.random(self.shape).flatten() * distance_from_swarm_best
+                        + c2 * np.random.random(self.shape).flatten() * distance_from_swarm_best \
+                        - 0.0001 * self.position
 
     def update_personal_best(self):
         self.fitness = self.calculate_fitness()

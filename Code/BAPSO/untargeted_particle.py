@@ -12,7 +12,6 @@ class UntargetedParticle(Particle):
 
     def calculate_fitness(self) -> None:
         prediction = np.argmax(self.model.predict(self.position.reshape((1,) + self.shape)))
-        print("Prediction: ", prediction)
         if prediction == self.target_label:
             # No longer adversarial
             self.fitness = np.infty
@@ -21,20 +20,42 @@ class UntargetedParticle(Particle):
             self.fitness = np.linalg.norm(self.target_image - self.position)
 
     def update_velocity(self, swarm_best_position: np.array, c1=0., c2=0.) -> None:
-        distance_from_personal_best = self.best_position - self.position
-        distance_from_swarm_best = swarm_best_position - self.position
 
-        target_image_direction = self.target_image.flatten() - self.position
-        norm = np.linalg.norm(target_image_direction)
-        target_image_direction /= norm
+        # Orthogonal step
+        while True:
+            trial_samples = []
+            for _ in np.arange(10):
+                trial_sample = self.position + self.orthogonal_perturbation()
+                trial_samples.append(trial_sample)
+            predictions = self.model.predict(np.array(trial_samples).reshape((10,) + self.shape))
+            predictions = np.argmax(predictions, axis=1)
+            d_score = np.mean(predictions != self.target_label)
+            if d_score > 0.0:
+                if d_score < 0.3:
+                    self.delta *= 0.9
+                elif d_score > 0.7:
+                    self.delta /= 0.9
+                adversarial_sample = np.array(trial_samples)[np.where(predictions != self.target_label)[0][0]]
+                break
+            else:
+                self.delta *= 0.9
+        # Forward step
+        e_step = 0
+        while True:
+            e_step += 1
+            # print("\t#{}".format(e_step))
+            trial_sample = adversarial_sample + self.forward_perturbation()
+            prediction = self.model.predict(trial_sample.reshape((1,) + self.shape))
+            if np.argmax(prediction) != self.target_label:
+                adversarial_sample = trial_sample
+                self.eps /= 0.5
+                break
+            elif e_step > 500:
+                break
+            else:
+                self.eps *= 0.5
 
-        orthogonal_direction = self.orthogonal_perturbation()
-
-        c3 = self.delta
-        c4 = self.eps
-        self.velocity = c1 * np.random.random(self.shape).flatten() * distance_from_personal_best + \
-                        c2 * np.random.random(self.shape).flatten() * distance_from_swarm_best + \
-                        orthogonal_direction + c4 * target_image_direction
+        self.velocity = adversarial_sample - self.position
 
     def orthogonal_perturbation(self) -> np.array:
         # From https://github.com/greentfrapp/boundary-attack/blob/master/boundary-attack-resnet.py
@@ -51,4 +72,9 @@ class UntargetedParticle(Particle):
         perturb -= overflow * (overflow > 0)
         underflow = np.zeros_like(self.position) - (self.position + perturb)
         perturb += underflow * (underflow > 0)
+        return perturb
+
+    def forward_perturbation(self):
+        perturb = (self.target_image.flatten() - self.position)
+        perturb *= self.eps
         return perturb

@@ -2,7 +2,7 @@ from PSO.particle import Particle
 
 
 class Swarm:
-    def __init__(self, target_image, n_particles=50, target_label=0, targeted=False, model=None):
+    def __init__(self, target_image, n_particles=20, target_label=0, targeted=False, model=None):
         self.particles = [
             Particle(i, target_image=target_image, target_label=target_label, targeted=targeted, model=model) for i in
             range(n_particles)]
@@ -20,7 +20,7 @@ class Swarm:
     def optimize(self):
         # Update all particles
         for particle in self.particles:
-            particle.update_velocity(self.swarm_best_position, c1=0.2, c2=0.1)
+            particle.update_velocity(self.swarm_best_position, c1=.2, c2=.2)
             particle.update_position()
             particle.update_personal_best()
 
