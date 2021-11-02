@@ -12,6 +12,7 @@ class Particle:
     def __init__(self, target_image, target_label, model, swarm):
         # self.position = np.random.random(target_image.shape)
         self.position = create_perlin_noise(target_image.shape)
+        self.is_adversarial = True
 
         self.target_image = target_image
         self.target_label = target_label
@@ -45,21 +46,77 @@ class Particle:
         if prediction == self.target_label:
             # No longer adversarial
             self.fitness = np.infty
+            self.is_adversarial = False
         else:
             self.fitness = np.linalg.norm(self.position - self.target_image)
+            self.is_adversarial = True
 
     def update_position(self):
         new_position = np.add(self.position, self.velocity)
         self.position = np.clip(new_position, 0, 1)
         self.iteration += 1
 
-    def update_velocity(self, c1=2., c2=2., c3=0.4, c4=0.4):
+    def update_velocity_alt(self, c1=2., c2=2.):
         w = self.calculate_w(1., 0., 1000)
         particle_best_delta = c2 * (self.best_position - self.position) * np.random.uniform(0., 1.,
                                                                                             self.target_image.shape)
         swarm_best_delta = c1 * (self.swarm.best_position - self.position) * np.random.uniform(0., 1.,
                                                                                                self.target_image.shape)
-        target_delta = c3 * (self.target_image - self.position) * np.random.uniform(0., 1., self.target_image.shape)
+
+        deltas = particle_best_delta + swarm_best_delta
+        self.velocity = w * np.clip(self.velocity + deltas, -1 * self.maximum_diff, self.maximum_diff)
+
+    def generate_boundary_sample(self):
+        spherical_step = 1E-2
+        source_step = 1E-2
+        scale = (1. - self.iteration / 10000) + 0.3
+        # scale = 1.
+        spherical_step *= scale
+        source_step *= scale
+        if not self.is_adversarial:
+            source_step *= -1
+
+        # From: https://github.com/ttbrunner/biased_boundary_attack/blob/master/attacks/biased_boundary_attack.py
+        unnormalized_source_direction = self.target_image - self.position
+        source_norm = np.linalg.norm(unnormalized_source_direction)
+        source_direction = unnormalized_source_direction / source_norm
+
+        sampling_direction = create_perlin_noise(self.target_image.shape)
+
+        # Project onto sphere
+        dot = np.vdot(sampling_direction, source_direction)
+        sampling_direction -= dot * source_direction
+        new_mask = np.abs(self.position - self.target_image)
+        new_mask /= np.max(new_mask)
+        new_mask **= 0.5
+        mask = new_mask
+        sampling_direction *= mask
+        sampling_direction /= np.linalg.norm(sampling_direction)
+
+        sampling_direction *= source_norm * spherical_step
+
+        D = 1 / np.sqrt(spherical_step ** 2 + 1)
+        direction = sampling_direction - unnormalized_source_direction
+        spherical_candidate = self.target_image + D * direction
+        spherical_candidate = np.clip(spherical_candidate, 0., 1)
+
+        # Step towards source
+        new_source_direction = self.target_image - spherical_candidate
+        new_source_direction_norm = np.linalg.norm(new_source_direction)
+        new_source_direction /= new_source_direction_norm
+        spherical_candidate = self.target_image - source_norm * new_source_direction
+
+        candidate = spherical_candidate + (source_norm * source_step) * new_source_direction
+        candidate = np.clip(candidate, 0., 1.)
+        self.position = candidate
+
+    def update_velocity(self, c1=2., c2=2., c3=0.4, c4=0.4):
+        w = self.calculate_w(1., 0., 10000)
+        particle_best_delta = c2 * (self.best_position - self.position) * np.random.uniform(0., 1.,
+                                                                                            self.target_image.shape)
+        swarm_best_delta = c1 * (self.swarm.best_position - self.position) * np.random.uniform(0., 1.,
+                                                                                               self.target_image.shape)
+        target_delta = c3 * (self.target_image - self.position) * np.random.uniform(0., .5, self.target_image.shape)
         # TODO: binary search to find boundary?
         perturb = np.random.random(self.target_image.shape)
         perturb /= np.linalg.norm(perturb)
@@ -74,7 +131,7 @@ class Particle:
 
         orthogonal_delta = c4 * np.random.uniform(0., 1., self.target_image.shape) * perturb
         deltas = particle_best_delta + swarm_best_delta + target_delta + orthogonal_delta
-        self.velocity = np.add(w * np.clip(self.velocity, -1 * self.maximum_diff, self.maximum_diff), deltas)
+        self.velocity = w * np.clip(self.velocity + deltas, -1 * self.maximum_diff, self.maximum_diff)
 
         # TODO: Fix masking
         # mask = np.abs(self.target_image - self.position)
@@ -99,10 +156,10 @@ class Particle:
             random_perturbations = np.random.random(self.target_image.shape)
             indices = np.random.random(self.target_image.shape)
             percentage = 0.5
-            indices[indices < percentage] = 1
-            indices[indices >= percentage] = 0
+            indices[indices > percentage] = 2
+            indices[indices <= percentage] = 0
             random_perturbations *= indices
-            self.position -= np.clip(indices * 2, 0, 1)
-            self.position = self.position + random_perturbations
+            self.position = np.clip(self.position - indices, 0., 1.)
+            self.position += random_perturbations
             self.velocity = np.zeros_like(self.velocity)
             self.update_bests()

@@ -34,7 +34,7 @@ class Swarm:
         self.update_positions()
         self.update_bests()
         if self.is_stuck():
-            print("Mutation")
+            # print("Mutation")
             self.mutate_swarm()
 
     def update_velocities(self):
@@ -50,6 +50,7 @@ class Swarm:
     def update_positions(self):
         for particle in self.particles:
             particle.update_position()
+            particle.generate_boundary_sample()
 
     def update_bests(self):
         for particle in self.particles:

@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from keras.models import load_model
 import numpy as np
+import csv
 
 from tqdm import tqdm
 from MNIST.setup_mnist import MNIST
@@ -13,8 +14,15 @@ if __name__ == '__main__':
     label = np.argmax(model.predict(target_image.reshape(1, 28, 28, 1)))
     current_best = np.infty
     swarm = Swarm(20, target_image, label, model)
-    for i in tqdm(range(1000)):
+    with open('difference10000.csv', 'w') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Iteration', 'Difference'])
+
+    for i in tqdm(range(10000)):
         swarm.optimize()
+        with open('difference10000.csv', 'a') as file:
+            writer = csv.writer(file)
+            writer.writerow([i, np.linalg.norm(swarm.get_best_particle()[0] - swarm.get_worst_article()[0])])
         if swarm.best_fitness < current_best:
             fig, ax = plt.subplots(1, 3)
             current_best = swarm.best_fitness
