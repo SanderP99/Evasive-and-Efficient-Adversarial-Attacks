@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def line_search_to_boundary(bb_model, x_orig, x_start, label, is_targeted):
+def line_search_to_boundary(bb_model, x_orig, x_start, label, is_targeted, calls=False):
     eps = 0.4
     i = 0
     x1 = np.float32(x_start)
@@ -17,9 +17,11 @@ def line_search_to_boundary(bb_model, x_orig, x_start, label, is_targeted):
             x2 = x_candidate
 
         diff = x2 - x1
-    print("Found decision boundary after {} queries.".format(i))
-    print(f"Class of image is {label}, target is {label - 1}")
-    print(f"Distance to original is {np.linalg.norm(x_orig - x1)}")
+    # print("Found decision boundary after {} queries.".format(i))
+    # print(f"Class of image is {label}, target is {label - 1}")
+    # print(f"Distance to original is {np.linalg.norm(x_orig - x1)}")
+    if calls:
+        return x1, i
     return x1
 
 
@@ -42,12 +44,14 @@ def find_closest_img(bb_model, X_orig, X_targets, label, is_targeted):
         dists[i] = d_l2
 
     indices = np.argsort(dists)
+    calls = 0
     for index in indices:
         X_target = X_targets[index]
         pred_clsid = np.argmax(bb_model.predict(X_target.reshape((1, 28, 28, 1))))
+        calls += 1
         if (pred_clsid == label) == is_targeted:
             print("Found an image of the target class, d_l2={:.3f}.".format(dists[index]))
-            return X_target
+            return X_target, calls
 
         print("Image of target class is wrongly classified by model, skipping.")
 

@@ -1,5 +1,7 @@
 import numpy as np
 
+np.random.seed(42)
+
 
 # From: https://github.com/ttbrunner/biased_boundary_attack/blob/0a810b51e6039876c8626ca19d8575b2864f531a/utils/sampling/perlin.py
 

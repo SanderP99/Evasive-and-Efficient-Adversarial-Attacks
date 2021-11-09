@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
+import csv
 from BBA.sampling_provider import create_perlin_noise
 
 
@@ -12,8 +12,17 @@ class BiasedBoundaryAttack:
         self.calls = 0
 
     def run_attack(self, x_orig, label, is_targeted, x_start, n_calls_left, n_max_per_batch=50, n_seconds=None,
-                   source_step=1e-2, spherical_step=1e-2, mask=None, recalc_mask_every=None):
+                   source_step=1e-2, spherical_step=1e-2, mask=None, recalc_mask_every=None, pso=False, output=False, filename=None):
         self.calls = 0
+        if output:
+            assert filename is not None
+            self.calls = 10000 - n_calls_left()
+            with open(filename, 'w') as file:
+                writer = csv.writer(file)
+                writer.writerow(['Queries', 'Distance'])
+            with open(filename, 'a') as file:
+                writer = csv.writer(file)
+                writer.writerow([self.calls, np.linalg.norm(x_orig - x_start)])
         assert len(x_orig.shape) == 3
         assert len(x_start.shape) == 3
 
@@ -32,6 +41,10 @@ class BiasedBoundaryAttack:
         last_mask_recalc_calls = n_calls_left()
 
         while n_calls_left() > 0:
+            if output:
+                with open(filename, 'a') as file:
+                    writer = csv.writer(file)
+                    writer.writerow([self.calls, np.linalg.norm(x_orig - x_adv_best)])
             if recalc_mask_every is not None and last_mask_recalc_calls - n_calls_left() >= recalc_mask_every:
                 new_mask = np.abs(x_adv_best - x_orig)
                 new_mask /= np.max(new_mask)  # scale to [0,1]
@@ -46,7 +59,7 @@ class BiasedBoundaryAttack:
 
             for i in range(n_candidates):
                 candidate = self.generate_candidate(i, n_candidates, x_orig, x_adv_best, mask, source_step,
-                                                           spherical_step)
+                                                    spherical_step)
                 candidate_label, dist = self._eval_sample(candidate, x_orig)
                 # print(candidate_label, label)
                 if (candidate_label == label) == is_targeted:
@@ -55,6 +68,8 @@ class BiasedBoundaryAttack:
                         x_adv_best = candidate
                         best_distance = dist
                         break
+            if pso:
+                return candidate
         return x_adv_best
 
     def _eval_sample(self, x, x_orig_normed=None):
@@ -76,7 +91,7 @@ class BiasedBoundaryAttack:
         sampling_fn = create_perlin_noise
 
         candidate = self.generate_boundary_sample(x_orig, x_adv_best, mask, c_source_step, c_spherical_step,
-                                                         sampling_fn)
+                                                  sampling_fn)
 
         return candidate
 

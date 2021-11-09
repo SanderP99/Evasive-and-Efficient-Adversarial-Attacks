@@ -17,7 +17,6 @@ class ParticleBiasedBoundaryAttack:
             i in range(n_particles)]
 
         self.best_position, self.best_fitness = self.get_best_particle()
-        print(self.best_fitness)
 
         self.target_img = target_img
         self.target_label = target_label
