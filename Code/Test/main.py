@@ -11,6 +11,7 @@ if __name__ == '__main__':
     mnist = MNIST()
     model = load_model('../MNIST/models/mnist', compile=False)
     target_image = mnist.test_data[500]
+    print(np.min(target_image))
     label = np.argmax(model.predict(target_image.reshape(1, 28, 28, 1)))
     current_best = np.infty
     swarm = Swarm(20, target_image, label, model)

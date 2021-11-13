@@ -44,7 +44,7 @@ def main():
 
     labels = np.argmax(mnist.test_labels, axis=1)
     labels = mnist.test_data[labels == target_label]
-    for n_particles in [10]:
+    for n_particles in [5, 10]:
     # n_particles = 5
         inits = labels[:n_particles]
         swarm = ParticleBiasedBoundaryAttack(n_particles=n_particles, model=bb_model,
