@@ -1,18 +1,16 @@
-import matplotlib.pyplot as plt
 import numpy as np
 from keras.models import load_model
 from tqdm import tqdm
 import csv
 
 from BBA.bba import BiasedBoundaryAttack
-from BBA.bba_pso import ParticleBiasedBoundaryAttack
+from Attacks.TargetedBBA.bba_pso import ParticleBiasedBoundaryAttack
 from BBA.sampling_provider import create_perlin_noise
-from BBA.utils import find_closest_img, line_search_to_boundary
 from MNIST.setup_mnist import MNIST
 
 
 def main():
-    bb_model = load_model('../MNIST/models/mnist', compile=False)
+    bb_model = load_model('../../MNIST/models/mnist', compile=False)
     mnist = MNIST()
 
     bba_attack = BiasedBoundaryAttack(bb_model, create_perlin_noise)

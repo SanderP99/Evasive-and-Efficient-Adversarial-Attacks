@@ -7,7 +7,7 @@ import ast
 from keras.models import load_model
 from tqdm import tqdm
 
-from BBA.bba_pso import ParticleBiasedBoundaryAttack
+from Attacks.TargetedBBA.bba_pso import ParticleBiasedBoundaryAttack
 from MNIST.setup_mnist import MNIST
 
 
@@ -30,7 +30,7 @@ def main():
                                                  target_img=x_orig,
                                                  target_label=experiment.y_target, inits=random_inits)
             n_calls_max = 10000
-            filename = f'../BBA/distance_files/distances_pso_{experiment.name}_{experiment.y_target}_{n_particles}_random.csv'
+            filename = f'../Attacks/TargetedBBA/distance_files/distances_pso_{experiment.name}_{experiment.y_target}_{n_particles}_random.csv'
             with open(filename, 'w') as file:
                 writer = csv.writer(file)
                 writer.writerow(['Queries', 'Distance'])
@@ -50,7 +50,7 @@ def main():
                                                  target_img=x_orig,
                                                  target_label=experiment.y_target, inits=closest_inits)
             current_best = np.infty
-            filename = f'../BBA/distance_files/distances_pso_{experiment.name}_{experiment.y_target}_{n_particles}_closest.csv'
+            filename = f'../Attacks/TargetedBBA/distance_files/distances_pso_{experiment.name}_{experiment.y_target}_{n_particles}_closest.csv'
             with open(filename, 'w') as file:
                 writer = csv.writer(file)
                 writer.writerow(['Queries', 'Distance'])

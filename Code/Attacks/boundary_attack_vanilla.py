@@ -55,10 +55,10 @@ if __name__ == '__main__':
     raw_advs, clipped_advs, success = attack(fmodel, target_images, labels, epsilons=None)
 
     # # raw_advs, clipped_advs, success = attack(fmodel, target_images, labels, epsilons=epsilons)
-    f = open('raw.txt', 'wb')
+    f = open('UntargetedBBA/raw.txt', 'wb')
     pickle.dump(raw_advs, f)
     f.close()
-    with open('clipped.txt', 'wb') as f:
+    with open('UntargetedBBA/clipped.txt', 'wb') as f:
         pickle.dump(clipped_advs, f)
 
     plt.imshow(np.array(clipped_advs[0]).reshape((28, 28, 1)))

@@ -9,7 +9,7 @@ from Test.swarm import Swarm
 
 if __name__ == '__main__':
     mnist = MNIST()
-    model = load_model('../MNIST/models/mnist', compile=False)
+    model = load_model('../../MNIST/models/mnist', compile=False)
     target_image = mnist.test_data[500]
     print(np.min(target_image))
     label = np.argmax(model.predict(target_image.reshape(1, 28, 28, 1)))

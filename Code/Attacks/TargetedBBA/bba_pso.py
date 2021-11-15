@@ -1,7 +1,5 @@
-import numpy as np
-
 from BBA.bba import BiasedBoundaryAttack
-from BBA.particle import Particle
+from Attacks.TargetedBBA.particle import Particle
 from BBA.sampling_provider import create_perlin_noise
 
 
