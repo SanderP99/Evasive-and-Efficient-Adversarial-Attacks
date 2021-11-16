@@ -3,9 +3,9 @@ from keras.models import load_model
 from tqdm import tqdm
 import csv
 
-from BBA.bba import BiasedBoundaryAttack
+from bba import BiasedBoundaryAttack
 from Attacks.TargetedBBA.bba_pso import ParticleBiasedBoundaryAttack
-from BBA.sampling_provider import create_perlin_noise
+from sampling_provider import create_perlin_noise
 from MNIST.setup_mnist import MNIST
 
 

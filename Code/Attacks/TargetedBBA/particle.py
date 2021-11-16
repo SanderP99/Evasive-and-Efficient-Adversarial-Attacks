@@ -2,7 +2,7 @@ from functools import total_ordering
 
 import numpy as np
 
-from BBA.utils import line_search_to_boundary
+from Attacks.TargetedBBA.utils import line_search_to_boundary
 
 
 @total_ordering

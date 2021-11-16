@@ -4,7 +4,7 @@ import numpy.ma as ma
 
 from functools import total_ordering
 
-from Test.perlin import create_perlin_noise
+from perlin import create_perlin_noise
 
 
 @total_ordering

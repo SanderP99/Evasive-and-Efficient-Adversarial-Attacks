@@ -1,11 +1,11 @@
-from BBA.bba import BiasedBoundaryAttack
+from Attacks.TargetedBBA.bba import BiasedBoundaryAttack
 from Attacks.TargetedBBA.particle import Particle
-from BBA.sampling_provider import create_perlin_noise
+from Attacks.TargetedBBA.sampling_provider import create_perlin_noise
 
 
 class ParticleBiasedBoundaryAttack:
 
-    def __init__(self, n_particles, inits, target_img, target_label, model):
+    def __init__(self, n_particles, inits, target_img, target_label, model, distributed=False):
         assert n_particles == len(inits)
         self.total_queries = 0
         self.iteration = 0

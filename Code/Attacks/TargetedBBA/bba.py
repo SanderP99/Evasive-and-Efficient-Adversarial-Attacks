@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import csv
-from BBA.sampling_provider import create_perlin_noise
+
+from Attacks.TargetedBBA.sampling_provider import create_perlin_noise
 
 
 class BiasedBoundaryAttack:

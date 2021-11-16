@@ -5,7 +5,7 @@ import csv
 
 from tqdm import tqdm
 from MNIST.setup_mnist import MNIST
-from Test.swarm import Swarm
+from swarm import Swarm
 
 if __name__ == '__main__':
     mnist = MNIST()

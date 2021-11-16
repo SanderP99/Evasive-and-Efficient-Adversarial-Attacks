@@ -1,6 +1,6 @@
 import numpy as np
 
-from Test.particle import Particle
+from particle import Particle
 
 
 class Swarm:
