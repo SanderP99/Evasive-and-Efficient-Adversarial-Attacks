@@ -45,9 +45,9 @@ def main():
     for n_particles in [5, 10]:
     # n_particles = 5
         inits = labels[:n_particles]
-        swarm = ParticleBiasedBoundaryAttack(n_particles=n_particles, model=bb_model,
-                                             target_img=mnist.test_data[image_index],
-                                             target_label=target_label, inits=inits)
+        swarm = ParticleBiasedBoundaryAttack(n_particles=n_particles, inits=inits,
+                                             target_img=mnist.test_data[image_index], target_label=target_label,
+                                             model=bb_model)
         current_best = np.infty
         filename = f'distance_files/distances_pso_{image_index}_{target_label}_{n_particles}.csv'
         with open(filename, 'w') as file:

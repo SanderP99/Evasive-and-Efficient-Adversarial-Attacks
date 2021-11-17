@@ -5,10 +5,15 @@ from Attacks.TargetedBBA.bba_pso import ParticleBiasedBoundaryAttack
 
 
 class DistributedBiasedBoundaryAttack:
-    def __init__(self, n_particles, inits, target_img, target_label, model, distribution_scheme):
-        self.swarm = ParticleBiasedBoundaryAttack(n_particles, inits, target_img, target_label, model, distributed=True)
-        self.nodes = [Node(i) for i in range(n_particles)]
-        self.mapping = deque(list(range(n_particles)))
+    def __init__(self, n_particles, inits, target_img, target_label, model, distribution_scheme, n_nodes=None):
+        if n_nodes is None:
+            self.n_nodes = n_particles
+        else:
+            self.n_nodes = n_nodes
+
+        self.swarm = ParticleBiasedBoundaryAttack(n_particles, inits, target_img, target_label, model)
+        self.nodes = [Node(i) for i in range(self.n_nodes)]
+        self.mapping = deque(list(range(self.n_nodes)))
         self.distribution_scheme = distribution_scheme
 
     def attack(self):

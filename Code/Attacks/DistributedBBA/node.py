@@ -11,7 +11,8 @@ class Node:
         self.queries = deque(maxlen=chunk_size)
         self.particles = deque(maxlen=chunk_size)
         self.detector = SimilarityDetector(k=k, chunk_size=chunk_size, threshold=0.449137,
-                                           weights_path='../../Defense/encoder_weights.h5')
+                                           # Threshold autoencoder: 0.449137
+                                           weights_path='../../Defense/MNISTencoder.h5')
 
     def add_query(self, query, particle_id):
         """

@@ -5,7 +5,7 @@ from Attacks.TargetedBBA.sampling_provider import create_perlin_noise
 
 class ParticleBiasedBoundaryAttack:
 
-    def __init__(self, n_particles, inits, target_img, target_label, model, distributed=False):
+    def __init__(self, n_particles, inits, target_img, target_label, model):
         assert n_particles == len(inits)
         self.total_queries = 0
         self.iteration = 0

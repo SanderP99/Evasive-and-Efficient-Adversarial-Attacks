@@ -1,7 +1,7 @@
 import numpy as np
 import sklearn.metrics.pairwise as pairwise
 import gc
-from Defense.vaencoder import mnist_encoder
+from Defense.vaencoder import mnist_encoder, mnist_auto_encoder
 
 
 def calculate_thresholds(training_data, k, encoder=lambda x: x, p=1000, up_to_k=False):
@@ -67,7 +67,7 @@ class Detector:
         raise NotImplementedError("Must implement your own encode function!")
 
     def process(self, queries):
-        queries = self.encode(queries)[0]
+        queries = self.encode(queries)
         for query in queries:
             self.process_query(query)
 
@@ -118,5 +118,5 @@ class Detector:
 class SimilarityDetector(Detector):
 
     def _init_encoder(self, weights_path):
-        self.encoder = mnist_encoder(weights=weights_path)
+        self.encoder = mnist_encoder(weights_path)
         self.encode = lambda x: self.encoder.predict(x)

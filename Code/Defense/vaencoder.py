@@ -1,6 +1,6 @@
 from keras import backend as K, losses
 from keras.layers import Dense, Reshape, Input, Lambda
-from keras.models import Model
+from keras.models import Model, load_model
 
 from MNIST.setup_mnist import MNIST
 
@@ -46,7 +46,7 @@ def create_vae_model(original_dim=784, intermediate_dim=64, latent_dim=32):
     encoder.save_weights('encoder_weights.h5')
 
 
-def mnist_encoder(original_dim=784, intermediate_dim=64, latent_dim=32, weights=None):
+def mnist_auto_encoder(original_dim=784, intermediate_dim=64, latent_dim=32, weights=None):
     inputs = Input(shape=(28, 28, 1))
     reshaped_inputs = Reshape((original_dim,))(inputs)
     h = Dense(intermediate_dim, activation='relu')(reshaped_inputs)
@@ -64,3 +64,8 @@ def mnist_encoder(original_dim=784, intermediate_dim=64, latent_dim=32, weights=
 
     encoder.load_weights(weights)
     return encoder
+
+
+def mnist_encoder(path_to_model):
+    model = load_model(path_to_model, compile=False)
+    return model

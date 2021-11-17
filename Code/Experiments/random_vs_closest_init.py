@@ -26,9 +26,8 @@ def main():
             targets = ast.literal_eval(experiment.targets)
             random_inits = mnist.test_data[
                 np.array(targets)[np.random.choice(len(targets), size=n_particles, replace=False)]]
-            swarm = ParticleBiasedBoundaryAttack(n_particles=n_particles, model=bb_model,
-                                                 target_img=x_orig,
-                                                 target_label=experiment.y_target, inits=random_inits)
+            swarm = ParticleBiasedBoundaryAttack(n_particles=n_particles, inits=random_inits, target_img=x_orig,
+                                                 target_label=experiment.y_target, model=bb_model)
             n_calls_max = 10000
             filename = f'../Attacks/TargetedBBA/distance_files/distances_pso_{experiment.name}_{experiment.y_target}_{n_particles}_random.csv'
             with open(filename, 'w') as file:
@@ -46,9 +45,8 @@ def main():
                     writer.writerow([swarm.total_queries, swarm.best_fitness])
                 # if swarm.total_queries > n_calls_max:
                 #     break
-            swarm = ParticleBiasedBoundaryAttack(n_particles=n_particles, model=bb_model,
-                                                 target_img=x_orig,
-                                                 target_label=experiment.y_target, inits=closest_inits)
+            swarm = ParticleBiasedBoundaryAttack(n_particles=n_particles, inits=closest_inits, target_img=x_orig,
+                                                 target_label=experiment.y_target, model=bb_model)
             current_best = np.infty
             filename = f'../Attacks/TargetedBBA/distance_files/distances_pso_{experiment.name}_{experiment.y_target}_{n_particles}_closest.csv'
             with open(filename, 'w') as file:
