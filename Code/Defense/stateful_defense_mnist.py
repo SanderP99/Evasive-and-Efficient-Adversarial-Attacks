@@ -5,17 +5,19 @@ from MNIST.setup_mnist import MNIST
 
 
 def create_stateful_mnist_defence():
-    # mnist = MNIST()
-    # x_train = np.array(mnist.train_data)
-    # 0.449137 = threshold
-    detector = SimilarityDetector(50, threshold=0.449137, weights_path='encoder_weights.h5')
-    return detector
+    mnist = MNIST()
+    x_train = np.array(mnist.train_data)
+    # 0.449137 = threshold VAE
+    # 0.00926118174381554 = threshold SE
+    return SimilarityDetector(50, threshold=0.00926118174381554, weights_path='MNISTencoder.h5')
 
 
 if __name__ == '__main__':
     detector = create_stateful_mnist_defence()
+    print(detector.threshold)
     mnist = MNIST()
     x_train = np.array(mnist.train_data)
+
     perm = np.random.permutation(x_train.shape[0])
 
     benign_queries = x_train[perm[:1000], :, :, :]

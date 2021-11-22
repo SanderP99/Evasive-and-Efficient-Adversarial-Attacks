@@ -5,7 +5,8 @@ from Defense.vaencoder import mnist_encoder, mnist_auto_encoder
 
 
 def calculate_thresholds(training_data, k, encoder=lambda x: x, p=1000, up_to_k=False):
-    data = np.array(encoder(training_data))[0]
+    print(training_data.shape)
+    data = np.array(encoder(training_data))
     print(data.shape)
 
     dists = None
@@ -20,7 +21,7 @@ def calculate_thresholds(training_data, k, encoder=lambda x: x, p=1000, up_to_k=
         else:
             dists = np.concatenate([dists, distance_mat_k])
 
-    # distance_mat = np.concatenate(dists)
+    distance_mat = dists
     start = 0 if up_to_k else k
 
     thresholds = []

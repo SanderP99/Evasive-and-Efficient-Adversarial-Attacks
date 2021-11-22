@@ -10,7 +10,7 @@ class Node:
         self.idx = idx
         self.queries = deque(maxlen=chunk_size)
         self.particles = deque(maxlen=chunk_size)
-        self.detector = SimilarityDetector(k=k, chunk_size=chunk_size, threshold=0.449137,
+        self.detector = SimilarityDetector(k=k, chunk_size=chunk_size, threshold=0.00926118174381554,
                                            # Threshold autoencoder: 0.449137
                                            weights_path='../../Defense/MNISTencoder.h5')
 
