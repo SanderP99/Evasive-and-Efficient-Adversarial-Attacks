@@ -59,6 +59,103 @@
 \end{frame}
 
 \subsection{Related work}
+%% Particle Swarm Optimization
+\begin{frame}{Particle Swarm Optimization (PSO)}
+\begin{itemize}
+	\item Optimization framework
+	\item Inspired by flocking of birds
+	\begin{itemize}
+		\item Each particle has a position and corresponding fitness
+		\item Move based on personal best fitness, group best fitness and inertia 
+	\end{itemize}
+\end{itemize}
+	\tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt  
+	      
+\begin{figure}
+\centering
+\scalebox{0.5}{%
+\begin{tikzpicture}[x=0.75pt,y=0.75pt,yscale=-1,xscale=1]
+
+%uncomment if require: \path (0,300); %set diagram left start at 0, and has height of 300
+
+%Shape: Circle [id:dp06935534605548432] 
+\draw  [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ,fill opacity=1 ] (100,161) .. controls (100,152.16) and (107.16,145) .. (116,145) .. controls (124.84,145) and (132,152.16) .. (132,161) .. controls (132,169.84) and (124.84,177) .. (116,177) .. controls (107.16,177) and (100,169.84) .. (100,161) -- cycle ;
+%Straight Lines [id:da36297070749556615] 
+\draw [color={rgb, 255:red, 255; green, 0; blue, 0 }  ,draw opacity=1 ][line width=3]    (116,161) -- (109.44,250.02) ;
+\draw [shift={(109,256)}, rotate = 274.21] [fill={rgb, 255:red, 255; green, 0; blue, 0 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
+%Shape: Circle [id:dp2975589876543052] 
+\draw  [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ,fill opacity=1 ] (258,156) .. controls (258,147.16) and (265.16,140) .. (274,140) .. controls (282.84,140) and (290,147.16) .. (290,156) .. controls (290,164.84) and (282.84,172) .. (274,172) .. controls (265.16,172) and (258,164.84) .. (258,156) -- cycle ;
+%Straight Lines [id:da11974704599725938] 
+\draw [color={rgb, 255:red, 255; green, 0; blue, 0 }  ,draw opacity=1 ][line width=3]    (274,156) -- (267.44,245.02) ;
+\draw [shift={(267,251)}, rotate = 274.21] [fill={rgb, 255:red, 255; green, 0; blue, 0 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
+%Straight Lines [id:da34669530870861953] 
+\draw [color={rgb, 255:red, 0; green, 0; blue, 255 }  ,draw opacity=1 ][line width=3]    (267,251) -- (207.74,176.69) ;
+\draw [shift={(204,172)}, rotate = 51.43] [fill={rgb, 255:red, 0; green, 0; blue, 255 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
+%Straight Lines [id:da2944239439562262] 
+\draw [color={rgb, 255:red, 55; green, 158; blue, 54 }  ,draw opacity=1 ][line width=3]    (204,172) -- (217.97,148.18) ;
+\draw [shift={(221,143)}, rotate = 120.38] [fill={rgb, 255:red, 55; green, 158; blue, 54 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
+%Straight Lines [id:da9472051718664152] 
+\draw [color={rgb, 255:red, 243; green, 0; blue, 255 }  ,draw opacity=1 ][line width=2.25]  [dash pattern={on 2.53pt off 3.02pt}]  (274,156) -- (224.88,143.95) ;
+\draw [shift={(221,143)}, rotate = 13.78] [color={rgb, 255:red, 243; green, 0; blue, 255 }  ,draw opacity=1 ][line width=2.25]    (15.74,-7.06) .. controls (10.01,-3.31) and (4.76,-0.96) .. (0,0) .. controls (4.76,0.96) and (10.01,3.31) .. (15.74,7.06)   ;
+%Straight Lines [id:da8503925276289086] 
+\draw [color={rgb, 255:red, 0; green, 0; blue, 255 }  ,draw opacity=1 ][line width=3]    (116,161) -- (56.74,86.69) ;
+\draw [shift={(53,82)}, rotate = 51.43] [fill={rgb, 255:red, 0; green, 0; blue, 255 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
+%Straight Lines [id:da10251717157021911] 
+\draw [color={rgb, 255:red, 55; green, 158; blue, 54 }  ,draw opacity=1 ][line width=3]    (116,161) -- (129.97,137.18) ;
+\draw [shift={(133,132)}, rotate = 120.38] [fill={rgb, 255:red, 55; green, 158; blue, 54 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
+
+% Text Node
+\draw (46,156) node [anchor=north west][inner sep=0.75pt]   [align=left] {Particle};
+% Text Node
+\draw (115,244) node [anchor=north west][inner sep=0.75pt]   [align=left] {\textcolor[rgb]{1,0,0}{Inertia}};
+% Text Node
+\draw (38,65) node [anchor=north west][inner sep=0.75pt]  [color={rgb, 255:red, 0; green, 0; blue, 255 }  ,opacity=1 ] [align=left] {Swarm best};
+% Text Node
+\draw (94,110) node [anchor=north west][inner sep=0.75pt]  [color={rgb, 255:red, 55; green, 158; blue, 54 }  ,opacity=1 ] [align=left] {Individual best};
+% Text Node
+\draw (212,117) node [anchor=north west][inner sep=0.75pt]   [align=left] {\textcolor[rgb]{0.95,0,1}{New position}};
+
+
+\end{tikzpicture}
+}
+\caption{PSO logic, inspired by \cite{pso}}
+\label{fig:pso}
+\end{figure}
+
+
+\end{frame}
+
+
+%% Adversarial attack
+\begin{frame}{Adversarial attack}
+\vspace{-12pt}
+	\begin{figure}
+	\centering
+	\includegraphics[width=0.6\textwidth]{graphics/adversarial_attack.png}
+	\caption{Adversarial examples \label{fig:figure1} \cite{adversarial_attack}}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Adversarial attack}
+\begin{itemize}
+	\item White box attack
+	\begin{itemize}
+		\item Access to output
+		\item Access to model parameters
+		\item Easier to attack
+	\end{itemize}
+	\item Black box attack
+	\begin{itemize}
+		\item Access to output
+		\item \alert{No} access to model parameters
+		\item More difficult to attack
+		\item More relevant in real scenarios
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+%% Boundary Attack
 \begin{frame}{Related work}
 \begin{itemize}
 	\item Boundary attack (BA)
@@ -74,30 +171,32 @@
 
 \end{frame}
 
-\begin{frame}{Related work}
-\begin{itemize}
-	\item Boundary attack (BA)
-	\item Biased boundary Attack (BBA)
-	\begin{itemize}
-		\item Masking
-		\item Perlin noise
-	\end{itemize}
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Related work}
-\begin{itemize}
-	\item HopSkipJump attack (HSJA)
-	\vspace{6pt}
-	\begin{figure}
-	\centering
-	\includegraphics[width=0.8\textwidth]{graphics/hsj_attack.png}
-	\caption{HopSkipJump attack \cite{chen2020hopskipjumpattack}\label{fig:hsj_attack}}
-	\footnotesize
-	\flushleft
-	\end{figure}
-\end{itemize}
-\end{frame}
+%%% Biased Boundary Attack
+%\begin{frame}{Related work}
+%\begin{itemize}
+%	\item Boundary attack (BA)
+%	\item Biased boundary Attack (BBA)
+%	\begin{itemize}
+%		\item Masking
+%		\item Perlin noise
+%	\end{itemize}
+%\end{itemize}
+%\end{frame}
+%
+%%% HopSkipJump Attack
+%\begin{frame}{Related work}
+%\begin{itemize}
+%	\item HopSkipJump attack (HSJA)
+%	\vspace{6pt}
+%	\begin{figure}
+%	\centering
+%	\includegraphics[width=0.8\textwidth]{graphics/hsj_attack.png}
+%	\caption{HopSkipJump attack \cite{chen2020hopskipjumpattack}\label{fig:hsj_attack}}
+%	\footnotesize
+%	\flushleft
+%	\end{figure}
+%\end{itemize}
+%\end{frame}
 
 \subsection{Research gap}
 \begin{frame}{Research gap}
@@ -137,30 +236,29 @@
 \subsection{Research questions}
 \begin{frame}{Possible research questions}
 	\begin{exampleblock}
-	{Can PSO be used to craft adversarial examples in a decision based setting?}
+	{How can attackers cooperate in order to evade a stateful detection mechanism?}
 	\end{exampleblock}
 	\begin{exampleblock}
-	{Can PSO be used to craft the global best adversarial example in a decision based setting?}
+	{How can a single attacker distribute its queries in order to evade detection?}
 	\end{exampleblock}
 	\begin{exampleblock}
-	{Can distribution of queries help towards evading stateful detection mechanisms?}
+	{What are the advantages of distributing an adversarial attack?}
 	\end{exampleblock}
 	\begin{exampleblock}
-	{What distribution scheme triggers the least detections by a stateful detection mechanism?}
+	{What are to (dis)advantages of PSO in relation to adversarial attacks?}
 	\end{exampleblock}
-
 \end{frame}
 
 \section{Progress}
 \begin{frame}{Progress}
 \begin{itemize}
-	\item Working PSO algorithm based on Biased boundary attack (PSO-BA)
+	\item Working PSO algorithm based on boundary attack (PSO-BA)
 	\begin{figure}
 	\centering
 	\includegraphics[width=0.30\textwidth]{graphics/comparison_1_3.png}
 	\includegraphics[width=0.30\textwidth]{graphics/comparison_42_9.png}
 	\includegraphics[width=0.30\textwidth]{graphics/comparison_1302_3.png}
-	\caption{Comparison BBA and PSO-BA\label{fig:comparisons}}
+	\caption{Comparison BA and PSO-BA\label{fig:comparisons}}
 	\footnotesize
 	\flushleft
 	\end{figure}
@@ -169,7 +267,7 @@
 
 \begin{frame}[plain]{Progress}
 \begin{itemize}
-	\item Working PSO algorithm based on Biased boundary attack (PSO-BA)
+	\item Working PSO algorithm based on boundary attack (PSO-BA)
 	\item Performed experiments to show that PSO is a viable candidate
 	\begin{figure}
 	\centering
@@ -184,9 +282,9 @@
 
 \begin{frame}{Progress}
 \begin{itemize}
-	\item Working PSO algorithm based on Biased boundary attack (PSO-BA)
+	\item Working PSO algorithm based on boundary attack (PSO-BA)
 	\item Performed experiments to show that PSO is a viable candidate
-	\item Compare detections PSO-BA and BBA (Not done yet but hopefully have done this before the presentation)
+	\item Compare detections PSO-BA and BA (Not done yet but hopefully have done this before the presentation)
 \end{itemize}
 \end{frame}
 
@@ -200,7 +298,7 @@
 		\item Performing more experiments to confirm the results
 		\item Applying the algorithm on different datasets
 	\end{itemize}
-	\item Implementing a new algorithm based on PSO and HSJA
+	\item Implementing a new algorithm based on more efficient black box attacks (such as HopSkipJump attack)
 	\begin{itemize}
 		\item Comparing this algorithm with PSO-BA
 	\end{itemize}
