@@ -1,0 +1,49 @@
+\documentclass[master=cws,masteroption=ai,fleqn,english]{kulemt}
+%
+% Indien je UTF-8 karakters gebruikt, verwijder "% " uit de volgende lijn
+\setup{inputenc=utf8,
+% Vul de titel van jouw masterproef hieronder in tussen { en }.
+title={Distributed Adversarial Attacks},
+%
+% Vul hieronder namen in, steeds Voornaam Naam.
+% Indien meerdere auteurs, assessoren, assistenten, scheidt hun namen met "\and ".
+author={Sander Prenen},
+promotor={Prof. dr. ir. W. Joosen \and Dr. ir. D. Preuveneers},
+assessor={Ir.\,W. Eetveel\and W. Eetrest},
+assistant={Ir.\ A.~Assistent \and D.~Vriend}
+}
+
+
+% Kies de fonts voor de gewone tekst, bv. Latin Modern
+\setup{font=lm}
+
+% Hier kun je dan nog andere pakketten laden of eigen definities voorzien
+\usepackage{amsmath, amssymb}
+\setlength{\mathindent}{1cm}
+\setlength{\parindent}{0mm}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+% Tenslotte wordt hyperref gebruikt voor pdf bestanden.
+% Dit mag verwijderd worden voor de af te drukken versie.
+\usepackage[pdfusetitle,colorlinks,plainpages=false]{hyperref}
+
+%
+%%%%%%%%% Wijzig niets onder deze regel %%%%%%%%
+
+\begin{document}
+
+\include{preface}
+
+\tableofcontents
+
+\include{abstract}
+
+
+\mainmatter
+\include{introduction}
+\include{background}
+
+\bibliographystyle{unsrt}
+\bibliography{bibliography}
+\end{document}
