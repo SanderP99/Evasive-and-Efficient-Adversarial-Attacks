@@ -1,3 +1,5 @@
+from collections import deque
+
 import numpy as np
 import sklearn.metrics.pairwise as pairwise
 import gc
@@ -55,7 +57,7 @@ class Detector:
             print("K = %d; set threshold to: %f" % (self.k, self.threshold))
 
         self.num_queries = 0
-        self.buffer = []
+        self.buffer = deque(maxlen=chunk_size)
         # self.memory = []
         self.chunk_size = chunk_size
 
@@ -84,20 +86,12 @@ class Detector:
             dists = np.linalg.norm(queries - query, axis=-1)
             all_dists.append(dists)
 
-        # for queries in self.memory:
-        #     dists = np.linalg.norm(queries - query, axis=-1)
-        #     all_dists.append(dists)
-
         dists = np.concatenate(all_dists)
         k_nearest_dists = np.partition(dists, self.k - 1)[:self.k, None]
         k_avg_dist = np.mean(k_nearest_dists)
 
         self.buffer.append(query)
         self.num_queries += 1
-
-        if len(self.buffer) >= self.chunk_size:
-            # self.memory.append(np.stack(self.buffer, axis=0))
-            self.buffer = []
 
         is_attack = k_avg_dist < self.threshold
         if is_attack:
@@ -106,7 +100,7 @@ class Detector:
             self.clear_memory()
 
     def clear_memory(self):
-        self.buffer = []
+        self.buffer = deque(maxlen=self.chunk_size)
         # self.memory = []
 
     def get_detections(self):
