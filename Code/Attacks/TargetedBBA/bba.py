@@ -7,13 +7,14 @@ from Attacks.TargetedBBA.sampling_provider import create_perlin_noise
 
 class BiasedBoundaryAttack:
 
-    def __init__(self, model, sample_gen):
+    def __init__(self, model, sample_gen, distributed=False):
         self.blackbox_model = model
         self.sample_gen = sample_gen
         self.calls = 0
 
     def run_attack(self, x_orig, label, is_targeted, x_start, n_calls_left, n_max_per_batch=50, n_seconds=None,
-                   source_step=1e-2, spherical_step=1e-2, mask=None, recalc_mask_every=None, pso=False, output=False, filename=None):
+                   source_step=1e-2, spherical_step=1e-2, mask=None, recalc_mask_every=None, pso=False, output=False,
+                   filename=None, node=None):
         self.calls = 0
         if output:
             assert filename is not None
@@ -61,7 +62,7 @@ class BiasedBoundaryAttack:
             for i in range(n_candidates):
                 candidate = self.generate_candidate(i, n_candidates, x_orig, x_adv_best, mask, source_step,
                                                     spherical_step)
-                candidate_label, dist = self._eval_sample(candidate, x_orig)
+                candidate_label, dist = self._eval_sample(candidate, x_orig, node=node)
                 # print(candidate_label, label)
                 if (candidate_label == label) == is_targeted:
                     # print(dist, best_distance)
@@ -73,8 +74,10 @@ class BiasedBoundaryAttack:
                 return candidate
         return x_adv_best
 
-    def _eval_sample(self, x, x_orig_normed=None):
+    def _eval_sample(self, x, x_orig_normed=None, node=None):
         pred = self.blackbox_model.predict(x.reshape((1, 28, 28, 1)))
+        if node is not None:
+            node.add_to_detector(x.reshape((28, 28, 1)))
         self.calls += 1
         label = np.argmax(pred)
 

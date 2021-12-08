@@ -41,9 +41,19 @@ class Particle:
         return self.fitness < other.fitness or (
                 self.fitness == other.fitness and self.best_fitness < other.best_fitness)
 
+    def get_node(self):
+        if self.swarm.distributed_attack is not None:
+            return self.swarm.nodes[self.swarm.mapping[self.id]]
+        else:
+            return None
+
     def calculate_fitness(self):
         prediction = np.argmax(self.model.predict(np.expand_dims(self.position, axis=0)))
         self.swarm.total_queries += 1
+
+        node = self.get_node()
+        if node is not None:
+            node.add_to_detector(self.position)
 
         if (prediction == self.target_label) != self.is_targeted:
             # No longer adversarial
@@ -58,10 +68,12 @@ class Particle:
             mask = np.abs(self.position - self.target_image)
             mask /= np.max(mask)  # scale to [0,1]
             mask = mask ** 0.5  # weaken the effect a bit.
+            node = self.get_node()
             self.position = self.swarm.attack.run_attack(self.target_image, self.target_label, True, self.position,
                                                          (lambda: self.steps_per_iteration - self.swarm.attack.calls),
                                                          source_step=self.source_step,
-                                                         spherical_step=self.spherical_step, mask=mask, pso=True)
+                                                         spherical_step=self.spherical_step, mask=mask, pso=True,
+                                                         node=node)
             self.swarm.total_queries += self.swarm.attack.calls
             self.source_step *= 1.05
         else:

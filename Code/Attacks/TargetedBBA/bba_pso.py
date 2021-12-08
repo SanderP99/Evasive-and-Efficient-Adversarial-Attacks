@@ -5,22 +5,29 @@ from Attacks.TargetedBBA.sampling_provider import create_perlin_noise
 
 class ParticleBiasedBoundaryAttack:
 
-    def __init__(self, n_particles, inits, target_img, target_label, model):
+    def __init__(self, n_particles, inits, target_img, target_label, model, distributed_attack=None):
         assert n_particles == len(inits)
         self.total_queries = 0
         self.iteration = 0
+
+        self.target_img = target_img
+        self.target_label = target_label
+
+        self.model = model
+        distributed = True if distributed_attack is not None else False
+        self.attack = BiasedBoundaryAttack(model, create_perlin_noise, distributed=distributed)
+
+        if distributed_attack is not None:
+            self.distributed_attack = distributed_attack
+            self.nodes = self.distributed_attack.nodes
+            self.distribution_scheme = self.distributed_attack.distribution_scheme
+            self.mapping = self.distributed_attack.mapping
 
         self.particles = [
             Particle(i, init=inits[i], target_img=target_img, target_label=target_label, model=model, swarm=self) for
             i in range(n_particles)]
 
         self.best_position, self.best_fitness = self.get_best_particle()
-
-        self.target_img = target_img
-        self.target_label = target_label
-
-        self.model = model
-        self.attack = BiasedBoundaryAttack(model, create_perlin_noise)
 
     def get_best_particle(self):
         best_particle = min(self.particles)
