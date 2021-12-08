@@ -12,7 +12,19 @@ class DistributionScheme(ABC):
         pass
 
 
+class FixedDistribution(DistributionScheme):
+
+    def rotate(self, mapping: deque, **kwargs) -> deque:
+        return mapping
+
+    def __str__(self):
+        return 'fixed'
+
+
 class RoundRobinDistribution(DistributionScheme):
 
     def rotate(self, mapping, r=1):
         return mapping.rotate(r)
+
+    def __str__(self):
+        return 'round_robin'

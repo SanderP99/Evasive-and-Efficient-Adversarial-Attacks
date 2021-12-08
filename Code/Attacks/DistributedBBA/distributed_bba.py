@@ -1,11 +1,10 @@
-from collections import deque
-
 from Attacks.DistributedBBA.node import Node
 from Attacks.TargetedBBA.bba_pso import ParticleBiasedBoundaryAttack
 
 
 class DistributedBiasedBoundaryAttack:
-    def __init__(self, n_particles, inits, target_img, target_label, model, distribution_scheme, mapping = None, n_nodes=None):
+    def __init__(self, n_particles, inits, target_img, target_label, model, distribution_scheme, mapping=None,
+                 n_nodes=None):
         if n_nodes is None:
             self.n_nodes = n_particles
         else:
