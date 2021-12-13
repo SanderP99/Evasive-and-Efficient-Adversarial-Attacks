@@ -15,7 +15,7 @@ class ParticleBiasedBoundaryAttack:
 
         self.model = model
         distributed = True if distributed_attack is not None else False
-        self.attack = BiasedBoundaryAttack(model, create_perlin_noise, distributed=distributed)
+        self.attack = BiasedBoundaryAttack(model, create_perlin_noise)
 
         if distributed_attack is not None:
             self.distributed_attack = distributed_attack

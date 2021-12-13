@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import csv
 
@@ -7,18 +6,18 @@ from Attacks.TargetedBBA.sampling_provider import create_perlin_noise
 
 class BiasedBoundaryAttack:
 
-    def __init__(self, model, sample_gen, distributed=False):
+    def __init__(self, model, sample_gen):
         self.blackbox_model = model
         self.sample_gen = sample_gen
         self.calls = 0
 
     def run_attack(self, x_orig, label, is_targeted, x_start, n_calls_left, n_max_per_batch=50, n_seconds=None,
                    source_step=1e-2, spherical_step=1e-2, mask=None, recalc_mask_every=None, pso=False, output=False,
-                   filename=None, node=None):
+                   filename=None, node=None, maximal_calls=10000):
         self.calls = 0
         if output:
             assert filename is not None
-            self.calls = 10000 - n_calls_left()
+            self.calls = maximal_calls - n_calls_left()
             with open(filename, 'w') as file:
                 writer = csv.writer(file)
                 writer.writerow(['Queries', 'Distance'])
