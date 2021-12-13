@@ -19,12 +19,12 @@
 
 
 %%% TITLE PAGE INFO:
-\title[Distributed Adversarial Attacks]{Distributed Adversarial Attacks} %[]] will appear in footline
+\title[Distributed Adversarial Attacks]{Evading stateful defense while crafting adversarial examples using particle swarm optimization} %[]] will appear in footline
 \subtitle{Intermediate presentation}
 
 \author{Sander Prenen}
-\institute{Vera Rimmer, Ilias Tsingenopoulos}
-\date{Prof. dr. ir. W. Joosen, Dr. ir. D. Preuveneers}
+\date{Mentors: I. Tsingenopoulos, V. Rimmer}
+\institute{Thesis~supervisors:~Prof.~dr.~ir.~W.~Joosen,~Dr.~ir.~D.~Preuveneers}
 
 
 
@@ -122,8 +122,6 @@
 \caption{PSO logic, inspired by \cite{pso}}
 \label{fig:pso}
 \end{figure}
-
-
 \end{frame}
 
 
@@ -175,10 +173,12 @@
 \begin{frame}{Related work}
 \begin{itemize}
 	\item Boundary attack (BA)
-	\vspace{6pt}
+	\vspace{-32pt}
+	\hspace{5pt}
 	\begin{figure}
 	\centering
-	\includegraphics[width=0.8\textwidth]{graphics/boundary_attack.png}
+	\hspace{5pt}
+	\includegraphics[width=0.4\textwidth]{graphics/boundary_attack.png}
 	\caption{Boundary attack \cite{brendel2018decisionbased}\label{fig:boundary_attack}}
 	\footnotesize
 	\flushleft
@@ -474,7 +474,7 @@
 \end{tikzpicture}
 }
 \caption{Advantage of PSO, inspired by \cite{brendel2018decisionbased}}
-\label{fig:pso_advantage}
+\label{fig:pso_advantage_rand}
 \end{figure}
 \end{frame}
 
@@ -497,7 +497,15 @@
 \begin{itemize}
 	\item Working PSO algorithm based on boundary attack (PSO-BA)
 	\item Performed experiments to show that PSO is a viable candidate
-	\item Compare detections PSO-BA and BA (Not done yet but hopefully have done this before the presentation)
+	\item Compare detections PSO-BA and BA
+	\begin{table}
+		\begin{tabular}{r|c|c|c}
+			& Avg. $L_2$-distance & Avg. \# Detections & Avg. \# Queries \\ \hline
+		BBA	& 5.0244 &977 &25000 \\
+		PSO-BBA & 2.8841	&79	&24721 \\
+		D-PSO-BBA & 2.8841 &51 &24721 \\
+		\end{tabular}
+	\end{table}
 \end{itemize}
 \end{frame}
 
