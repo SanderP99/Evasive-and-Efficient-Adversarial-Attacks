@@ -14,12 +14,12 @@ class Node:
                                            # Threshold autoencoder: 0.449137
                                            weights_path='../../Defense/MNISTencoder.h5')
 
-    def add_query(self, query, particle_id):
+    def add_query(self, query: np.ndarray, particle_id: int) -> None:
         """
         FOR DEBUG ONLY
         """
         self.queries.append(query)
         self.particles.append(particle_id)
 
-    def add_to_detector(self, query):
+    def add_to_detector(self, query: np.ndarray) -> None:
         self.detector.process(np.expand_dims(query, axis=0))

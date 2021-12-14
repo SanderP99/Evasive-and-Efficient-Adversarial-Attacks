@@ -4,7 +4,7 @@ from Defense.detector import SimilarityDetector
 from MNIST.setup_mnist import MNIST
 
 
-def create_stateful_mnist_defence():
+def create_stateful_mnist_defence() -> SimilarityDetector:
     mnist = MNIST()
     x_train = np.array(mnist.train_data)
     # 0.449137 = threshold VAE

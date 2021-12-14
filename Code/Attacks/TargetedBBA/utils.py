@@ -1,13 +1,17 @@
+from typing import Union, Optional, Tuple
+
 import numpy as np
+from keras.models import Model
 
 
-def line_search_to_boundary(bb_model, x_orig, x_start, label, is_targeted, calls=False):
-    eps = 0.4
-    i = 0
-    x1 = np.float32(x_start)
-    x2 = np.float32(x_orig)
-    diff = x2 - x1
-    x_candidate = None
+def line_search_to_boundary(bb_model: Model, x_orig: np.ndarray, x_start: np.ndarray, label: int, is_targeted: bool,
+                            calls: bool = False) -> Union[np.ndarray, Tuple[np.ndarray, int]]:
+    eps: float = 0.4
+    i: int = 0
+    x1: np.ndarray = np.float32(x_start)
+    x2: np.ndarray = np.float32(x_orig)
+    diff: np.ndarray = x2 - x1
+    x_candidate: Optional[np.ndarray] = None
     while np.linalg.norm(diff) > eps:
         i += 1
         x_candidate = x1 + 0.5 * diff
@@ -25,7 +29,8 @@ def line_search_to_boundary(bb_model, x_orig, x_start, label, is_targeted, calls
     return x1
 
 
-def find_closest_img(bb_model, X_orig, X_targets, label, is_targeted):
+def find_closest_img(bb_model: Model, X_orig: np.ndarray, X_targets: np.ndarray, label: int,
+                     is_targeted: bool) -> (np.ndarray, int):
     """
     From a list of potential starting images, finds the closest to the original.
     Before returning, this method makes sure that the image fulfills the adversarial condition (is actually classified as the target label).
@@ -37,14 +42,14 @@ def find_closest_img(bb_model, X_orig, X_targets, label, is_targeted):
     :return: the closest image (in L2 distance) to the original that also fulfills the adversarial condition.
     """
 
-    X_orig_normed = np.float32(X_orig)
-    dists = np.empty(len(X_targets), dtype=np.float32)
+    X_orig_normed: np.ndarray = np.float32(X_orig)
+    dists: np.ndarray = np.empty(len(X_targets), dtype=np.float32)
     for i in range(len(X_targets)):
         d_l2 = np.linalg.norm((np.float32(X_targets[i, ...]) - X_orig_normed))
         dists[i] = d_l2
 
-    indices = np.argsort(dists)
-    calls = 0
+    indices: np.ndarray = np.argsort(dists)
+    calls: int = 0
     for index in indices:
         X_target = X_targets[index]
         pred_clsid = np.argmax(bb_model.predict(X_target.reshape((1, 28, 28, 1))))

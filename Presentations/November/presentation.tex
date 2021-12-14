@@ -19,7 +19,7 @@
 
 
 %%% TITLE PAGE INFO:
-\title[Distributed Adversarial Attacks]{Evading stateful defense while crafting adversarial examples using particle swarm optimization} %[]] will appear in footline
+\title[Distributed Adversarial Attacks]{Evasive and efficient distributed adversarial attacks using PSO} %[]] will appear in footline
 \subtitle{Intermediate presentation}
 
 \author{Sander Prenen}
@@ -45,15 +45,16 @@
 \section{Research topic}
 \begin{frame}{Research topic}
 \begin{itemize}
-	\item Black-box adversarial attack
+	\item Evasive and Efficient Attacks
 	\begin{itemize}
-		\item Decision based
-		\item No confidence scores
+		\item Evade stateful defense
+		\item By being efficient (less queries)
+		\item By distribution
 	\end{itemize}
-
 	\item Distribution
 	\begin{itemize}
-		\item Particle swarm optimization (PSO)
+		\item Distribute the work
+		\item Distribute points of attack
 	\end{itemize}
 \end{itemize}
 \end{frame}
@@ -138,35 +139,29 @@
 \begin{frame}{Adversarial attack}
 \begin{itemize}
 	\item White box attack
-	\begin{itemize}
-		\item Access to output
-		\item Access to model parameters
-		\item Easier to attack
-	\end{itemize}
 	\item Black box attack
 	\begin{itemize}
-		\item Access to output
-		\item \alert{No} access to model parameters
-		\item More difficult to attack
-		\item More relevant in real scenarios
+		\item More relevant in security use-cases
+		\item Bypassing malware detection
+		\item Bypassing intrusion detection systems
 	\end{itemize}
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Adversarial attack}
-\begin{itemize}
-	\item Untargeted attack
-	\begin{itemize}
-		\item Misclassify to \alert{any} label
-		\item Easier to create adversarial examples
-	\end{itemize}
-	\item Targeted attack
-	\begin{itemize}
-		\item Misclassify to \alert{specific} label
-		\item More relevant in real scenarios
-	\end{itemize}
-\end{itemize}
-\end{frame}
+%\begin{frame}{Adversarial attack}
+%\begin{itemize}
+%	\item Untargeted attack
+%	\begin{itemize}
+%		\item Misclassify to \alert{any} label
+%		\item Easier to create adversarial examples
+%	\end{itemize}
+%	\item Targeted attack
+%	\begin{itemize}
+%		\item Misclassify to \alert{specific} label
+%		\item More relevant in real scenarios
+%	\end{itemize}
+%\end{itemize}
+%\end{frame}
 
 
 %% Boundary Attack
@@ -199,23 +194,22 @@
 %\end{itemize}
 %\end{frame}
 %
-%%% HopSkipJump Attack
-%\begin{frame}{Related work}
-%\begin{itemize}
-%	\item HopSkipJump attack (HSJA)
-%	\vspace{6pt}
-%	\begin{figure}
-%	\centering
-%	\includegraphics[width=0.8\textwidth]{graphics/hsj_attack.png}
-%	\caption{HopSkipJump attack \cite{chen2020hopskipjumpattack}\label{fig:hsj_attack}}
-%	\footnotesize
-%	\flushleft
-%	\end{figure}
-%\end{itemize}
-%\end{frame}
+%% HopSkipJump Attack
+\begin{frame}{Related work}
+\begin{itemize}
+	\item HopSkipJump attack (HSJA)
+	\vspace{6pt}
+	\begin{figure}
+	\centering
+	\includegraphics[width=0.8\textwidth]{graphics/hsj_attack.png}
+	\caption{HopSkipJump attack \cite{chen2020hopskipjumpattack}\label{fig:hsj_attack}}
+	\footnotesize
+	\flushleft
+	\end{figure}
+\end{itemize}
+\end{frame}
 
-\subsection{Research gap}
-\begin{frame}{Research gap}
+\begin{frame}{Related work}
 	\begin{itemize}
 	\item Stateful detection
 	
@@ -231,7 +225,7 @@
 	\end{itemize}
 \end{frame}
 
-\begin{frame}{Research gap}
+\begin{frame}{Related work}
 \begin{itemize}
 	\item Stateful detection
 	\begin{itemize}
@@ -239,15 +233,25 @@
 		\item User can be uniquely identified
 		\item No cooperation between users
 	\end{itemize}
-	
+\end{itemize}
+\end{frame}
+
+\subsection{Research gap}
+\begin{frame}{Research gap}
+\begin{itemize}	
 	\item Distribution
 	\begin{itemize}
-		\item Evade the stateful detection algorithm
-		\item Cooperate to craft better adversarial examples in fewer queries
+		\item Dual goal
+		\begin{itemize}
+			\item Evade detection
+			\item Improve existing attacks using PSO
+		\end{itemize}
 	\end{itemize}
 	
 	\item Existing work
 	\begin{itemize}
+		\item Uses PSO as algorithm in itself
+		\item Does not evaluate against stateful detection 
 		\item Uses confidence scores \cite{10.1007/978-3-030-59013-0_22, s20247158}
 	\end{itemize}
 \end{itemize}
@@ -264,11 +268,7 @@
 	\end{exampleblock}
 	
 	\begin{exampleblock}
-	{How can a single attacker distribute its queries in order to evade detection?}
-	\end{exampleblock}
-	
-	\begin{exampleblock}
-	{What are the (dis)advantages of PSO in relation to adversarial attacks?}
+	{What are the (dis)advantages of using PSO in relation to vanilla adversarial attacks?}
 	\end{exampleblock}
 \end{frame}
 
@@ -501,7 +501,7 @@
 	\begin{table}
 		\begin{tabular}{r|c|c|c}
 			& Avg. $L_2$-distance & Avg. \# Detections & Avg. \# Queries \\ \hline
-		BBA	& 5.0244 &977 &25000 \\
+		BBA	& 2.9868 &148 &25010 \\
 		PSO-BBA & 2.8841	&79	&24721 \\
 		D-PSO-BBA & 2.8841 &51 &24721 \\
 		\end{tabular}
@@ -509,8 +509,8 @@
 \end{itemize}
 \end{frame}
 
-\section{Future work}
-\begin{frame}{Future work}
+\section{Evaluation plan}
+\begin{frame}{Evaluation plan}
 \begin{itemize}
 	\item Improving the existing PSO-BA
 	\begin{itemize}

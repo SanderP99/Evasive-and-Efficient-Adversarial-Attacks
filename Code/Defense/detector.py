@@ -1,4 +1,5 @@
 from collections import deque
+from typing import Optional, Callable
 
 import numpy as np
 import sklearn.metrics.pairwise as pairwise
@@ -6,7 +7,9 @@ import gc
 from Defense.vaencoder import mnist_encoder, mnist_auto_encoder
 
 
-def calculate_thresholds(training_data, k, encoder=lambda x: x, p=1000, up_to_k=False):
+def calculate_thresholds(training_data: np.ndarray, k: int, encoder: Callable[[np.ndarray], np.ndarray] = lambda x: x,
+                         p: int = 1000,
+                         up_to_k: bool = False) -> (list, list):
     print(training_data.shape)
     data = np.array(encoder(training_data))
     print(data.shape)
@@ -40,7 +43,8 @@ def calculate_thresholds(training_data, k, encoder=lambda x: x, p=1000, up_to_k=
 
 class Detector:
 
-    def __init__(self, k, threshold=None, training_data=None, chunk_size=1000, weights_path='./encoder_1.h5'):
+    def __init__(self, k: int, threshold: float = None, training_data: np.ndarray = None, chunk_size: int = 1000,
+                 weights_path: str = './encoder_1.h5'):
         self.k = k
         self.threshold = threshold
         self.training_data = training_data
@@ -65,16 +69,16 @@ class Detector:
         self.history_by_attack = []
         self.detected_dists = []  # Tracks knn-dist that was detected
 
-    def _init_encoder(self, weights_path):
+    def _init_encoder(self, weights_path: str) -> None:
         self.encode = lambda x: x
         raise NotImplementedError("Must implement your own encode function!")
 
-    def process(self, queries):
+    def process(self, queries: np.ndarray) -> None:
         queries = self.encode(queries)
         for query in queries:
             self.process_query(query)
 
-    def process_query(self, query):
+    def process_query(self, query: np.ndarray) -> Optional[bool]:
         if len(self.buffer) < self.k:
             self.buffer.append(query)
             self.num_queries += 1
@@ -99,11 +103,11 @@ class Detector:
             self.detected_dists.append(k_avg_dist)
             self.clear_memory()
 
-    def clear_memory(self):
+    def clear_memory(self) -> None:
         self.buffer = deque(maxlen=self.chunk_size)
         # self.memory = []
 
-    def get_detections(self):
+    def get_detections(self) -> list:
         epochs = []
         for i in range(len(self.history) - 1):
             epochs.append(self.history[i + 1] - self.history[i])
@@ -112,6 +116,6 @@ class Detector:
 
 class SimilarityDetector(Detector):
 
-    def _init_encoder(self, weights_path):
+    def _init_encoder(self, weights_path: str) -> None:
         self.encoder = mnist_encoder(weights_path)
         self.encode = lambda x: self.encoder.predict(x)

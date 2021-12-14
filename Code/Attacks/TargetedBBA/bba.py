@@ -1,19 +1,26 @@
+from typing import Optional, Union, Tuple
+
 import numpy as np
 import csv
 
+from keras.models import Model
+
+from Attacks.DistributedBBA.node import Node
 from Attacks.TargetedBBA.sampling_provider import create_perlin_noise
 
 
 class BiasedBoundaryAttack:
 
-    def __init__(self, model, sample_gen):
-        self.blackbox_model = model
+    def __init__(self, model: Model, sample_gen):
+        self.blackbox_model: Model = model
         self.sample_gen = sample_gen
-        self.calls = 0
+        self.calls: int = 0
 
-    def run_attack(self, x_orig, label, is_targeted, x_start, n_calls_left, n_max_per_batch=50, n_seconds=None,
-                   source_step=1e-2, spherical_step=1e-2, mask=None, recalc_mask_every=None, pso=False, output=False,
-                   filename=None, node=None, maximal_calls=10000):
+    def run_attack(self, x_orig: np.ndarray, label: int, is_targeted: bool, x_start: np.ndarray, n_calls_left,
+                   n_max_per_batch: int = 50, n_seconds: Optional[int] = None, source_step: float = 1e-2,
+                   spherical_step: float = 1e-2, mask: Optional[np.ndarray] = None,
+                   recalc_mask_every=None, pso: bool = False, output: bool = False, filename: Optional[str] = None,
+                   node: Optional[Node] = None, maximal_calls: int = 10000) -> Optional[np.ndarray]:
         self.calls = 0
         if output:
             assert filename is not None
@@ -73,7 +80,8 @@ class BiasedBoundaryAttack:
                 return candidate
         return x_adv_best
 
-    def _eval_sample(self, x, x_orig_normed=None, node=None):
+    def _eval_sample(self, x: np.ndarray, x_orig_normed: Optional[np.ndarray] = None, node: Optional[Node] = None) -> \
+            Union[int, Tuple[int, float]]:
         pred = self.blackbox_model.predict(x.reshape((1, 28, 28, 1)))
         if node is not None:
             node.add_to_detector(x.reshape((28, 28, 1)))
@@ -86,7 +94,8 @@ class BiasedBoundaryAttack:
             d = np.linalg.norm(x - x_orig_normed)
             return label, d
 
-    def generate_candidate(self, i, n, x_orig, x_adv_best, mask, source_step, spherical_step):
+    def generate_candidate(self, i: int, n: int, x_orig: np.ndarray, x_adv_best: np.ndarray, mask: np.ndarray,
+                           source_step: float, spherical_step: float) -> np.ndarray:
         # Scale both spherical and source step with i.
         scale = (1. - i / n) + 0.3
         c_source_step = source_step * scale
@@ -98,7 +107,8 @@ class BiasedBoundaryAttack:
 
         return candidate
 
-    def generate_boundary_sample(self, x_orig, x_adv_best, mask, source_step, spherical_step, sampling_fn):
+    def generate_boundary_sample(self, x_orig: np.ndarray, x_adv_best: np.ndarray, mask: np.ndarray, source_step: float,
+                                 spherical_step: float, sampling_fn) -> np.ndarray:
         unnormalized_source_direction = np.float32(x_orig) - np.float32(x_adv_best)
         source_norm = np.linalg.norm(unnormalized_source_direction)
         source_direction = unnormalized_source_direction / source_norm

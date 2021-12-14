@@ -27,7 +27,7 @@ if __name__ == '__main__':
     n_experiments = 5
     n_particles = 1
     max_queries = 25000
-    for i in range(1, n_experiments):
+    for i in range(n_experiments):
         for n_nodes in [1]:
             np.random.seed(42)
             if n_nodes == 1:

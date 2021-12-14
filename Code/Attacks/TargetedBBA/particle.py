@@ -1,53 +1,57 @@
 from functools import total_ordering
+from typing import Optional
 
 import numpy as np
+from keras.models import Model
 
+from Attacks.DistributedBBA.node import Node
 from Attacks.TargetedBBA.utils import line_search_to_boundary
 
 
 @total_ordering
 class Particle:
 
-    def __init__(self, i, init=None, target_img=None, target_label=0, model=None, swarm=None, is_targeted=True):
-        self.id = i
-        self.position = init
-        self.velocity = np.random.randn(*self.position.shape)
+    def __init__(self, i: int, init: np.ndarray = None, target_img: np.ndarray = None, target_label: int = 0,
+                 model: Model = None, swarm=None, is_targeted: bool = True):
+        self.id: int = i
+        self.position: np.ndarray = init
+        self.velocity: np.ndarray = np.random.randn(*self.position.shape) - 0.5
         self.position, calls = line_search_to_boundary(model, target_img, self.position, target_label, True, True)
-        self.is_adversarial = True
-        self.is_targeted = is_targeted
+        self.is_adversarial: bool = True
+        self.is_targeted: bool = is_targeted
 
-        self.target_image = target_img
-        self.target_label = target_label
+        self.target_image: np.ndarray = target_img
+        self.target_label: int = target_label
 
-        self.model = model
+        self.model: Model = model
         self.swarm = swarm
         self.swarm.total_queries += calls
 
-        self.steps_per_iteration = 50
-        self.fitness = np.infty
+        self.steps_per_iteration: int = 50
+        self.fitness: float = np.infty
         self.calculate_fitness()
-        self.best_position = self.position
-        self.best_fitness = self.fitness
+        self.best_position: np.ndarray = self.position
+        self.best_fitness: float = self.fitness
 
-        self.source_step = 0.25
-        self.spherical_step = 5e-2
-        self.maximum_diff = 0.4
+        self.source_step: float = 0.25
+        self.spherical_step: float = 5e-2
+        self.maximum_diff: float = 0.4
         self.c1, self.c2 = self.select_cs()
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'Particle') -> bool:
         return self.fitness == other.fitness and self.best_fitness == other.best_fitness
 
-    def __lt__(self, other):
+    def __lt__(self, other: 'Particle') -> bool:
         return self.fitness < other.fitness or (
                 self.fitness == other.fitness and self.best_fitness < other.best_fitness)
 
-    def get_node(self):
+    def get_node(self) -> Optional[Node]:
         if self.swarm.distributed_attack is not None:
             return self.swarm.nodes[self.swarm.mapping[self.id]]
         else:
             return None
 
-    def calculate_fitness(self):
+    def calculate_fitness(self) -> None:
         prediction = np.argmax(self.model.predict(np.expand_dims(self.position, axis=0)))
         self.swarm.total_queries += 1
 
@@ -63,7 +67,7 @@ class Particle:
             self.fitness = np.linalg.norm(self.position - self.target_image)
             self.is_adversarial = True
 
-    def update_position(self):
+    def update_position(self) -> None:
         if self.is_adversarial:
             mask = np.abs(self.position - self.target_image)
             mask /= np.max(mask)  # scale to [0,1]
@@ -84,30 +88,33 @@ class Particle:
             # print(np.mean(self.position))
             self.source_step *= 0.6
 
-    def update_bests(self):
+    def update_bests(self) -> None:
         self.calculate_fitness()
         # print(f"Particle {self.id}: {self.fitness}")
         if self.fitness < self.best_fitness:
             self.best_fitness = self.fitness
             self.best_position = self.position
 
-    def update_velocity(self, c1=2., c2=2.):
+    def update_velocity(self, c1: float = 2., c2: float = 2.) -> None:
         w = self.calculate_w(1., 0., 1000)
         particle_best_delta = c2 * (self.best_position - self.position) * np.random.uniform(0., 1.,
                                                                                             self.target_image.shape)
         swarm_best_delta = c1 * (self.swarm.best_position - self.position) * np.random.uniform(0., 1.,
                                                                                                self.target_image.shape)
         deltas = particle_best_delta + swarm_best_delta
-        self.velocity += deltas
-        # self.velocity = w * np.clip(self.velocity + deltas, -1 * self.maximum_diff, self.maximum_diff)
+        # self.velocity += deltas
+        self.velocity = w * np.clip(self.velocity + deltas, -1 * self.maximum_diff, self.maximum_diff)
 
-    def calculate_w(self, w_start, w_end, max_queries):
+    def calculate_w(self, w_start: float, w_end: float, max_queries: int) -> float:
+        if self.swarm.n_particles == 1:
+            return 1.
+
         if np.all(np.equal(self.best_position, self.swarm.best_position)):
             return w_end
         else:
             return w_end + ((w_start - w_end) * (1 - (self.swarm.iteration / max_queries)))
 
-    def select_cs(self):
+    def select_cs(self) -> (float, float):
         a1, a2 = 1., 2.
         if self.id % 2 == 0:
             c1, c2 = max(a1, a2), min(a1, a2)

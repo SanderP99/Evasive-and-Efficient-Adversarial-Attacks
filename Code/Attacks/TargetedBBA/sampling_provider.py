@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 
 np.random.seed(42)
@@ -5,7 +7,8 @@ np.random.seed(42)
 
 # From: https://github.com/ttbrunner/biased_boundary_attack/blob/0a810b51e6039876c8626ca19d8575b2864f531a/utils/sampling/perlin.py
 
-def create_perlin_noise(px, seed=None, color=False, normalize=True, freq=5, precalc_fade=None):
+def create_perlin_noise(px: np.ndarray, seed: Optional[int] = None, color: Optional[bool] = False,
+                        normalize: Optional[bool] = True, freq: int = 5, precalc_fade=None):
     """
     Creates a batch of perlin noise patterns.
     :param px: image dimension. Only quadratic images are supported, i.e. (px * px * 3).
