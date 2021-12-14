@@ -4,6 +4,7 @@ from typing import Optional
 import numpy as np
 from keras.models import Model
 
+from Attacks.DistributedBBA.distribution_scheme import RoundRobinDistribution
 from Attacks.DistributedBBA.node import Node
 from Attacks.TargetedBBA.utils import line_search_to_boundary
 
@@ -47,7 +48,10 @@ class Particle:
 
     def get_node(self) -> Optional[Node]:
         if self.swarm.distributed_attack is not None:
-            return self.swarm.nodes[self.swarm.mapping[self.id]]
+            if isinstance(self.swarm.distributed_attack.distribution_scheme, RoundRobinDistribution):
+                return self.swarm.nodes[self.swarm.mapping[self.id]]
+            else:
+                return None
         else:
             return None
 
@@ -85,7 +89,6 @@ class Particle:
             self.update_velocity()
             self.position += self.velocity
             self.position = np.clip(self.position, 0, 1)
-            # print(np.mean(self.position))
             self.source_step *= 0.6
 
     def update_bests(self) -> None:
@@ -102,7 +105,6 @@ class Particle:
         swarm_best_delta = c1 * (self.swarm.best_position - self.position) * np.random.uniform(0., 1.,
                                                                                                self.target_image.shape)
         deltas = particle_best_delta + swarm_best_delta
-        # self.velocity += deltas
         self.velocity = w * np.clip(self.velocity + deltas, -1 * self.maximum_diff, self.maximum_diff)
 
     def calculate_w(self, w_start: float, w_end: float, max_queries: int) -> float:

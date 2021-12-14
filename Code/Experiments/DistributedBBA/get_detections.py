@@ -28,7 +28,7 @@ if __name__ == '__main__':
     n_particles = 1
     max_queries = 25000
     for i in range(n_experiments):
-        for n_nodes in [1]:
+        for n_nodes in [1, 5]:
             np.random.seed(42)
             if n_nodes == 1:
                 mapping = deque([0] * n_particles)
