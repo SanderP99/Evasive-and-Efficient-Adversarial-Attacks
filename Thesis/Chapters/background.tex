@@ -219,6 +219,8 @@ The expressiveness of \glspl{ann} is a double-edged sword. It is the cause for t
 
 Most research on adversarial attacks is done using images. Researchers have the most freedom in this domain, since a slightly altered image is still an image with roughly the same contents. Slightly modifying an industrial control system however, might break the entire way the system works. Research in other domains is mostly conducted by altering existing image algorithms to the specific use case. For this reason this works only focuses on adversarial attacks on images.\\ 
 
+TODO: Threat model!
+
 \subsection{Adversarial attacks terminology}
 Adversarial attacks are generally divided in two categories, white box attacks and black box attacks. In a white box attack, the attacker has complete knowledge of the classifier under attack. This knowledge consists of the architecture, parameters and thus their gradients and all output of the classifier. Examples of white box attacks are the \gls{fgsm} \cite{FGSM} or the Carlini \& Wagner attack \cite{cw_attack}.\\
 
@@ -272,6 +274,8 @@ L_\infty(X, Y) &= \lim_{p\rightarrow \infty}\left( \sum_{i=1}^d|x_i-y_i|^p\right
 In both distances $X$ and $Y$ represent the images and $(x_1, x_2, \ldots, x_i, \ldots, x_d)$ and $(y_1, y_2, \ldots, y_i, \ldots, y_d)$ are the pixel values of $X$ and $Y$ respectively. The $L_2$-distance is also known as the Euclidean distance, which is a generalization of the Pythagorean theorem in more than two dimensions. It takes the pairwise distances between all pixels into account. The $L_\infty$-distance is also called the Chebyshev distance. This distance only depends on the maximal pairwise distance between the two images. By minimizing the $L_\infty$-distance, the maximal pixelwise difference in minimized \cite{wiki_distances}. 
 
 \subsection{Adversarial defenses}
+--- Under Construction ---\\
+The existence of adversarial attacks naturally gave rise to adversarial defenses. The earliest defenses relied on 
 
 \section{Particle swarm optimization}
 \gls{pso} \cite{pso} is an optimization framework part of the \glspl{ea} family. In \glspl{ea}, populations of candidate solutions evolve based on mechanisms inspired by the field op biology, such as ant colonies \cite{aco}, mutation and recombination \cite{genetic_algorithm}. The mechanism that inspired \gls{pso} is the flocking of birds. The framework has been applied to numerous problems such as routing problems \cite{ev_transport, freight_transport}, diagnosing diseases from imaging \cite{leukemia_pso} and calculating heat transfer coefficients \cite{heat_transfer_pso}.\\
