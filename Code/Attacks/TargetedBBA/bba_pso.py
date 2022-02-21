@@ -27,7 +27,7 @@ class ParticleBiasedBoundaryAttack:
             self.distributed_attack = distributed_attack
             self.nodes: list = self.distributed_attack.nodes
             self.distribution_scheme = self.distributed_attack.distribution_scheme
-            self.mapping: deque = self.distributed_attack.mapping
+            # self.mapping: deque = self.distributed_attack.distribution_scheme.get_mapping()
 
         self.particles: list = [
             Particle(i, init=inits[i], target_img=target_img, target_label=target_label, model=model, swarm=self) for

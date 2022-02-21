@@ -18,7 +18,7 @@ class DistributedBiasedBoundaryAttack:
             self.n_nodes: int = n_nodes
 
         self.nodes: list = [Node(i) for i in range(self.n_nodes)]
-        self.mapping: deque = mapping
+        # self.mapping: deque = mapping
         self.distribution_scheme = distribution_scheme
 
         self.swarm: ParticleBiasedBoundaryAttack = ParticleBiasedBoundaryAttack(n_particles, inits, target_img,
@@ -27,15 +27,17 @@ class DistributedBiasedBoundaryAttack:
     def attack(self) -> None:
         self.swarm.optimize()
         self.process_query()
-        self.distribution_scheme(self.mapping)
+        self.distribution_scheme(positions=[particle.position for particle in self.swarm.particles])
 
     def add_to_nodes(self) -> None:
         """
         FOR DEBUG ONLY
         """
-        for p, m in zip(self.swarm.particles, self.mapping):
+        for p, m in zip(self.swarm.particles, self.distribution_scheme.get_mapping()):
             self.nodes[m].add_query(p.position, p.id)
 
     def process_query(self) -> None:
-        for p, m in zip(self.swarm.particles, self.mapping):
+        mapping = self.distribution_scheme.get_mapping(
+            positions=[particle.position for particle in self.swarm.particles])
+        for p, m in zip(self.swarm.particles, mapping):
             self.nodes[m].add_to_detector(p.position)

@@ -4,7 +4,7 @@ from typing import Optional
 import numpy as np
 from keras.models import Model
 
-from Attacks.DistributedBBA.distribution_scheme import RoundRobinDistribution
+from Attacks.DistributedBBA.distribution_scheme import RoundRobinDistribution, DistanceBasedDistributionScheme
 from Attacks.DistributedBBA.node import Node
 from Attacks.TargetedBBA.utils import line_search_to_boundary
 
@@ -49,7 +49,11 @@ class Particle:
     def get_node(self) -> Optional[Node]:
         if self.swarm.distributed_attack is not None:
             if isinstance(self.swarm.distributed_attack.distribution_scheme, RoundRobinDistribution):
-                return self.swarm.nodes[self.swarm.mapping[self.id]]
+                mapping = self.swarm.distribution_scheme.get_mapping()
+                return self.swarm.nodes[mapping[self.id]]
+            elif isinstance(self.swarm.distributed_attack.distribution_scheme, DistanceBasedDistributionScheme):
+                mapping = self.swarm.distribution_scheme.get_mapping()
+                return self.swarm.nodes[mapping[self.id]]
             else:
                 return None
         else:
