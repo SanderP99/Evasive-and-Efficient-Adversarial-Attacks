@@ -35,11 +35,11 @@ class ParticleBiasedBoundaryAttack:
             Particle(i, init=inits[i], target_img=target_img, target_label=target_label, model=model, swarm=self) for
             i in range(n_particles)]
 
-        self.best_position, self.best_fitness = self.get_best_particle()
+        self.best_position, self.best_fitness, _ = self.get_best_particle()
 
     def get_best_particle(self) -> (np.ndarray, float):
         best_particle = min(self.particles)
-        return best_particle.position, best_particle.fitness
+        return best_particle.position, best_particle.fitness, best_particle.current_label
 
     def get_worst_article(self) -> (np.ndarray, float):
         worst_particle = max(self.particles)
@@ -62,12 +62,14 @@ class ParticleBiasedBoundaryAttack:
         self.move_swarm()
 
         # Update swarm
-        current_best_position, current_best_fitness = self.get_best_particle()
+        current_best_position, current_best_fitness, _ = self.get_best_particle()
 
         if self.iteration % 100 == 0:
             fig, ax = plt.subplots(2)
-            ax[0].imshow(current_best_position)
+            ax[0].imshow(self.best_position)
+            ax[0].set_title(str(self.best_fitness))
             ax[1].imshow(self.target_img)
+            ax[1].set_title(self.target_label)
             plt.show()
 
         if current_best_fitness < self.best_fitness:

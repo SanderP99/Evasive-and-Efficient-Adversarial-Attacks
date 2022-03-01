@@ -18,6 +18,7 @@ class Particle:
         self.position: np.ndarray = init
         self.velocity: np.ndarray = np.random.randn(*self.position.shape) - 0.5
         self.position, calls = line_search_to_boundary(model, target_img, self.position, target_label, True, True)
+        self.current_label: int = -1
         self.is_adversarial: bool = True
         self.is_targeted: bool = is_targeted
 
@@ -34,7 +35,7 @@ class Particle:
         self.best_position: np.ndarray = self.position
         self.best_fitness: float = self.fitness
 
-        self.source_step: float = 0.25
+        self.source_step: float = 0.01  # 0.25 for MNIST
         self.spherical_step: float = 5e-2
         self.maximum_diff: float = 0.4
         self.c1, self.c2 = self.select_cs()
@@ -62,6 +63,7 @@ class Particle:
     def calculate_fitness(self) -> None:
         prediction = np.argmax(self.model.predict(np.expand_dims(self.position, axis=0)))
         self.swarm.total_queries += 1
+        self.current_label = prediction
 
         node = self.get_node()
         if node is not None:
