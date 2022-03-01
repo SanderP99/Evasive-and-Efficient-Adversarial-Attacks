@@ -85,7 +85,7 @@ class Particle:
                                                          (lambda: self.steps_per_iteration - self.swarm.attack.calls),
                                                          source_step=self.source_step,
                                                          spherical_step=self.spherical_step, mask=mask, pso=True,
-                                                         node=node)
+                                                         node=node, dimensions=self.position.shape)
             self.swarm.total_queries += self.swarm.attack.calls
             self.source_step *= 1.05
         else:

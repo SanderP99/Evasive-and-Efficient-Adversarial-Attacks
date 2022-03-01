@@ -1,5 +1,6 @@
 from collections import deque
 
+import matplotlib.pyplot as plt
 import numpy as np
 from keras.models import Model
 
@@ -10,7 +11,8 @@ from Attacks.TargetedBBA.sampling_provider import create_perlin_noise
 
 class ParticleBiasedBoundaryAttack:
 
-    def __init__(self, n_particles: int, inits: np.ndarray, target_img: np.ndarray, target_label: int, model: Model, distributed_attack=None):
+    def __init__(self, n_particles: int, inits: np.ndarray, target_img: np.ndarray, target_label: int, model: Model,
+                 distributed_attack=None):
         assert n_particles == len(inits)
         self.n_particles: int = n_particles
         self.total_queries: int = 0
@@ -61,6 +63,13 @@ class ParticleBiasedBoundaryAttack:
 
         # Update swarm
         current_best_position, current_best_fitness = self.get_best_particle()
+
+        if self.iteration % 100 == 0:
+            fig, ax = plt.subplots(2)
+            ax[0].imshow(current_best_position)
+            ax[1].imshow(self.target_img)
+            plt.show()
+
         if current_best_fitness < self.best_fitness:
             print(self.total_queries, current_best_fitness)
             self.best_fitness = current_best_fitness

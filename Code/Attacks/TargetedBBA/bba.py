@@ -15,13 +15,16 @@ class BiasedBoundaryAttack:
         self.blackbox_model: Model = model
         self.sample_gen = sample_gen
         self.calls: int = 0
+        self.dimensions = None
 
     def run_attack(self, x_orig: np.ndarray, label: int, is_targeted: bool, x_start: np.ndarray, n_calls_left,
                    n_max_per_batch: int = 50, n_seconds: Optional[int] = None, source_step: float = 1e-2,
                    spherical_step: float = 1e-2, mask: Optional[np.ndarray] = None,
                    recalc_mask_every=None, pso: bool = False, output: bool = False, filename: Optional[str] = None,
-                   node: Optional[Node] = None, maximal_calls: int = 10000) -> Optional[np.ndarray]:
+                   node: Optional[Node] = None, maximal_calls: int = 10000, dimensions: np.ndarray = None) -> Optional[
+        np.ndarray]:
         self.calls = 0
+        self.dimensions = dimensions
         if output:
             assert filename is not None
             self.calls = maximal_calls - n_calls_left()
@@ -82,9 +85,9 @@ class BiasedBoundaryAttack:
 
     def _eval_sample(self, x: np.ndarray, x_orig_normed: Optional[np.ndarray] = None, node: Optional[Node] = None) -> \
             Union[int, Tuple[int, float]]:
-        pred = self.blackbox_model.predict(x.reshape((1, 28, 28, 1)))
+        pred = self.blackbox_model.predict(x.reshape((1,) + self.dimensions))
         if node is not None:
-            node.add_to_detector(x.reshape((28, 28, 1)))
+            node.add_to_detector(x.reshape(self.dimensions))
         self.calls += 1
         label = np.argmax(pred)
 

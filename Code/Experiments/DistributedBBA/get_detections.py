@@ -44,12 +44,12 @@ if __name__ == '__main__':
             random_inits = mnist.test_data[
                 np.array(targets)[np.random.choice(len(targets), size=n_particles, replace=False)]]
             # distribution_scheme = RoundRobinDistribution(mapping)
-            distribution_scheme = DistanceBasedDistributionScheme(mapping, n_nodes)
+            distribution_scheme = DistanceBasedDistributionScheme(mapping, n_nodes, dataset='mnist')
             attack = DistributedBiasedBoundaryAttack(n_particles=n_particles, model=bb_model,
                                                      target_img=x_orig,
                                                      target_label=experiment.y_target, inits=random_inits,
                                                      distribution_scheme=distribution_scheme,
-                                                     n_nodes=n_nodes, mapping=mapping)
+                                                     n_nodes=n_nodes, mapping=mapping, dataset='mnist')
             previous_queries = 0
             new_queries = 0
             with tqdm(total=max_queries) as pbar:
@@ -70,4 +70,4 @@ if __name__ == '__main__':
                     [experiment.name, experiment.y_orig, experiment.y_target, n_particles, n_nodes,
                      attack.swarm.best_fitness,
                      total_detections, attack.swarm.total_queries, [len(x) for x in detections_all],
-                     str(distribution_scheme)])
+                     str(distribution_scheme), 'mnist'])

@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from keras.models import load_model
 
+from MNIST.setup_cifar import CIFAR
 from MNIST.setup_mnist import MNIST
 
 
@@ -33,12 +34,12 @@ def split_dataframe(df):
 
 if __name__ == '__main__':
     np.random.seed(42)
-    # mnist = MNIST()
-    # model = load_model('../MNIST/models/mnist', compile=False)
-    # predictions = make_predictions(mnist, model)
-    # df = create_dataframe(mnist, predictions)
-    # df.to_csv('predictions.csv', index_label='index')
-    df = pd.read_csv('predictions.csv', index_col='index')
+    # cifar = CIFAR()
+    # model = load_model('../MNIST/models/cifar', compile=False)
+    # predictions = make_predictions(cifar, model)
+    # df = create_dataframe(cifar, predictions)
+    # df.to_csv('predictions_cifar.csv', index_label='index')
+    df = pd.read_csv('predictions_cifar.csv', index_col='index')
     dfs = split_dataframe(df)
     experiments = {}
     i = 0
@@ -62,4 +63,5 @@ if __name__ == '__main__':
     experiments['y_orig'] = y_orig
     experiments['y_target'] = y_target
     experiments_df = pd.DataFrame(data=experiments)
-    experiments_df.to_csv('experiments.csv', index=False)
+    experiments_df.to_csv('experiments_cifar.csv', index=False)
+#

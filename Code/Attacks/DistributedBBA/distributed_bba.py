@@ -11,13 +11,13 @@ from Attacks.TargetedBBA.bba_pso import ParticleBiasedBoundaryAttack
 class DistributedBiasedBoundaryAttack:
     def __init__(self, n_particles: int, inits: np.ndarray, target_img: np.ndarray, target_label: int, model: Model,
                  distribution_scheme, mapping: Optional[deque] = None,
-                 n_nodes: Optional[int] = None):
+                 n_nodes: Optional[int] = None, dataset=None):
         if n_nodes is None:
             self.n_nodes: int = n_particles
         else:
             self.n_nodes: int = n_nodes
 
-        self.nodes: list = [Node(i) for i in range(self.n_nodes)]
+        self.nodes: list = [Node(i, dataset) for i in range(self.n_nodes)]
         # self.mapping: deque = mapping
         self.distribution_scheme = distribution_scheme
 

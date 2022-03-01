@@ -31,7 +31,11 @@ class FixedDistribution(DistributionScheme):
 
 class RoundRobinDistribution(DistributionScheme):
 
-    def rotate(self, mapping: deque, r: int = 1) -> None:
+    def rotate(self, mapping: deque, **kwargs) -> None:
+        if 'r' in kwargs:
+            r = kwargs['r']
+        else:
+            r = 1
         mapping.rotate(r)
         self.mapping = mapping
 
@@ -41,11 +45,18 @@ class RoundRobinDistribution(DistributionScheme):
 
 class DistanceBasedDistributionScheme(DistributionScheme):
 
-    def __init__(self, mapping, n_nodes, history_len: int = 1):
+    def __init__(self, mapping, n_nodes, history_len: int = 1, dataset: str = ''):
+        if dataset == 'mnist':
+            shape = (28, 28, 1)
+        elif dataset == 'cifar':
+            shape = (32, 32, 3)
+        else:
+            raise ValueError
+
         super().__init__(mapping)
         self.history_len: int = history_len
         self.n_nodes: int = n_nodes
-        self.history: np.ndarray = np.zeros((self.n_nodes, self.history_len, 28, 28, 1))  # TODO: add shape
+        self.history: np.ndarray = np.zeros((self.n_nodes, self.history_len) + shape)
         self.idx: int = 0
         self.best_deque: deque = deque([])
 

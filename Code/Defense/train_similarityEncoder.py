@@ -3,7 +3,7 @@ from __future__ import print_function
 import numpy as np
 
 import random
-from tensorflow.keras.datasets import mnist
+from tensorflow.keras.datasets import mnist, cifar10
 from tensorflow.keras.models import Model, Sequential, load_model
 from tensorflow.keras.layers import Input, Flatten, Dense, Dropout, Lambda, Conv2D, Activation, MaxPooling2D
 from tensorflow.keras.optimizers import RMSprop
