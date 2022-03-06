@@ -64,13 +64,13 @@ class ParticleBiasedBoundaryAttack:
         # Update swarm
         current_best_position, current_best_fitness, _ = self.get_best_particle()
 
-        if self.iteration % 100 == 0:
-            fig, ax = plt.subplots(2)
-            ax[0].imshow(self.best_position)
-            ax[0].set_title(str(self.best_fitness))
-            ax[1].imshow(self.target_img)
-            ax[1].set_title(self.target_label)
-            plt.show()
+        # if self.iteration % 100 == 0:
+        #     fig, ax = plt.subplots(2)
+        #     ax[0].imshow(self.best_position)
+        #     ax[0].set_title(str(self.best_fitness))
+        #     ax[1].imshow(self.target_img)
+        #     ax[1].set_title(self.target_label)
+        #     plt.show()
 
         if current_best_fitness < self.best_fitness:
             print(self.total_queries, current_best_fitness)
