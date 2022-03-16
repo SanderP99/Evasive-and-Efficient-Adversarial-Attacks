@@ -11,7 +11,9 @@ from Attacks.TargetedBBA.bba_pso import ParticleBiasedBoundaryAttack
 class DistributedBiasedBoundaryAttack:
     def __init__(self, n_particles: int, inits: np.ndarray, target_img: np.ndarray, target_label: int, model: Model,
                  distribution_scheme, mapping: Optional[deque] = None,
-                 n_nodes: Optional[int] = None, dataset=None):
+                 n_nodes: Optional[int] = None, dataset=None, source_step: float = 1e-2,
+                 spherical_step: float = 5e-2, steps_per_iteration: int = 50, source_step_multiplier_up: float = 1.05,
+                 source_step_multiplier_down: float = 0.6):
         if n_nodes is None:
             self.n_nodes: int = n_particles
         else:
@@ -22,7 +24,12 @@ class DistributedBiasedBoundaryAttack:
         self.distribution_scheme = distribution_scheme
 
         self.swarm: ParticleBiasedBoundaryAttack = ParticleBiasedBoundaryAttack(n_particles, inits, target_img,
-                                                                                target_label, model, self)
+                                                                                target_label, model, self,
+                                                                                source_step=source_step,
+                                                                                source_step_multiplier_up=source_step_multiplier_up,
+                                                                                source_step_multiplier_down=source_step_multiplier_down,
+                                                                                steps_per_iteration=steps_per_iteration,
+                                                                                spherical_step=spherical_step)
 
     def attack(self) -> None:
         self.swarm.optimize()

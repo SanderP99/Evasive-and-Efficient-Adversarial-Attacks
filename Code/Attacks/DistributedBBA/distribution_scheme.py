@@ -31,13 +31,37 @@ class FixedDistribution(DistributionScheme):
 
 class RoundRobinDistribution(DistributionScheme):
 
+    def __init__(self, mapping, n_nodes=1, n_particles=1):
+        super().__init__(mapping)
+        self.n_nodes = n_nodes
+        self.n_particles = n_particles
+        self.full_mapping = None
+
+        if n_nodes == n_particles:
+            self.mapping = deque(range(self.n_particles))
+            self.full_mapping = self.mapping
+        elif n_nodes < n_particles:
+            self.mapping = deque(range(self.n_nodes)) + deque(np.random.randint(0, n_nodes, n_particles - n_nodes))
+            self.full_mapping = deque(range(self.n_nodes))
+        else:
+            self.full_mapping = deque(range(self.n_nodes))
+            self.mapping = self.full_mapping[:n_particles]
+
     def rotate(self, mapping: deque, **kwargs) -> None:
         if 'r' in kwargs:
             r = kwargs['r']
         else:
             r = 1
-        mapping.rotate(r)
-        self.mapping = mapping
+        if self.n_nodes == self.n_particles:
+            mapping.rotate(r)
+            self.mapping = mapping
+        elif self.n_nodes < self.n_particles:
+            self.full_mapping.rotate(r)
+            self.mapping = self.full_mapping + deque(
+                np.random.randint(0, self.n_nodes, self.n_particles - self.n_nodes))
+        else:
+            self.full_mapping.rotate(r)
+            self.mapping = deque(list(self.full_mapping)[:self.n_particles])
 
     def __str__(self) -> str:
         return 'round_robin'

@@ -12,7 +12,9 @@ from Attacks.TargetedBBA.sampling_provider import create_perlin_noise
 class ParticleBiasedBoundaryAttack:
 
     def __init__(self, n_particles: int, inits: np.ndarray, target_img: np.ndarray, target_label: int, model: Model,
-                 distributed_attack=None):
+                 distributed_attack=None, source_step: float = 1e-2,
+                 spherical_step: float = 5e-2, steps_per_iteration: int = 50, source_step_multiplier_up: float = 1.05,
+                 source_step_multiplier_down: float = 0.6):
         assert n_particles == len(inits)
         self.n_particles: int = n_particles
         self.total_queries: int = 0
@@ -32,7 +34,10 @@ class ParticleBiasedBoundaryAttack:
             # self.mapping: deque = self.distributed_attack.distribution_scheme.get_mapping()
 
         self.particles: list = [
-            Particle(i, init=inits[i], target_img=target_img, target_label=target_label, model=model, swarm=self) for
+            Particle(i, init=inits[i], target_img=target_img, target_label=target_label, model=model, swarm=self,
+                     source_step_multiplier_up=source_step_multiplier_up,
+                     source_step_multiplier_down=source_step_multiplier_down, source_step=source_step,
+                     spherical_step=spherical_step, steps_per_iteration=steps_per_iteration) for
             i in range(n_particles)]
 
         self.best_position, self.best_fitness, _ = self.get_best_particle()

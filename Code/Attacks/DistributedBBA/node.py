@@ -13,7 +13,7 @@ class Node:
         if dataset == 'mnist':
             self.detector = SimilarityDetector(k=k, chunk_size=chunk_size, threshold=0.00926118174381554,
                                            # Threshold autoencoder: 0.449137
-                                           weights_path='../../Defense/MNISTencoder.h5')
+                                           weights_path='../Defense/MNISTencoder.h5')
         elif dataset == 'cifar':
             self.detector = SimilarityDetector(k=k, chunk_size=chunk_size, threshold=0.021234,
                                                weights_path='../../Defense/CIFARencoder.h5')

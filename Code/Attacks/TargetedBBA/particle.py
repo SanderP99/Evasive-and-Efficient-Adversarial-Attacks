@@ -13,7 +13,9 @@ from Attacks.TargetedBBA.utils import line_search_to_boundary
 class Particle:
 
     def __init__(self, i: int, init: np.ndarray = None, target_img: np.ndarray = None, target_label: int = 0,
-                 model: Model = None, swarm=None, is_targeted: bool = True):
+                 model: Model = None, swarm=None, is_targeted: bool = True, source_step: float = 1e-2,
+                 spherical_step: float = 5e-2, steps_per_iteration: int = 50, source_step_multiplier_up: float = 1.05,
+                 source_step_multiplier_down: float = 0.6):
         self.id: int = i
         self.position: np.ndarray = init
         self.velocity: np.ndarray = np.random.randn(*self.position.shape) - 0.5
@@ -29,14 +31,16 @@ class Particle:
         self.swarm = swarm
         self.swarm.total_queries += calls
 
-        self.steps_per_iteration: int = 50
+        self.steps_per_iteration: int = steps_per_iteration
         self.fitness: float = np.infty
         self.calculate_fitness()
         self.best_position: np.ndarray = self.position
         self.best_fitness: float = self.fitness
 
-        self.source_step: float = 0.01  # 0.25 for MNIST
-        self.spherical_step: float = 5e-2
+        self.source_step: float = source_step  # 0.25 for MNIST
+        self.source_step_multiplier_up = source_step_multiplier_up
+        self.source_step_multiplier_down = source_step_multiplier_down
+        self.spherical_step: float = spherical_step
         self.maximum_diff: float = 0.4
         self.c1, self.c2 = self.select_cs()
 
@@ -89,13 +93,13 @@ class Particle:
                                                          spherical_step=self.spherical_step, mask=mask, pso=True,
                                                          node=node, dimensions=self.position.shape)
             self.swarm.total_queries += self.swarm.attack.calls
-            self.source_step *= 1.05
+            self.source_step *= self.source_step_multiplier_up
         else:
             # print(f"Particle {self.id} is not longer adversarial!")
             self.update_velocity()
             self.position += self.velocity
             self.position = np.clip(self.position, 0, 1)
-            self.source_step *= 0.6
+            self.source_step *= self.source_step_multiplier_down
 
     def update_bests(self) -> None:
         self.calculate_fitness()
