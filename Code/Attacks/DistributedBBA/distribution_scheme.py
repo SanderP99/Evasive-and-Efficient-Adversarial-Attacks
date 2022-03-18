@@ -45,7 +45,7 @@ class RoundRobinDistribution(DistributionScheme):
             self.full_mapping = deque(range(self.n_nodes))
         else:
             self.full_mapping = deque(range(self.n_nodes))
-            self.mapping = self.full_mapping[:n_particles]
+            self.mapping = deque(list(self.full_mapping)[:n_particles])
 
     def rotate(self, mapping: deque, **kwargs) -> None:
         if 'r' in kwargs:
