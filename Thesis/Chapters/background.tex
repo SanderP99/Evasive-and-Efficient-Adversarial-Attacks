@@ -228,8 +228,7 @@ In black box attacks, the only thing the attacker has access to is the output of
 
 Transfer attacks \cite{transfer_attack} try to overcome this hurdle by creating a surrogate model. This is an undefended model similar to the model under attack. This idea is based on the observation that adversarial perturbations often are transferable to other models \cite{FGSM}. Attacks can leverage information (such as gradients) from the surrogate model to breach the black box model. Due to the transferability of adversarial examples, it is also possible to perform so called zero-query attacks. Zero-query attacks are performed entirely on the surrogate model and the resulting adversarial example is forwarded to the black box model.\\
 
-Both white box and black box attacks can be divided into targeted and untargeted attacks depending on their goal. In a targeted attack, the goal of the attacker is to create an adversarial example with a specific target class. In an untargeted attack the target class can be any class. Untargeted variants of attacks generally enjoy much more freedom and are therefore able to craft adversarial examples that are closer to the original. Figure \ref{fig:target_vs_untargeted} visually explains the difference between the two types.\\
-
+Both white box and black box attacks can be divided into targeted and untargeted attacks depending on their goal. In a targeted attack, the goal of the attacker is to create an adversarial example with a specific target class. In an untargeted attack the target class can be any class. Untargeted variants of attacks generally enjoy much more freedom and are therefore able to craft adversarial examples that are closer to the original. Figure \ref{fig:target_vs_untargeted} visually explains the difference between the two types.
 
 \begin{figure}
 \centering
@@ -311,10 +310,6 @@ Some defenses rely on \textbf{proximity measurements} between the input and the 
 \draw   (324,75.03) .. controls (324,71.72) and (326.69,69.03) .. (330,69.03) .. controls (333.31,69.03) and (336,71.72) .. (336,75.03) .. controls (336,78.35) and (333.31,81.03) .. (330,81.03) .. controls (326.69,81.03) and (324,78.35) .. (324,75.03) -- cycle ;
 %Shape: Circle [id:dp014656790375494388] 
 \draw  [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ,fill opacity=1 ] (336,79.03) .. controls (336,75.72) and (338.69,73.03) .. (342,73.03) .. controls (345.31,73.03) and (348,75.72) .. (348,79.03) .. controls (348,82.35) and (345.31,85.03) .. (342,85.03) .. controls (338.69,85.03) and (336,82.35) .. (336,79.03) -- cycle ;
-
-
-
-
 \end{tikzpicture}
 \caption[Adversarial training]{Decision boundaries before (left) and after (right) adversarial training. Before adversarial training, an adversarial example can be created (black circle). This example is added to the training set and the network is retrained. A new decision surface is created in the process. This surface classifies the previous adversarial example correctly (empty circle), but there is a new opportunity for an adversarial attack (black circle).}
 \label{fig:adversarial_training}

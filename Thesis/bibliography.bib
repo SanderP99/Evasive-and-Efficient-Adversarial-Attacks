@@ -1,9 +1,8 @@
 
-@article{alzantot_genattack_2019,
+@article{genattack,
 	title = {{GenAttack}: {Practical} {Black}-box {Attacks} with {Gradient}-{Free} {Optimization}},
 	shorttitle = {{GenAttack}},
 	url = {http://arxiv.org/abs/1805.11090},
-	abstract = {Deep neural networks are vulnerable to adversarial examples, even in the black-box setting, where the attacker is restricted solely to query access. Existing black-box approaches to generating adversarial examples typically require a significant number of queries, either for training a substitute network or performing gradient estimation. We introduce GenAttack, a gradient-free optimization technique that uses genetic algorithms for synthesizing adversarial examples in the black-box setting. Our experiments on different datasets (MNIST, CIFAR-10, and ImageNet) show that GenAttack can successfully generate visually imperceptible adversarial examples against state-of-the-art image recognition models with orders of magnitude fewer queries than previous approaches. Against MNIST and CIFAR-10 models, GenAttack required roughly 2,126 and 2,568 times fewer queries respectively, than ZOO, the prior state-of-the-art black-box attack. In order to scale up the attack to large-scale high-dimensional ImageNet models, we perform a series of optimizations that further improve the query efficiency of our attack leading to 237 times fewer queries against the Inception-v3 model than ZOO. Furthermore, we show that GenAttack can successfully attack some state-of-the-art ImageNet defenses, including ensemble adversarial training and non-differentiable or randomized input transformations. Our results suggest that evolutionary algorithms open up a promising area of research into effective black-box attacks.},
 	urldate = {2021-08-04},
 	journal = {arXiv:1805.11090 [cs]},
 	author = {Alzantot, Moustafa and Sharma, Yash and Chakraborty, Supriyo and Zhang, Huan and Hsieh, Cho-Jui and Srivastava, Mani},
@@ -33,7 +32,6 @@
 @article{chen_stateful_2019,
 	title = {Stateful {Detection} of {Black}-{Box} {Adversarial} {Attacks}},
 	url = {http://arxiv.org/abs/1907.05587},
-	abstract = {The problem of adversarial examples, evasion attacks on machine learning classifiers, has proven extremely difficult to solve. This is true even when, as is the case in many practical settings, the classifier is hosted as a remote service and so the adversary does not have direct access to the model parameters. This paper argues that in such settings, defenders have a much larger space of actions than have been previously explored. Specifically, we deviate from the implicit assumption made by prior work that a defense must be a stateless function that operates on individual examples, and explore the possibility for stateful defenses. To begin, we develop a defense designed to detect the process of adversarial example generation. By keeping a history of the past queries, a defender can try to identify when a sequence of queries appears to be for the purpose of generating an adversarial example. We then introduce query blinding, a new class of attacks designed to bypass defenses that rely on such a defense approach. We believe that expanding the study of adversarial examples from stateless classifiers to stateful systems is not only more realistic for many black-box settings, but also gives the defender a much-needed advantage in responding to the adversary.},
 	urldate = {2021-08-04},
 	journal = {arXiv:1907.05587 [cs]},
 	author = {Chen, Steven and Carlini, Nicholas and Wagner, David},
@@ -49,7 +47,6 @@
 	shorttitle = {Guessing {Smart}},
 	url = {http://arxiv.org/abs/1812.09803},
 	doi = {10.1109/ICCV.2019.00506},
-	abstract = {We consider adversarial examples for image classification in the black-box decision-based setting. Here, an attacker cannot access confidence scores, but only the final label. Most attacks for this scenario are either unreliable or inefficient. Focusing on the latter, we show that a specific class of attacks, Boundary Attacks, can be reinterpreted as a biased sampling framework that gains efficiency from domain knowledge. We identify three such biases, image frequency, regional masks and surrogate gradients, and evaluate their performance against an ImageNet classifier. We show that the combination of these biases outperforms the state of the art by a wide margin. We also showcase an efficient way to attack the Google Cloud Vision API, where we craft convincing perturbations with just a few hundred queries. Finally, the methods we propose have also been found to work very well against strong defenses: Our targeted attack won second place in the NeurIPS 2018 Adversarial Vision Challenge.},
 	urldate = {2021-08-04},
 	journal = {2019 IEEE/CVF International Conference on Computer Vision (ICCV)},
 	author = {Brunner, Thomas and Diehl, Frederik and Le, Michael Truong and Knoll, Alois},
@@ -69,7 +66,6 @@
 	shorttitle = {Particle {Swarm} {Optimization}},
 	url = {http://arxiv.org/abs/1804.05319},
 	doi = {10.3390/make1010010},
-	abstract = {Particle Swarm Optimization (PSO) is a metaheuristic global optimization paradigm that has gained prominence in the last two decades due to its ease of application in unsupervised, complex multidimensional problems which cannot be solved using traditional deterministic algorithms. The canonical particle swarm optimizer is based on the flocking behavior and social co-operation of birds and fish schools and draws heavily from the evolutionary behavior of these organisms. This paper serves to provide a thorough survey of the PSO algorithm with special emphasis on the development, deployment and improvements of its most basic as well as some of the state-of-the-art implementations. Concepts and directions on choosing the inertia weight, constriction factor, cognition and social weights and perspectives on convergence, parallelization, elitism, niching and discrete optimization as well as neighborhood topologies are outlined. Hybridization attempts with other evolutionary and swarm paradigms in selected applications are covered and an up-to-date review is put forward for the interested reader.},
 	number = {1},
 	urldate = {2021-08-04},
 	journal = {Machine Learning and Knowledge Extraction},
@@ -87,7 +83,6 @@
 	title = {{HopSkipJumpAttack}: {A} {Query}-{Efficient} {Decision}-{Based} {Attack}},
 	shorttitle = {{HopSkipJumpAttack}},
 	url = {http://arxiv.org/abs/1904.02144},
-	abstract = {The goal of a decision-based adversarial attack on a trained model is to generate adversarial examples based solely on observing output labels returned by the targeted model. We develop HopSkipJumpAttack, a family of algorithms based on a novel estimate of the gradient direction using binary information at the decision boundary. The proposed family includes both untargeted and targeted attacks optimized for \${\textbackslash}ell\_2\$ and \${\textbackslash}ell\_{\textbackslash}infty\$ similarity metrics respectively. Theoretical analysis is provided for the proposed algorithms and the gradient direction estimate. Experiments show HopSkipJumpAttack requires significantly fewer model queries than Boundary Attack. It also achieves competitive performance in attacking several widely-used defense mechanisms. (HopSkipJumpAttack was named Boundary Attack++ in a previous version of the preprint.)},
 	urldate = {2021-08-04},
 	journal = {arXiv:1904.02144 [cs, math, stat]},
 	author = {Chen, Jianbo and Jordan, Michael I. and Wainwright, Martin J.},
@@ -122,7 +117,6 @@ year = {2010},
 isbn = {9781605589077},
 publisher = {Omnipress},
 address = {Madison, WI, USA},
-abstract = {Restricted Boltzmann machines were developed using binary stochastic hidden units. These can be generalized by replacing each binary unit by an infinite number of copies that all have the same weights but have progressively more negative biases. The learning and inference rules for these "Stepped Sigmoid Units" are unchanged. They can be approximated efficiently by noisy, rectified linear units. Compared with binary units, these units learn features that are better for object recognition on the NORB dataset and face verification on the Labeled Faces in the Wild dataset. Unlike binary units, rectified linear units preserve information about relative intensities as information travels through multiple layers of feature detectors.},
 booktitle = {Proceedings of the 27th International Conference on International Conference on Machine Learning},
 pages = {807–814},
 numpages = {8},
@@ -293,7 +287,7 @@ day={02}
  pages = {},
  publisher = {Curran Associates, Inc.},
  title = {ImageNet Classification with Deep Convolutional Neural Networks},
- url = {https://proceedings.neurips.cc/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf},
+ url = {\url{https://proceedings.neurips.cc/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf}},
  volume = {25},
  year = {2012}
 }
@@ -649,5 +643,72 @@ keywords = {search, visual similarity, deep learning, interior design}
   year = 2009
 }
 
+@inproceedings{dong2019efficient,
+  title={Efficient decision-based black-box adversarial attacks on face recognition},
+  author={Dong, Yinpeng and Su, Hang and Wu, Baoyuan and Li, Zhifeng and Liu, Wei and Zhang, Tong and Zhu, Jun},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  pages={7714--7722},
+  year={2019}
+}
 
+@article{mosli2019they,
+  title={They might not be giants: crafting black-box adversarial examples with fewer queries using particle swarm optimization},
+  author={Mosli, Rayan and Wright, Matthew and Yuan, Bo and Pan, Yin},
+  journal={arXiv preprint arXiv:1909.07490},
+  year={2019}
+}
 
+@Article{suryanto2020,
+AUTHOR = {Suryanto, Naufal and Kang, Hyoeun and Kim, Yongsu and Yun, Youngyeo and Larasati, Harashta Tatimma and Kim, Howon},
+TITLE = {A Distributed Black-Box Adversarial Attack Based on Multi-Group Particle Swarm Optimization},
+JOURNAL = {Sensors},
+VOLUME = {20},
+YEAR = {2020},
+NUMBER = {24},
+ARTICLE-NUMBER = {7158},
+URL = {https://www.mdpi.com/1424-8220/20/24/7158},
+ISSN = {1424-8220},
+DOI = {10.3390/s20247158}
+}
+
+@ARTICLE{audio_pso,  
+author={Mun, Hyunjun and Seo, Sunggwan and Son, Baehoon and Yun, Joobeom},  
+journal={IEEE Access},   
+title={Black-Box Audio Adversarial Attack Using Particle Swarm Optimization},   
+year={2022},  
+volume={10},  
+number={},  
+pages={23532-23544},  
+doi={10.1109/ACCESS.2022.3152526}
+}
+
+@INPROCEEDINGS{inertia_weight,
+  author={Shi, Y. and Eberhart, R.C.},
+  booktitle={Proceedings of the 1999 Congress on Evolutionary Computation-CEC99 (Cat. No. 99TH8406)}, 
+  title={Empirical study of particle swarm optimization}, 
+  year={1999},
+  volume={3},
+  number={},
+  pages={1945-1950 Vol. 3},
+  doi={10.1109/CEC.1999.785511}
+  }
+
+@ARTICLE{constriction_factor,
+  author={Clerc, M. and Kennedy, J.},
+  journal={IEEE Transactions on Evolutionary Computation}, 
+  title={The particle swarm - explosion, stability, and convergence in a multidimensional complex space}, 
+  year={2002},
+  volume={6},
+  number={1},
+  pages={58-73},
+  doi={10.1109/4235.985692}
+  }
+  
+@misc{ddos,
+howpublished={\url{www.usa.kaspersky.com/resource-center/threats/ddos-attacks}},
+title={What is a DDoS Attack? - DDoS Meaning},
+note = {Accessed: 2022-03-18},
+author={Kaspersky},
+year={2021},
+month={01},
+}
