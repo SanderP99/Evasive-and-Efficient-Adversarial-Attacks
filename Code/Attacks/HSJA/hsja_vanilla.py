@@ -1,5 +1,7 @@
 import numpy as np
 
+from Attacks.HSJA.query_distribution_wrapper import QueryDistributionWrapper
+
 
 def hsja(model,
          sample,
@@ -13,7 +15,8 @@ def hsja(model,
          stepsize_search='geometric_progression',
          max_num_evals=1e4,
          init_num_evals=100,
-         verbose=True):
+         verbose=True,
+         distributed=False):
     """
     Main algorithm for HopSkipJumpAttack.
     https://github.com/Jianbo-Lab/HSJA
@@ -41,6 +44,7 @@ def hsja(model,
     """
     # Set parameters
     original_label = np.argmax(model.predict(sample))
+    qdw = QueryDistributionWrapper(1)
     params = {'clip_max': clip_max, 'clip_min': clip_min,
               'shape': sample.shape,
               'original_label': original_label,
@@ -54,6 +58,8 @@ def hsja(model,
               'max_num_evals': max_num_evals,
               'init_num_evals': init_num_evals,
               'verbose': verbose,
+              'distributed': distributed,
+              'qdw': qdw,
               }
 
     # Set binary search threshold.
@@ -121,7 +127,8 @@ def hsja(model,
         dist = compute_distance(perturbed, sample, constraint)
         if verbose:
             print('iteration: {:d}, {:s} distance {:.4E}'.format(j + 1, constraint, dist))
-
+    if distributed:
+        return perturbed, qdw
     return perturbed
 
 
@@ -131,7 +138,11 @@ def decision_function(model, images, params):
     0 otherwise.
     """
     images = clip_image(images, params['clip_min'], params['clip_max'])
-    prob = model.predict(images.reshape((images.shape[0],) + (28, 28, 1)))
+    if not params['distributed']:
+        prob = model.predict(images.reshape((images.shape[0],) + (28, 28, 1)))
+    else:
+        qdw = params['qdw']
+        prob = qdw.predict(model, images)
     if params['target_label'] is None:
         return np.argmax(prob, axis=1) != params['original_label']
     else:

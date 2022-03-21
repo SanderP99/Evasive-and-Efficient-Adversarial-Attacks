@@ -13,7 +13,7 @@ if __name__ == '__main__':
     mnist = MNIST()
     experiments = pd.read_csv('../../Experiments/experiments_sorted.csv', index_col='index')
 
-    experiment = experiments.iloc[0]
+    experiment = experiments.iloc[1]
     x_orig = mnist.test_data[experiment.name]
     targets = ast.literal_eval(experiment.targets)
     random_inits = mnist.test_data[
@@ -23,8 +23,11 @@ if __name__ == '__main__':
     plt.imshow(x_orig)
     plt.show()
 
-    example = hsja(model, np.expand_dims(x_orig, axis=0), target_label=experiment.y_target,
-                   target_image=random_inits[0])
+    example, qdw = hsja(model, np.expand_dims(x_orig, axis=0), target_label=experiment.y_target,
+                        target_image=random_inits[0], num_iterations=2, distributed=True)
 
     plt.imshow(example[0])
     plt.show()
+
+    print(np.argmax(model.predict(example)), np.linalg.norm(example - x_orig))
+    print(qdw.n_queries, qdw.get_n_detections())

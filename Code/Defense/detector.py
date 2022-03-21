@@ -44,10 +44,11 @@ def calculate_thresholds(training_data: np.ndarray, k: int, encoder: Callable[[n
 class Detector:
 
     def __init__(self, k: int, threshold: float = None, training_data: np.ndarray = None, chunk_size: int = 1000,
-                 weights_path: str = './encoder_1.h5'):
+                 weights_path: str = './encoder_1.h5', clear_buffer_after_detection: bool = True):
         self.k = k
         self.threshold = threshold
         self.training_data = training_data
+        self.clear_buffer_after_detection = clear_buffer_after_detection
 
         if self.threshold is None and self.training_data is None:
             raise ValueError("Must provide explicit detection threshold or training data to calculate threshold!")
@@ -101,7 +102,8 @@ class Detector:
         if is_attack:
             self.history.append(self.num_queries)
             self.detected_dists.append(k_avg_dist)
-            self.clear_memory()
+            if self.clear_buffer_after_detection:
+                self.clear_memory()
 
     def clear_memory(self) -> None:
         self.buffer = deque(maxlen=self.chunk_size)
