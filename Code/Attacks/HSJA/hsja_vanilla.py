@@ -131,7 +131,7 @@ def decision_function(model, images, params):
     0 otherwise.
     """
     images = clip_image(images, params['clip_min'], params['clip_max'])
-    prob = model.predict(images)
+    prob = model.predict(images.reshape((images.shape[0],) + (28, 28, 1)))
     if params['target_label'] is None:
         return np.argmax(prob, axis=1) != params['original_label']
     else:
