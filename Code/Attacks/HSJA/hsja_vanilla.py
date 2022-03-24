@@ -16,7 +16,10 @@ def hsja(model,
          max_num_evals=1e4,
          init_num_evals=100,
          verbose=True,
-         distributed=False):
+         distributed=False,
+         flush_buffer_after_detection=True,
+         step_size_decrease=2.0,
+         ):
     """
     Main algorithm for HopSkipJumpAttack.
     https://github.com/Jianbo-Lab/HSJA
@@ -44,7 +47,7 @@ def hsja(model,
     """
     # Set parameters
     original_label = np.argmax(model.predict(sample))
-    qdw = QueryDistributionWrapper(1)
+    qdw = QueryDistributionWrapper(1, flush_buffer_after_detection=flush_buffer_after_detection)
     params = {'clip_max': clip_max, 'clip_min': clip_min,
               'shape': sample.shape,
               'original_label': original_label,
@@ -100,7 +103,8 @@ def hsja(model,
         if params['stepsize_search'] == 'geometric_progression':
             # find step size.
             epsilon = geometric_progression_for_stepsize(perturbed,
-                                                         update, dist, model, params)
+                                                         update, dist, model, params,
+                                                         step_size_decrease=step_size_decrease)
 
             # Update the sample.
             perturbed = clip_image(perturbed + epsilon * update,
@@ -303,7 +307,7 @@ def initialize(model, sample, params):
     return initialization
 
 
-def geometric_progression_for_stepsize(x, update, dist, model, params):
+def geometric_progression_for_stepsize(x, update, dist, model, params, step_size_decrease=2.0):
     """
     Geometric progression to search for stepsize.
     Keep decreasing stepsize by half until reaching
@@ -317,7 +321,7 @@ def geometric_progression_for_stepsize(x, update, dist, model, params):
         return success
 
     while not phi(epsilon):
-        epsilon /= 2.0
+        epsilon /= step_size_decrease
 
     return epsilon
 

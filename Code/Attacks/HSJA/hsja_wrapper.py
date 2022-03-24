@@ -24,7 +24,8 @@ if __name__ == '__main__':
     plt.show()
 
     example, qdw = hsja(model, np.expand_dims(x_orig, axis=0), target_label=experiment.y_target,
-                        target_image=random_inits[0], num_iterations=2, distributed=True)
+                        target_image=random_inits[0], num_iterations=100, distributed=True,
+                        flush_buffer_after_detection=False)
 
     plt.imshow(example[0])
     plt.show()
