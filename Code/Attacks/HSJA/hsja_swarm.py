@@ -1,5 +1,6 @@
 from typing import List
 
+import numpy as np
 from keras.models import Model
 
 from Attacks.HSJA.hsja_particle import HSJAParticle
@@ -43,6 +44,7 @@ class HSJASwarm:
     def move_swarm(self) -> None:
         self.update_positions()
         self.update_bests()
+        self.total_queries = np.sum([particle.queries for particle in self.particles])
 
     def optimize(self) -> None:
         self.move_swarm()

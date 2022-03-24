@@ -31,6 +31,8 @@ class HSJAParticle:
         self.c2 = 2.
         self.w: HSJAPosition = HSJAPosition()
         self.mnist = MNIST()
+        self.queries = 0
+
 
     def __eq__(self, other: 'HSJAParticle') -> bool:
         return self.fitness == other.fitness and self.best_fitness == other.best_fitness
@@ -70,7 +72,7 @@ class HSJAParticle:
         targets = ast.literal_eval(experiment.targets)
         random_inits = self.mnist.test_data[
             np.array(targets)[np.random.choice(len(targets), size=1, replace=False)]]
-        self.experiment_idx += 1
+        # self.experiment_idx += 1
         _, qdw = hsja(self.model, np.expand_dims(x_orig, axis=0), target_label=experiment.y_target,
                       target_image=random_inits[0], distributed=True,
                       flush_buffer_after_detection=True,
@@ -79,4 +81,5 @@ class HSJAParticle:
                       gamma=self.position.gamma,
                       step_size_decrease=self.position.step_size_decrease)
         queries, detections = qdw.n_queries, qdw.get_n_detections()
+        self.queries += queries
         self.fitness = detections / queries
