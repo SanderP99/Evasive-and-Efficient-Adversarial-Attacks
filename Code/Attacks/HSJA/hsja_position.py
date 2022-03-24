@@ -23,4 +23,10 @@ class HSJAPosition:
         return HSJAPosition(*(operator.sub(*pair) for pair in zip(self, other)))
 
     def __mul__(self, other):
-        return HSJAPosition(*(operator.mul(*pair) for pair in zip(self, other)))
+        if isinstance(other, HSJAPosition):
+            return HSJAPosition(*(operator.mul(*pair) for pair in zip(self, other)))
+        elif isinstance(other, float):
+            return HSJAPosition(*(operator.mul(f, other) for f in self))
+
+    def __rmul__(self, other):
+        return self * other
