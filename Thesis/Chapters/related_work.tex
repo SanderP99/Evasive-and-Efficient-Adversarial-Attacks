@@ -12,7 +12,7 @@ The step sizes are adjusted according to local geometry of the boundary. The ort
 
 The second improvement is to use a masking. The original \gls{ba} applies a perturbation to the images as a whole. Every pixel will be perturbed with the same magnitude. This magnitude can be altered on a per-pixel basis when using a mask. Pixels that are farther away from the target image will receive a larger perturbation than pixels that are already close to the corresponding pixel in the target. This technique improves efficiency since the search space is significantly reduced. It is also possible to engineer masks for specific examples in order to incorporate other knowledge in the attack.\\
 
-The final improvement is based on the idea of transfer attacks. A surrogate model is trained and will be used to calculate adversarial gradients. These gradients will then be used to bias the sampling direction for the orthogonal step. If the surrogate model does not closely resemble the defender, then the gradients will only hamper the speed of convergence of the attack instead of completely failing the attack.\\
+The final improvement is based on the idea of transfer attacks. A surrogate model is trained and will be used to calculate adversarial gradients. These gradients will then be used to bias the sampling direction for the orthogonal step. If the surrogate model does not closely resemble the defender, then the gradients will only hamper the speed of convergence of the attack instead of completely failing the attack.
 
 \begin{figure}
 \centering
@@ -120,8 +120,101 @@ original image
 \label{fig:boundary_attack_intuition}
 \end{figure}
 
+\section{HopSkipJumpAttack}
+\gls{hsja} \cite{hsja}, like \gls{ba}, is a decision-based adversarial attack that starts from an adversarial input. The initial input is obtained in an identical manner as in \gls{ba}. \gls{hsja} is an iterative algorithm that consists of three steps.\\
+
+The first step is a projection onto the decision boundary of the model under attack. This projection is carried out using a binary search. The second step is to estimate the direction of the gradient at the boundary. Different directions are sampled from a uniform distribution over a $d$-dimensional sphere, where $d$ is the input dimension. This random direction is added to the boundary point, generating a new query for the model. The results of these queries are combined to a gradient estimation~$\widetilde{\nabla S}$ using the Monte Carlo estimate of equation \ref{eq:monte_carlo_estimate}. In this equation $u_b$ are the random directions and $x_t$ is the boundary position. $B$ is the number of random directions that needs to be sampled. This number increases based on the current iteration of the attack to reduce the variance of the estimate. The function~$\phi_{x^*}$ returns 1 if the new position is adversarial and -1 if it is not adversarial. $\delta$ is a positive parameter determining the size of the $d$-dimensional sphere.
+
+\begin{equation}\label{eq:monte_carlo_estimate}
+\widetilde{\nabla S}(x_t,\delta) := \frac{1}{B} \sum_{b=1}^{B}\phi_{x^*}(x_t + \delta u_b)u_b
+\end{equation}
+
+Once the gradient has been estimated, the third and final operation is to take a step along this gradient. The step size is determined using a geometric progression scheme. These steps are iteratively repeated until the pre-set stopping criterion is met. Figure \ref{fig:hsja_intuition} represents the intuition behind \gls{hsja} in a graphical manner.\\
+
+\gls{hsja} eclipses \gls{ba} and \gls{bba} both on median distance against queries and attack success rates using a limited amount of queries. The untargeted version of \gls{hsja} is able to compete with white box attacks on the ImageNet dataset \cite{imagenet}. It also performs similar or superior to white box attacks such as the C\&W attack \cite{cw_attack} when evaluated against defensive mechanisms such as defensive distillation \cite{defensive_distillation}, region-based classification \cite{region-based_classification} and adversarial training \cite{FGSM}.
+
+
+\begin{figure}
+\centering
+
+\tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt        
+
+\begin{tikzpicture}[x=0.75pt,y=0.75pt,yscale=-1,xscale=1]
+%uncomment if require: \path (0,300); %set diagram left start at 0, and has height of 300
+
+%Curve Lines [id:da9704742483773781] 
+\draw    (243,111.62) .. controls (297.92,70.43) and (367.93,279.11) .. (405,99.26) ;
+%Shape: Star [id:dp26832364802919195] 
+\draw  [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ,fill opacity=1 ] (322.11,170.74) -- (325.14,176.87) -- (331.9,177.85) -- (327.01,182.62) -- (328.16,189.36) -- (322.11,186.18) -- (316.06,189.36) -- (317.22,182.62) -- (312.32,177.85) -- (319.09,176.87) -- cycle ;
+%Shape: Ellipse [id:dp9511930412387599] 
+\draw  [color={rgb, 255:red, 128; green, 128; blue, 128 }  ,draw opacity=1 ][dash pattern={on 4.5pt off 4.5pt}] (274.97,141.94) .. controls (274.97,120.26) and (292.54,102.69) .. (314.22,102.69) .. controls (335.9,102.69) and (353.48,120.26) .. (353.48,141.94) .. controls (353.48,163.63) and (335.9,181.2) .. (314.22,181.2) .. controls (292.54,181.2) and (274.97,163.63) .. (274.97,141.94) -- cycle ;
+%Shape: Circle [id:dp5681517768642557] 
+\draw  [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ,fill opacity=1 ] (298,72.3) .. controls (298,71.03) and (299.03,70) .. (300.3,70) .. controls (301.57,70) and (302.6,71.03) .. (302.6,72.3) .. controls (302.6,73.57) and (301.57,74.6) .. (300.3,74.6) .. controls (299.03,74.6) and (298,73.57) .. (298,72.3) -- cycle ;
+%Straight Lines [id:da06387380835189371] 
+\draw    (300.3,72.3) -- (313.63,139) ;
+\draw [shift={(314.22,141.94)}, rotate = 258.7] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da5011613685801404] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (314.22,141.94) -- (279.9,127.76) ;
+\draw [shift={(278.05,127)}, rotate = 22.45] [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (12,-3) -- (0,0) -- (12,3) -- cycle    ;
+%Shape: Boxed Line [id:dp5969211465757109] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (314.22,141.94) -- (327.54,107.28) ;
+\draw [shift={(328.26,105.41)}, rotate = 111.02] [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (12,-3) -- (0,0) -- (12,3) -- cycle    ;
+%Shape: Boxed Line [id:dp06580944891073615] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (314.22,141.94) -- (350.1,132.34) ;
+\draw [shift={(352.03,131.82)}, rotate = 165.01] [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (12,-3) -- (0,0) -- (12,3) -- cycle    ;
+%Shape: Boxed Line [id:dp5760742560965917] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (314.22,141.94) -- (340.03,168.65) ;
+\draw [shift={(341.42,170.09)}, rotate = 225.98] [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (12,-3) -- (0,0) -- (12,3) -- cycle    ;
+%Shape: Boxed Line [id:dp6962455418332032] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (314.22,141.94) -- (283.71,163.13) ;
+\draw [shift={(282.07,164.27)}, rotate = 325.23] [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (12,-3) -- (0,0) -- (12,3) -- cycle    ;
+%Straight Lines [id:da09211424476397356] 
+\draw    (314.22,141.94) -- (345.36,106.42) ;
+\draw [shift={(347.33,104.17)}, rotate = 131.23] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Shape: Boxed Line [id:dp11391160549760482] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (314.22,141.94) -- (349.44,153.74) ;
+\draw [shift={(351.34,154.37)}, rotate = 198.52] [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (12,-3) -- (0,0) -- (12,3) -- cycle    ;
+%Shape: Boxed Line [id:dp7901030813069994] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (314.22,141.94) -- (302.05,106.86) ;
+\draw [shift={(301.39,104.97)}, rotate = 70.87] [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (12,-3) -- (0,0) -- (12,3) -- cycle    ;
+%Shape: Boxed Line [id:dp12912601709580973] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (314.22,141.94) -- (319.79,178.66) ;
+\draw [shift={(320.09,180.64)}, rotate = 261.38] [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (12,-3) -- (0,0) -- (12,3) -- cycle    ;
+%Shape: Boxed Line [id:dp15440737606551624] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (314.22,141.94) -- (301.49,176.83) ;
+\draw [shift={(300.81,178.71)}, rotate = 290.05] [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (12,-3) -- (0,0) -- (12,3) -- cycle    ;
+%Shape: Boxed Line [id:dp47011579703760575] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (314.22,141.94) -- (277.11,143.45) ;
+\draw [shift={(275.11,143.53)}, rotate = 357.68] [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (12,-3) -- (0,0) -- (12,3) -- cycle    ;
+%Shape: Boxed Line [id:dp3426945663084944] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (314.22,141.94) -- (345.13,121.35) ;
+\draw [shift={(346.79,120.24)}, rotate = 146.33] [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (12,-3) -- (0,0) -- (12,3) -- cycle    ;
+
+% Text Node
+\draw (328.21,263) node   [align=left] {\begin{minipage}[lt]{96.27pt}\setlength\topsep{0pt}
+classified correctly
+\end{minipage}};
+% Text Node
+\draw (326.21,62) node   [align=left] {\begin{minipage}[lt]{96.27pt}\setlength\topsep{0pt}
+classified incorrectly
+\end{minipage}};
+% Text Node
+\draw (325.12,211.56) node   [align=left] {\begin{minipage}[lt]{68pt}\setlength\topsep{0pt}
+original image
+\end{minipage}};
+% Text Node
+\draw (304.6,75.3) node [anchor=north west][inner sep=0.75pt]   [align=left] {1};
+% Text Node
+\draw (262.33,131.33) node [anchor=north west][inner sep=0.75pt]   [align=left] {2};
+% Text Node
+\draw (346.33,92.67) node [anchor=north west][inner sep=0.75pt]   [align=left] {3};
+\end{tikzpicture}
+\caption[Intuition of the HopSkipJumpAttack]{Intuition behind the HopSkipJumpAttack. Each iteration consists of three steps. The first step is a projection onto the boundary. The second step is the estimation of the gradient at this point. This is done by sampling directions from a uniform distribution and querying the model under attack from this new position (grey arrows). The results are combined via the Monte Carlo estimate. The third and final step is to take a step along the estimated gradient. Image inspired by \cite{hsja}.}
+\label{fig:hsja_intuition}
+\end{figure}
+
 \section{Stateful defense}\label{sec:stateful_detection}
-The defensive schemes discussed in section \ref{sec:adversarial_defenses} all operate on the query level. They try to detect and flag possible attacks based on a single query without taking other context into account. The stateful detection mechanism by Chen, Carlini and Wagner \cite{chen_stateful_2019} is different in this aspect. As the name suggests, it holds state of previously submitted queries. It is similar to the defenses that use proximity measurements, but the measurement is here between queries instead of between the query and training data.\\
+The defensive schemes discussed in section \ref{sec:adversarial_defenses} all operate on the query level. They try to detect and flag possible attacks based on a single query without taking other context into account. The stateful detection mechanism by Chen, Carlini and Wagner \cite{chen_stateful_2019} is different in this aspect. As the name suggests, it holds state of previously submitted queries. It is similar to the defenses that use proximity measurements, but the measurement is between queries instead of between the query and training data.\\
 
 All queries submitted to the model equipped with a stateful detection mechanism are stored in a history buffer. Each user of the model has a distinct history buffer, where its queries are stored. These buffers can be bounded by time or number of queries depending on the resources available and the use case of the model. Each time a query is submitted to the model, the average distance to its $k$ nearest neighbors is calculated and if this distance is lower than a certain threshold then the user gets flagged by the mechanism. Appropriate actions such as banning the account can be taken.\\
 
