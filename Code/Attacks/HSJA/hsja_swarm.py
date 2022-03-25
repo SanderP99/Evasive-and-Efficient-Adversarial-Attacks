@@ -44,7 +44,7 @@ class HSJASwarm:
     def move_swarm(self) -> None:
         self.update_positions()
         self.update_bests()
-        self.total_queries = np.sum([particle.queries for particle in self.particles])
+        self.total_queries += np.sum([particle.queries for particle in self.particles])
 
     def optimize(self) -> None:
         self.move_swarm()

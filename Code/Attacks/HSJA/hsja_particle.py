@@ -81,5 +81,5 @@ class HSJAParticle:
                       gamma=self.position.gamma,
                       step_size_decrease=self.position.step_size_decrease)
         queries, detections = qdw.n_queries, qdw.get_n_detections()
-        self.queries += queries
+        self.queries = queries
         self.fitness = detections / queries

@@ -7,7 +7,7 @@ from Attacks.HSJA.hsja_position import HSJAPosition
 from Attacks.HSJA.hsja_swarm import HSJASwarm
 
 if __name__ == '__main__':
-    np.random.seed(42)
+    # np.random.seed(42)
     n_particles = 5
     model = load_model('../../MNIST/models/mnist', compile=False)
     inits = []
@@ -20,9 +20,9 @@ if __name__ == '__main__':
                                   step_size_decrease=step_size_decrease))
 
     swarm = HSJASwarm(n_particles, inits, model)
-    for _ in range(3):
+    for _ in range(20):
         swarm.optimize()
         p, _ = swarm.get_best_particle()
         with open('hsja_pso.csv', 'a') as f:
             writer = csv.writer(f)
-            writer.writerow([swarm.total_queries, swarm.best_fitness, p.init_n_evals, p.max_n_evals, p.step_size_decrease, p.gamma])
+            writer.writerow([min(swarm.particles).queries, swarm.best_fitness, p.init_n_evals, p.max_n_evals, p.step_size_decrease, p.gamma])
