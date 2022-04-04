@@ -33,7 +33,6 @@ class HSJAParticle:
         self.mnist = MNIST()
         self.queries = 0
 
-
     def __eq__(self, other: 'HSJAParticle') -> bool:
         return self.fitness == other.fitness and self.best_fitness == other.best_fitness
 
@@ -79,7 +78,7 @@ class HSJAParticle:
                       init_num_evals=self.position.init_n_evals,
                       max_num_evals=self.position.max_n_evals,
                       gamma=self.position.gamma,
-                      step_size_decrease=self.position.step_size_decrease)
+                      step_size_decrease=self.position.step_size_decrease, n_nodes=10)
         queries, detections = qdw.n_queries, qdw.get_n_detections()
         self.queries = queries
         self.fitness = detections / queries

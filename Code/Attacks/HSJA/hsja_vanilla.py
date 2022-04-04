@@ -19,6 +19,7 @@ def hsja(model,
          distributed=False,
          flush_buffer_after_detection=True,
          step_size_decrease=2.0,
+         n_nodes=1,
          ):
     """
     Main algorithm for HopSkipJumpAttack.
@@ -47,7 +48,7 @@ def hsja(model,
     """
     # Set parameters
     original_label = np.argmax(model.predict(sample))
-    qdw = QueryDistributionWrapper(1, flush_buffer_after_detection=flush_buffer_after_detection)
+    qdw = QueryDistributionWrapper(n_nodes, flush_buffer_after_detection=flush_buffer_after_detection)
     params = {'clip_max': clip_max, 'clip_min': clip_min,
               'shape': sample.shape,
               'original_label': original_label,
