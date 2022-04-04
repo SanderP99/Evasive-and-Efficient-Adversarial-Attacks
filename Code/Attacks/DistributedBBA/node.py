@@ -6,7 +6,7 @@ from Defense.detector import SimilarityDetector
 
 
 class Node:
-    def __init__(self, idx, dataset, k=50, chunk_size=1000, weights_path_mnist='../Defense/MNISTencoder.h5',
+    def __init__(self, idx, dataset, k=50, chunk_size=1000, weights_path_mnist='../../Defense/MNISTencoder.h5',
                  flush_buffer_after_detection=True):
         self.idx = idx
         self.queries = deque(maxlen=chunk_size)

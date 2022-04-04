@@ -46,5 +46,5 @@ class InsertNoiseDistributedBiasedBoundaryAttack(DistributedBiasedBoundaryAttack
             if self.node_calls[m] == self.insert_every:
                 self.node_calls[m] = 0
                 random_index = np.random.choice(self.insert_from.shape[0], size=1)
-                random_query = self.insert_from[random_index]
+                random_query = self.insert_from[random_index][0]
                 self.nodes[m].add_to_detector(random_query)

@@ -53,8 +53,8 @@ class RoundRobinDistribution(DistributionScheme):
         else:
             r = 1
         if self.n_nodes == self.n_particles:
-            mapping.rotate(r)
-            self.mapping = mapping
+            self.full_mapping.rotate(r)
+            self.mapping = self.full_mapping
         elif self.n_nodes < self.n_particles:
             self.full_mapping.rotate(r)
             self.mapping = self.full_mapping + deque(
