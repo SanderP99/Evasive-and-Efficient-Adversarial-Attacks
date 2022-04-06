@@ -36,7 +36,7 @@ if __name__ == '__main__':
             elif n_nodes == 5:
                 mapping = deque(range(n_particles))
             else:
-                break
+                mapping = None
 
             experiment = experiments.iloc[i]
             x_orig = cifar.test_data[experiment.name]

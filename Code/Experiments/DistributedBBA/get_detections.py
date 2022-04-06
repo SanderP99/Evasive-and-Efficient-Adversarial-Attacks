@@ -29,14 +29,14 @@ if __name__ == '__main__':
     n_particles = 5
     max_queries = 25000
     for i in range(n_experiments):
-        for n_nodes in [5]:
+        for n_nodes in [1, 5]:
             np.random.seed(42)
             if n_nodes == 1:
                 mapping = deque([0] * n_particles)
             elif n_nodes == 5:
                 mapping = deque(range(n_particles))
             else:
-                break
+                mapping = None
 
             experiment = experiments.iloc[i]
             x_orig = mnist.test_data[experiment.name]
@@ -51,7 +51,7 @@ if __name__ == '__main__':
                                                                 target_label=experiment.y_target, inits=random_inits,
                                                                 distribution_scheme=distribution_scheme,
                                                                 n_nodes=n_nodes, mapping=mapping, dataset='mnist',
-                                                                insert_every=10)
+                                                                insert_every=10, insert_n=5, insert_noise='uniform')
             previous_queries = 0
             new_queries = 0
             with tqdm(total=max_queries) as pbar:
@@ -67,10 +67,10 @@ if __name__ == '__main__':
             total_detections = np.sum([len(x) for x in detections_all])
             print(total_detections)
 
-            # with open(output_file, 'a') as file:
-            #     writer = csv.writer(file)
-            #     writer.writerow(
-            #         [experiment.name, experiment.y_orig, experiment.y_target, n_particles, n_nodes,
-            #          attack.swarm.best_fitness,
-            #          total_detections, attack.swarm.total_queries, [len(x) for x in detections_all],
-            #          str(distribution_scheme), 'mnist'])
+            with open(output_file, 'a') as file:
+                writer = csv.writer(file)
+                writer.writerow(
+                    [experiment.name, experiment.y_orig, experiment.y_target, n_particles, n_nodes,
+                     attack.swarm.best_fitness,
+                     total_detections, attack.swarm.total_queries, [len(x) for x in detections_all],
+                     str(distribution_scheme) + ' insert_20_uniform', 'mnist'])
