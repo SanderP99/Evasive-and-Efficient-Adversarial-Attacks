@@ -1,1 +1,14 @@
 \chapter{Approach}
+The research concerning adversarial attacks and defenses is predominantly driven by a cat-and-mouse game. Whenever a new attack is proposed, a defensive mechanism countering the novel attack is developed and vice versa. This work aims to create a new family of algorithms that can be used to perform both targeted and untargeted attacks. The goal of these algorithms is to craft adversarial examples comparable to state of the art approaches while remaining undetected by the stateful detection mechanism \cite{chen_stateful_2019} described in section \ref{sec:stateful_detection}.\\
+
+\section{Distribution}
+The stateful detection mechanism \cite{chen_stateful_2019} makes the assumption that queries can be traced back to their adversary and that there is no cooperation between different adversaries. This assumption can be problematic as $N$~collaborating adversaries can theoretically reduce the number of submitted queries per adversary by a factor~$1/N$. Even a single adversary could set up multiple accounts and submit queries on each account until it is banned. Due to the reduced number of submitted queries, less attacks will be detected since each buffer of the defense mechanism only holds a fraction of all queries.\\
+
+This work will aim to evade the detection mechanism by distributing the query submissions over multiple nodes. Each node will represent a different user of the model under attack. The users could in theory be all different persons or they could be different accounts of the same person.\\
+
+As described in section \ref{sec:pso_and_distributed_attacks}, several attempts have been made to distribute adversarial attacks \cite{distributed_pso_attack, suryanto2020}. However, none of these attacks have been evaluated against the stateful detection mechanism, since the goal of the distribution was to make the attack more efficient. This work will distribute the query submission over multiple nodes in order to avoid detection.\\
+
+\section{Optimization}
+As previously mentioned, reducing the number of submitted queries per adversary by a factor~$1/N$, where $N$ is the number of collaborators, is straightforward. Adversaries can gain knowledge about the search space by cooperating with other adversaries. They can leverage this knowledge in order to reduce the number of submitted queries even more. This idea has been utilized by multiple algorithms that were mentioned in section \ref{sec:pso_and_distributed_attacks}. These algorithms used some form of \gls{pso} to optimize the final adversarial example. However all but the \gls{pso}-\gls{bba} algorithm by Xiang et al \cite{distributed_pso_attack} rely on the confidence score of the model for the fitness value calculation. All attacks discussed use \gls{pso} as an attack in itself. This work will combine the benefits of state of the art black box attacks and \gls{pso}.
+
+\section{Approach}
