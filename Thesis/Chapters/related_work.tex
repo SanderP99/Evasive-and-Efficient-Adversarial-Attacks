@@ -52,9 +52,16 @@ The step sizes are adjusted according to local geometry of the boundary. The ort
 \label{fig:perlin_noise_frequencies}
 \end{figure}
 
-The second improvement is to use a masking. The original \gls{ba} applies a perturbation to the images as a whole. Every pixel will be perturbed with the same magnitude. This magnitude can be altered on a per-pixel basis when using a mask. Pixels that are farther away from the target image will receive a larger perturbation than pixels that are already close to the corresponding pixel in the target. This technique improves efficiency since the search space is significantly reduced. It is also possible to engineer masks for specific examples in order to incorporate other knowledge in the attack.\\
+The second improvement is to use a regional mask. The original \gls{ba} applies a perturbation to the images as a whole. Every pixel will be perturbed with the same magnitude. This magnitude can be altered on a per-pixel basis when using a mask. Pixels that are farther away from the target image will receive a larger perturbation than pixels that are already close to the corresponding pixel in the target. The mask $m$ is constructed according to equation \ref{eq:mask} based on the original image $x_{orig}$ and the adversarial image $x_{adv}$. It is then pixel-wise applied to the sampled perturbation in equation \ref{eq:mask_app}. The masked perturbation is normalized afterwards.\\ 
 
-The final improvement is based on the idea of transfer attacks. A surrogate model is trained and will be used to calculate adversarial gradients. These gradients will then be used to bias the sampling direction for the orthogonal step. If the surrogate model does not closely resemble the defender, then the gradients will only hamper the speed of convergence of the attack instead of completely failing the attack.
+\begin{align}
+m &= | x_{adv} - x_{orig}| \label{eq:mask}\\
+\eta_{k} &= m \odot \eta_k; \eta_k = \frac{\eta_k}{\| \eta_k \|} \label{eq:mask_app}
+\end{align}
+
+This technique improves efficiency since the search space is significantly reduced. It is also possible to engineer masks for specific examples in order to incorporate other knowledge in the attack.\\
+
+The final improvement is based on the idea of transfer attacks. A surrogate model is trained and will be used to calculate adversarial gradients. These gradients will then be used to bias the sampling direction for the orthogonal step. If the surrogate model does not closely resemble the defender, then the gradients will only hamper the speed of convergence of the attack instead of causing the attack to fail.
 
 \begin{figure}
 \centering

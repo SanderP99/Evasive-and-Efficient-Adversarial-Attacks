@@ -329,7 +329,17 @@ v_{t} &= \underbrace{wv_{t-1}}_\text{Inertia} + \underbrace{c_pr_p(p_{t-1} - x_{
 x_{t} &= x_{t-1} + v_{t} \label{eq:position_update}
 \end{align}
 
-% TODO something about inertia weights decreasing and other improvements
+Ever since the first mention of \gls{pso} in 1995, efforts have been made in order to improve the framework. The rest of this section will discuss some improvements.\\
+
+The first version of \gls{pso} used a fixed value for the inertia weight $w$. Later it has empirically been shown that a linearly decaying weight improves performance \cite{pso_study}. This allows the algorithm to focus on exploration in the early iterations, while shifting its focus to exploitation later on. The rate of decay depends on the high start value~$w_{start}$, the lower end value~$w_{end}$ and the maximum number of iterations $t_{max}$. The weight in iteration~$t$ is calculated as follows:
+
+\begin{align*}
+w_t = w_{end} + (w_{start} - w_{end})\left(1 - \frac{t}{t_{max}}\right)
+\end{align*}
+
+In a large search space, particles can be far apart, which can cause the velocities to explode. By limiting the value of velocities to $v_{max}$, the swarm can be stabilized and the probability of finding an optimum is increased \cite{pso}.\\
+
+TODO constriction factor, hybridization, multigroup
 
 \begin{figure}
 \centering

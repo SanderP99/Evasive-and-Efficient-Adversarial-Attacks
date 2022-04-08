@@ -8,7 +8,7 @@ This work will aim to evade the detection mechanism by distributing the query su
 
 As described in section \ref{sec:pso_and_distributed_attacks}, several attempts have been made to distribute adversarial attacks \cite{distributed_pso_attack, suryanto2020}. However, none of these attacks have been evaluated against the stateful detection mechanism, since the goal of the distribution was to make the attack more efficient. This work will distribute the query submission over multiple nodes in order to avoid detection.\\
 
-\section{Optimization}
+\section{Optimization} \label{sec:optimization_approach}
 As previously mentioned, reducing the number of submitted queries per adversary by a factor~$1/N$, where $N$ is the number of collaborators, is straightforward. Adversaries can gain knowledge about the search space by cooperating with other adversaries. They can leverage this knowledge in order to reduce the number of submitted queries even more. This idea has been utilized by multiple algorithms that were mentioned in section \ref{sec:pso_and_distributed_attacks}. These algorithms used some form of \gls{pso} to optimize the final adversarial example. However all but the \gls{pso}-\gls{bba} algorithm by Xiang et al \cite{distributed_pso_attack} rely on the confidence score of the model for the fitness value calculation. All attacks discussed use \gls{pso} as an attack in itself. This work will combine the benefits of state of the art black box attacks and \gls{pso}.
 
 \section{Approach}
