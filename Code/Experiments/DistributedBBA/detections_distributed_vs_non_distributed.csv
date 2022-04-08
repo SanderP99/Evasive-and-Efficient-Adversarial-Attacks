@@ -94,3 +94,21 @@ original_index,y_orig,y_target,n_particles,n_nodes,best_distance     ,n_detectio
 6265          ,4     ,2       ,5          ,5      ,3.7166412         ,48          ,25026  ,"[11, 10, 10, 8, 9]"  ,round_robin insert_1_mixed   ,mnist
 6265          ,4     ,2       ,5          ,5      ,3.3910468         ,48          ,25030  ,"[10, 12, 7, 10, 9]"  ,round_robin insert_10_mixed  ,mnist
 6265          ,4     ,2       ,5          ,5      ,3.272312          ,89          ,25010  ,"[18, 15, 17, 18, 21]",round_robin insert_20_mixed  ,mnist
+4426          ,9     ,7       ,5          ,1      ,1.9800127         ,36          ,25039  ,[36]                  ,round_robin insert_1_uniform ,mnist
+4426          ,9     ,7       ,5          ,1      ,1.8301675         ,141         ,25011  ,[141]                 ,round_robin insert_10_uniform,mnist
+4426          ,9     ,7       ,5          ,1      ,1.8464572         ,91          ,25000  ,[91]                  ,round_robin insert_20_uniform,mnist
+4426          ,9     ,7       ,5          ,1      ,1.9353644         ,232         ,25051  ,[232]                 ,round_robin insert_1_perlin  ,mnist
+4426          ,9     ,7       ,5          ,1      ,1.8703259         ,67          ,25042  ,[67]                  ,round_robin insert_10_perlin ,mnist
+4426          ,9     ,7       ,5          ,1      ,1.9234107         ,55          ,25002  ,[55]                  ,round_robin insert_20_perlin ,mnist
+4426          ,9     ,7       ,5          ,1      ,2.117557          ,24          ,25000  ,[24]                  ,round_robin insert_1_mixed   ,mnist
+4426          ,9     ,7       ,5          ,1      ,1.9522884         ,48          ,25000  ,[48]                  ,round_robin insert_10_mixed  ,mnist
+4426          ,9     ,7       ,5          ,1      ,1.8658869         ,73          ,25002  ,[73]                  ,round_robin insert_20_mixed  ,mnist
+4426          ,9     ,7       ,5          ,5      ,1.9800127         ,15          ,25039  ,"[4, 2, 4, 2, 3]"     ,round_robin insert_1_uniform ,mnist
+4426          ,9     ,7       ,5          ,5      ,1.8566908         ,57          ,25004  ,"[13, 11, 11, 11, 11]",round_robin insert_10_uniform,mnist
+4426          ,9     ,7       ,5          ,5      ,1.8920778         ,46          ,25041  ,"[10, 8, 8, 8, 12]"   ,round_robin insert_20_uniform,mnist
+4426          ,9     ,7       ,5          ,5      ,1.9353644         ,225         ,25051  ,"[45, 45, 45, 45, 45]",round_robin insert_1_perlin  ,mnist
+4426          ,9     ,7       ,5          ,5      ,1.8245039         ,51          ,25068  ,"[9, 11, 12, 10, 9]"  ,round_robin insert_10_perlin ,mnist
+4426          ,9     ,7       ,5          ,5      ,1.8377013         ,61          ,25009  ,"[13, 12, 9, 15, 12]" ,round_robin insert_20_perlin ,mnist
+4426          ,9     ,7       ,5          ,5      ,2.117557          ,15          ,25000  ,"[3, 2, 3, 4, 3]"     ,round_robin insert_1_mixed   ,mnist
+4426          ,9     ,7       ,5          ,5      ,1.8586004         ,47          ,25003  ,"[11, 9, 8, 8, 11]"   ,round_robin insert_10_mixed  ,mnist
+4426          ,9     ,7       ,5          ,5      ,1.8615662         ,35          ,25005  ,"[7, 7, 8, 6, 7]"     ,round_robin insert_20_mixed  ,mnist
