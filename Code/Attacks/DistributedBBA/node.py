@@ -18,7 +18,7 @@ class Node:
                                                clear_buffer_after_detection=flush_buffer_after_detection)
         elif dataset == 'cifar':
             self.detector = SimilarityDetector(k=k, chunk_size=chunk_size, threshold=0.021234,
-                                               weights_path='../../Defense/CIFARencoder.h5',
+                                               weights_path=weights_path_mnist,
                                                clear_buffer_after_detection=flush_buffer_after_detection)
         else:
             raise ValueError

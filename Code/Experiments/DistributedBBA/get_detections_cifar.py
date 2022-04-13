@@ -26,9 +26,9 @@ if __name__ == '__main__':
     #          'detections_per_node', 'distribution_scheme'])
 
     n_experiments = 5
-    n_particles = 5
+    n_particles = 10
     max_queries = 25000
-    for i in range(n_experiments):
+    for i in [0, 1, 3, 4, 6]:
         for n_nodes in [1]:
             np.random.seed(42)
             if n_nodes == 1:
@@ -47,13 +47,15 @@ if __name__ == '__main__':
             plt.imshow(cifar.test_data[4426])
             plt.show()
             # a
-            distribution_scheme = RoundRobinDistribution(mapping)
+            distribution_scheme = RoundRobinDistribution(mapping, n_nodes=n_nodes, n_particles=n_particles)
             # distribution_scheme = DistanceBasedDistributionScheme(mapping, n_nodes, dataset='cifar')
             attack = DistributedBiasedBoundaryAttack(n_particles=n_particles, model=bb_model,
                                                      target_img=x_orig,
                                                      target_label=experiment.y_target, inits=random_inits,
                                                      distribution_scheme=distribution_scheme,
-                                                     n_nodes=n_nodes, mapping=mapping, dataset='cifar')
+                                                     n_nodes=n_nodes, mapping=mapping, dataset='cifar',
+                                                     source_step_multiplier_up=1.05, source_step_multiplier_down=0.99,
+                                                     spherical_step=0.05, source_step=0.2)
             previous_queries = 0
             new_queries = 0
             with tqdm(total=max_queries) as pbar:

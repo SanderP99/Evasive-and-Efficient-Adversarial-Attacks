@@ -19,7 +19,7 @@ class DistributedBiasedBoundaryAttack:
         else:
             self.n_nodes: int = n_nodes
 
-        self.nodes: list = [Node(i, dataset) for i in range(self.n_nodes)]
+        self.nodes: list = [Node(i, dataset, weights_path_mnist='../../Defense/CIFARencoder.h5') for i in range(self.n_nodes)]
         # self.mapping: deque = mapping
         self.distribution_scheme = distribution_scheme
 

@@ -43,6 +43,8 @@ class Particle:
         self.spherical_step: float = spherical_step
         self.maximum_diff: float = 0.4
         self.c1, self.c2 = self.select_cs()
+        self.has_been_decreased = False
+        self.non_adversarial_count = 0
 
     def __eq__(self, other: 'Particle') -> bool:
         return self.fitness == other.fitness and self.best_fitness == other.best_fitness
@@ -83,6 +85,7 @@ class Particle:
 
     def update_position(self) -> None:
         if self.is_adversarial:
+            self.has_been_decreased = False
             mask = np.abs(self.position - self.target_image)
             mask /= np.max(mask)  # scale to [0,1]
             mask = mask ** 0.5  # weaken the effect a bit.
@@ -99,7 +102,10 @@ class Particle:
             self.update_velocity()
             self.position += self.velocity
             self.position = np.clip(self.position, 0, 1)
-            self.source_step *= self.source_step_multiplier_down
+            if not self.has_been_decreased:
+                self.source_step *= self.source_step_multiplier_down
+                self.has_been_decreased = True
+                self.non_adversarial_count += 1
 
     def update_bests(self) -> None:
         self.calculate_fitness()
@@ -107,6 +113,9 @@ class Particle:
         if self.fitness < self.best_fitness:
             self.best_fitness = self.fitness
             self.best_position = self.position
+
+        if self.non_adversarial_count >= 20:
+            self.source_step = 0.002
 
     def update_velocity(self, c1: float = 2., c2: float = 2.) -> None:
         w = self.calculate_w(1., 0., 1000)
