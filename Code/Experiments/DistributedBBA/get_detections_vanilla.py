@@ -13,13 +13,13 @@ from MNIST.setup_cifar import CIFAR
 from MNIST.setup_mnist import MNIST
 
 if __name__ == '__main__':
-    bb_model = load_model('../MNIST/models/cifar', compile=False)
-    mnist = CIFAR()
-    experiments = pd.read_csv('experiments_cifar.csv', index_col='index')
+    bb_model = load_model('../MNIST/models/mnist', compile=False)
+    mnist = MNIST()
+    experiments = pd.read_csv('experiments.csv', index_col='index')
 
     output_file = 'vanilla_detections.csv'
 
-    for i in [6]:
+    for i in [1]:
         np.random.seed(42)
         experiment = experiments.iloc[i]
         x_orig = mnist.test_data[experiment.name]
@@ -33,12 +33,13 @@ if __name__ == '__main__':
         plt.show()
 
         attack = BiasedBoundaryAttack(bb_model, create_perlin_noise)
-        node = Node(0, 'cifar', weights_path_mnist='../Defense/CIFARencoder.h5')
+        node = Node(0, 'cifar', weights_path_mnist='../Defense/MNISTencoder.h5')
         adv_example = attack.run_attack(x_orig, experiment.y_target, True, random_inits, (lambda: 25000 - attack.calls),
                                         maximal_calls=25000, dimensions=x_orig.shape, node=node, recalc_mask_every=1000,
                                         source_step=0.002, spherical_step=0.05)
 
         detections_all = [node.detector.get_detections()]
+        print(detections_all)
         total_detections = np.sum([len(x) for x in detections_all])
         print('Total: ', total_detections)
         distance = np.linalg.norm(adv_example - x_orig)

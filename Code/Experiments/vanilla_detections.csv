@@ -9,3 +9,4 @@ original_index,y_orig,y_target,detections,distance           ,calls,dataset
 466           ,4     ,6       ,473       ,1.347068338793156  ,25000,cifar
 4426          ,0     ,7       ,477       ,3.392773316383832  ,25000,cifar
 769           ,4     ,7       ,477       ,1.077302403531344  ,25000,cifar
+860,6,7,445,3.7945068,25000,cifar
