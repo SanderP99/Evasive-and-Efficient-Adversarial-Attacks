@@ -270,7 +270,7 @@ original image
 
 \end{axis}
 \end{tikzpicture}
-\caption[Detections of the different attacks]{The cumulative number of detections for different attack algorithms for one specific experiment. The number of detections of the \gls{bba} algorithm steadily increases with the number of calls. The number of detections of the \gls{pso}-\gls{bba} algorithm increases more slowly in the beginning due to the dispersed nature of the attack. The increase is more sharp near the end of the attack.}
+\caption[Detections of the different attacks]{The cumulative number of detections for different attack algorithms for one specific MNIST experiment. The number of detections of the \gls{bba} algorithm steadily increases with the number of calls. The number of detections of the \gls{pso}-\gls{bba} algorithm increases more slowly in the beginning due to the dispersed nature of the attack. The increase is more sharp near the end of the attack.}
 \label{fig:detections_bba_vs_pso_bba}
 \end{figure}
 
@@ -290,7 +290,48 @@ original image
 \end{table}
 
 \section{Towards distribution of the attack}
+The stateful defense mechanism \cite{chen_stateful_2019} makes the assumption that there is no collaboration between adversaries. Based on this assumption, each account or user will have its own detector buffer. This subsection aims to exploit this assumption by distributing the query submission over multiple accounts.\\
 
+By distributing the query submissions over multiple accounts, the number of total detection should be reduced compared to \gls{bba} due to two reasons. The first reason is obvious. If a budget of \num{25000} queries is distributed over $N$ accounts, then every account will submit \num{25000} / $N$ queries. The less queries there are submitted, the less potential attacks will be detected. The second reason is due to \gls{pso}. As stated before, the different particles reside in different parts of the search space. This means that a detector buffer of a specific account will contain queries from all over the search space, causing the inter query distances to be larger. The latter reason was also present in the algorithm described in section \ref{sec:combining_pso_bba}.\\
+
+It should be noted that there is only distribution at the query submission level. The algorithm itself will be executed on one machine without the need for distribution. Even the query submission can be done from one machine by constantly changing the \gls{api} key or by logging in and out of a specific account whenever it is needed. This approach makes the assumption that the \gls{api} under attack does not track the IP~address of the machine that submitted the query. Multiple machines might therefore be more convenient in a real attack setting.\\
+
+This work simulates the multiple machines setting by having separate node (or machine) objects on the same machine. Instead of having a detector buffer for each node at the location of the model, the responsibility is moved upstream to the nodes themselves. Each node will have a buffer to which the query will be added. All queries will be passed to the model afterwards. In Figure \ref{fig:distribution_overview}, the distribution is shown schematically. 
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+\begin{scope}[every node/.style={rectangle,thick,draw,anchor=base, minimum width=20mm}]
+	\node[align=center] (N1) at (3,5) {Node 1};
+	\node[align=center] (N2) at (3,4) {Node 2};
+	\node[align=center] (N3) at (3,3) {Node 3};
+	\node[align=center] (NN) at (3,1) {Node $N$};
+\end{scope}
+
+\node[align=center,anchor=base, minimum width=20mm,rectangle] (N) at (3,2) {$\ldots$};
+
+\begin{scope}[every node/.style={rectangle,thick,draw,anchor=base,minimum width=20mm, minimum height=10mm}]
+	\node[align=right, left= 35mm of N3] (A) {Algorithm};
+	\node[align=left, right= 35mm of N3] (M) {Model};
+\end{scope}
+
+\begin{scope}[]
+	\path [->] (A.east) edge (N1.west);
+	\path [->] (A.east) edge (N2.west);
+	\path [->] (A.east) edge (N3.west);
+%	\path [->] (A.east) edge (N.west);
+	\path [->] (A.east) edge (NN.west);
+
+	\path [->] (N1.east) edge (M.west);
+	\path [->] (N2.east) edge (M.west);
+	\path [->] (N3.east) edge (M.west);
+%	\path [->] (N.east) edge (M.west);
+	\path [->] (NN.east) edge (M.west);	
+\end{scope}
+\end{tikzpicture}
+\caption[Schematic overview of the query submission distribution]{Schematic overview of the query submission distribution. Each arrow represents a query. The algorithm distributes the queries over the different nodes. Every node forwards its received queries to the model using the corresponding account. In a real setting, the model will have a detector buffer for every account. In this work the buffers are located on the nodes themselves.}
+\label{fig:distribution_overview}
+\end{figure}
 
 \section{Throwing the defense off the scent}
 

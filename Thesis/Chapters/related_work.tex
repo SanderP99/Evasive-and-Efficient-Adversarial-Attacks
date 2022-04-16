@@ -11,45 +11,35 @@ The step sizes are adjusted according to local geometry of the boundary. The ort
 \gls{bba} \cite{brunner_guessing_2019} (previously known as \textit{Boundary Attack++}) is an improvement on the original \gls{ba} in three different ways. All three improvements will be discussed in order of the strength of their effect. The first improvement is a biased sampling technique. The key idea behind this that most previous attacks yield adversarial examples with high frequencies in the image. By sampling the perturbations in the first step of the \gls{ba} from a low frequency distribution, the frequency of the created adversarial example will be lowered as well. \gls{bba} does this by sampling from a Perlin noise \cite{perlin} distribution instead of a uniform distribution. Lower frequency images yield more natural results and can more easily bypass simple preprocessing defense schemes. The difference between the two noise patterns can be seen in Figure \ref{fig:noise_differences}. The noise patterns can be influenced by a frequency value. This value can be tuned depending on the size of the images at hand. Higher frequency values yield less smooth noise patterns. Figure \ref{fig:perlin_noise_frequencies} visually shows the influence of the frequency values.\\
 
 \begin{figure}
-\centering
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=.4\linewidth]{Images/gaussian_noise}
-  \caption{Uniform noise}
-  \label{fig:uniform_noise}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=.4\linewidth]{Images/perlin_noise}
-  \caption{Perlin noise}
-  \label{fig:perlin_noise}
-\end{subfigure}
-\caption[Difference between noise patterns]{Difference between noise patterns.}
-\label{fig:noise_differences}
+	\centering
+	\subfloat[Uniform noise]{%
+	\label{fig:uniform_noise}%
+	\includegraphics[width=.4\linewidth]{Images/gaussian_noise}
+	}\qquad
+	\subfloat[Perlin noise]{%
+	\label{fig:perlin_noise}%
+	\includegraphics[width=.4\linewidth]{Images/perlin_noise}
+	}
+	\caption[Difference between noise patterns]{Difference between noise patterns.}
+	\label{fig:noise_differences}
 \end{figure}
 
 \begin{figure}
-\centering
-\begin{subfigure}{0.33\textwidth}
 	\centering
-	\includegraphics[width=0.4\linewidth]{Images/perlin_noise_2}
-	\caption{Frequency 2}
-	\label{fig:perlin_noise_2}
-\end{subfigure}%
-\begin{subfigure}{0.33\textwidth}
-	\centering
-	\includegraphics[width=0.4\linewidth]{Images/perlin_noise}
-	\caption{Frequency 5}
-	\label{fig:perlin_noise_5}
-\end{subfigure}%
-\begin{subfigure}{0.33\textwidth}
-	\centering
-	\includegraphics[width=0.4\linewidth]{Images/perlin_noise_20}
-	\caption{Frequency 20}
-	\label{fig:perlin_noise_20}
-\end{subfigure}
-\caption[Influence of frequency on Perlin noise]{Influence of frequency on Perlin noise patterns.}
-\label{fig:perlin_noise_frequencies}
+	\subfloat[Frequency 2]{%
+	\label{fig:perlin_noise_2}%
+	\includegraphics[width=.3\linewidth]{Images/perlin_noise_2}
+	}\quad
+	\subfloat[Frequency 5]{%
+	\label{fig:perlin_noise_5}%
+	\includegraphics[width=.3\linewidth]{Images/perlin_noise}
+	}\quad
+	\subfloat[Frequency 20]{%
+	\label{fig:perlin_noise_20}%
+	\includegraphics[width=.3\linewidth]{Images/perlin_noise_20}
+	}
+	\caption[Influence of frequency on Perlin noise]{Influence of frequency on Perlin noise patterns.}
+	\label{fig:perlin_noise_frequencies}
 \end{figure}
 
 The second improvement is to use a regional mask. The original \gls{ba} applies a perturbation to the images as a whole. Every pixel will be perturbed with the same magnitude. This magnitude can be altered on a per-pixel basis when using a mask. Pixels that are farther away from the target image will receive a larger perturbation than pixels that are already close to the corresponding pixel in the target. The mask $m$ is constructed according to equation \ref{eq:mask} based on the original image $x_{orig}$ and the adversarial image $x_{adv}$. It is then pixel-wise applied to the sampled perturbation in equation \ref{eq:mask_app}. The masked perturbation is normalized afterwards.\\ 

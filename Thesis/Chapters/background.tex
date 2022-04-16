@@ -1,13 +1,23 @@
 \chapter{Background}
 \section{Neural networks}
-TODO: SOMETHING ABOUT DIFFERENT LAYERS\\
-
 Ever since the invention of computer systems, it has always been a goal of scientists and engineers to create \gls{ai}. Current state of the art approaches are mimicking the human brain, more specifically the neurons inside the brain. Already in the fifties, Rosenblatt introduced his perceptron \cite{rosenblatt_perceptron_1958}. The perceptron is a single neuron able to learn linearly separable patterns. It does so by finding a hyperplane that separates the two classes. This hyperplane is called the decision surface or decision boundary and the perceptron itself is called a classifier. Geometric regions separated by a decision boundary are called decision regions. The concept of linear separability is explained in Figure~\ref{fig:linear_separability} in two dimensions. In Figure~\ref{fig:decision_boundaries_decision_regions}, the decision boundaries and decision regions are explained visually. \\
 
-Unfortunately not all patterns are linearly separable. To overcome this problem, the neurons can be layered, creating an \gls{ann} in the process. Layering neurons sequentially is essentially a linear combination of neurons. This in itself does not create non-linear decision surfaces. Non-linear activation functions are added for the \gls{ann} to be able to learn more complex decision boundaries. Some commonly used activation functions are \gls{relu} \cite{relu}, Heaviside step function and softmax (or sigmoid when used on scalars). In Figure~\ref{fig:activation_functions} the plots of the activation functions can be found.\\ 
+Unfortunately not all patterns are linearly separable. To overcome this problem, the neurons can be layered, creating an \gls{ann} in the process. Layering neurons sequentially is essentially a linear combination of neurons. This in itself does not create non-linear decision surfaces. Non-linear activation functions are added for the \gls{ann} to be able to learn more complex decision boundaries. Some commonly used activation functions are \gls{relu} \cite{relu}, Heaviside step function and softmax (or sigmoid when used on scalars). In Figure~\ref{fig:activation_functions} the plots of some activation functions can be found.\\ 
 
 The neurons can be combined in different ways to create different \gls{ann} architectures. Each architecture has its own strengths and weaknesses. \glspl{cnn} excel in classifying visual data \cite{cnn_1, cnn_2}, whilst \glspl{rnn} are widely used when there exist dependencies inside the data, such as in speech recognition \cite{speech_1, speech_2} or time series prediction \cite{time_series_1}. More recent research focuses on \glspl{dnn}, due to the ever increasing computational power available. \gls{dnn} approaches are able to compare to and even surpass human performance on very specific tasks \cite{alpha_go_google, imagenet_dnn}.\\ 
 
+Most \glspl{ann} are not built from individual neurons, but rather from layers of neurons. An \gls{ann} architecture describes the different layers of which the network consists. The most basic type of layer is the fully connected or dense layer. This layer, as the name suggests, consists of neurons that are connected to all neurons of the previous layer. Every neuron in this layer outputs a value based on the perceptron rule:
+\begin{align*}
+	y = b + W \cdot X
+\end{align*} 
+Here $y$ is the output of the neuron, $b$ is the bias, $W$ is the weight matrix and $X$ is the vector consisting of the outputs of the previous layer. The values of the bias and weights are learned based on the training data. $W \cdot X$ is the dot product $\sum_{i=1}^nw_ix_i$, where $n$ is the number of neurons in the previous layer \cite{perceptron_wikipedia}.\\
+
+Activation layers apply activation functions to their inputs. They can be standalone layers, but more frequently they are integrated in other layers.\\ 
+
+Convolution layers \cite{mnist} are the main building blocks of \glspl{cnn}. Convolution layers map inputs to so called feature maps. A filter~$W$ slides over the input~$X$ from left to right top to bottom. At every position, the dot product $W\cdot X$ of the frame and the underlying values of the input is computed. This value is placed at the corresponding position of the feature map. Higher values of the dot product (for a fixed value of $\|W\|_2$) mean that $W$ and the underlying values of $X$ are more similar. The feature map therefore indicates where in the input~$X$ a certain pattern~$W$ can be found. This process is translation-invariant, meaning that a certain pattern can be detected at any location of $X$. Scale and rotation invariance can be achieved by repeating the process for scaled and rotated filters. This is the main reason why \glspl{cnn} are widely used for visual data. An example of a convolution layer is shown in Figure \ref{fig:convolution}.\\
+
+The use of convolution layers tends to cause an explosion in the dimensionality of the data. One filter will produce a feature map that is smaller than the original input. But a convolution layer typically consists of many filters, causing the explosion in the number of connections and weights. Pooling or subsampling layers \cite{mnist} alleviate this problem by aggregating nearby points. The aggregation happens using a sliding window similar to a convolution layer. This approach to reduce the dimensionality has the added benefit that the output of the model is less sensitive to the exact location of a pattern. Some commonly used pooling layers are the MaxPooling and AveragePooling layers. They aggregate nearby points using the maximum and average value respectively. Convolution and pooling layers are often used in combinations with each other and are repeated multiple times. This allows the \gls{cnn} to detect patterns at different scales.\\
+ 
 \begin{figure}
 \tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt        
 \centering
@@ -216,6 +226,114 @@ ticklabel style={font=\tiny,fill=white},
 \label{fig:activation_functions}
 \end{figure}
 
+\begin{figure}
+\centering
+\tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt        
+
+\begin{tikzpicture}[x=0.75pt,y=0.75pt,yscale=-.8,xscale=.8]
+%uncomment if require: \path (0,320); %set diagram left start at 0, and has height of 320
+
+%Shape: Rectangle [id:dp16302678045833785] 
+\draw  [fill={rgb, 255:red, 128; green, 128; blue, 128 }  ,fill opacity=1 ] (19.22,129.32) -- (19.22,89.32) -- (59.22,89.32) -- (59.22,129.32) -- cycle ;
+%Shape: Rectangle [id:dp4740979399382914] 
+\draw  [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=0.5 ] (89.61,130.67) -- (89.61,30.67) -- (189.61,30.67) -- (189.61,130.67) -- cycle ;
+%Shape: Rectangle [id:dp758935281388128] 
+\draw  [fill={rgb, 255:red, 128; green, 128; blue, 128 }  ,fill opacity=1 ] (89.73,70.27) -- (89.73,30.27) -- (129.73,30.27) -- (129.73,70.27) -- cycle ;
+%Shape: Rectangle [id:dp25147604731143414] 
+\draw  [dash pattern={on 0.84pt off 2.51pt}][line width=0.75]  (109.73,70.27) -- (109.73,30.27) -- (149.73,30.27) -- (149.73,70.27) -- cycle ;
+%Straight Lines [id:da8918779373551835] 
+\draw    (59.22,109.59) -- (147.25,71.2) ;
+\draw [shift={(150,70)}, rotate = 156.44] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da6145564233685059] 
+\draw    (59.22,109.59) -- (127.38,71.46) ;
+\draw [shift={(130,70)}, rotate = 150.78] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da19666841950671765] 
+\draw    (59.22,109.59) -- (107.63,71.84) ;
+\draw [shift={(110,70)}, rotate = 142.06] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Shape: Rectangle [id:dp7649040729081236] 
+\draw  [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=0.5 ] (219.46,130.53) -- (219.46,50.53) -- (299.46,50.53) -- (299.46,130.53) -- cycle ;
+%Straight Lines [id:da025473948126214063] 
+\draw    (170,110) -- (256.88,120.84) ;
+\draw [shift={(259.86,121.21)}, rotate = 187.11] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Shape: Square [id:dp7289182921794495] 
+\draw   (219.86,70.13) -- (219.86,50.13) -- (239.86,50.13) -- (239.86,70.13) -- cycle ;
+%Shape: Square [id:dp3517670098930954] 
+\draw  [dash pattern={on 0.84pt off 2.51pt}] (240,70) -- (240,50) -- (260,50) -- (260,70) -- cycle ;
+%Shape: Square [id:dp0060719107761508795] 
+\draw  [dash pattern={on 4.5pt off 4.5pt}] (130.27,129.73) -- (130.27,89.73) -- (170.27,89.73) -- (170.27,129.73) -- cycle ;
+%Shape: Square [id:dp7200889456273163] 
+\draw  [dash pattern={on 4.5pt off 4.5pt}] (260,130) -- (260,110) -- (280,110) -- (280,130) -- cycle ;
+%Shape: Square [id:dp27953712356059635] 
+\draw  [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=0.5 ] (340,30) -- (440,30) -- (440,130) -- (340,130) -- cycle ;
+%Shape: Square [id:dp8345536072101358] 
+\draw  [fill={rgb, 255:red, 205; green, 205; blue, 205 }  ,fill opacity=1 ] (490,20) -- (570,20) -- (570,100) -- (490,100) -- cycle ;
+%Shape: Square [id:dp25056816796659254] 
+\draw  [fill={rgb, 255:red, 128; green, 128; blue, 128 }  ,fill opacity=1 ] (500,30) -- (580,30) -- (580,110) -- (500,110) -- cycle ;
+%Shape: Square [id:dp2563580070283613] 
+\draw  [fill={rgb, 255:red, 205; green, 205; blue, 205 }  ,fill opacity=1 ] (510,40) -- (590,40) -- (590,120) -- (510,120) -- cycle ;
+%Shape: Square [id:dp33054308086122974] 
+\draw  [fill={rgb, 255:red, 128; green, 128; blue, 128 }  ,fill opacity=1 ] (520,50) -- (600,50) -- (600,130) -- (520,130) -- cycle ;
+%Shape: Square [id:dp0968521898422634] 
+\draw  [fill={rgb, 255:red, 205; green, 205; blue, 205 }  ,fill opacity=1 ] (530,60) -- (610,60) -- (610,140) -- (530,140) -- cycle ;
+
+%Shape: Square [id:dp4185921090555962] 
+\draw   (550,80) -- (570,80) -- (570,100) -- (550,100) -- cycle ;
+%Shape: Square [id:dp04075185233144274] 
+\draw   (360,50) -- (400,50) -- (400,90) -- (360,90) -- cycle ;
+%Straight Lines [id:da45029223803435126] 
+\draw  [dash pattern={on 0.84pt off 2.51pt}]  (400,50) -- (550,80) ;
+%Straight Lines [id:da34905935844861546] 
+\draw  [dash pattern={on 0.84pt off 2.51pt}]  (400,90) -- (550,100) ;
+%Straight Lines [id:da4533763369795718] 
+\draw    (580,10) -- (620,50) ;
+\draw [shift={(620,50)}, rotate = 225] [color={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.75]    (0,5.59) -- (0,-5.59)   ;
+\draw [shift={(580,10)}, rotate = 225] [color={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.75]    (0,5.59) -- (0,-5.59)   ;
+
+
+% Text Node
+\draw (40,150) node   [align=left] {\begin{minipage}[lt]{27.2pt}\setlength\topsep{0pt}
+\begin{center}
+Filter
+\end{center}
+
+\end{minipage}};
+% Text Node
+\draw (140,150) node   [align=left] {\begin{minipage}[lt]{68pt}\setlength\topsep{0pt}
+\begin{center}
+Input
+\end{center}
+
+\end{minipage}};
+% Text Node
+\draw (260,150) node   [align=left] {\begin{minipage}[lt]{68pt}\setlength\topsep{0pt}
+\begin{center}
+Feature map
+\end{center}
+
+\end{minipage}};
+% Text Node
+\draw (610,20) node   [align=left] {\begin{minipage}[lt]{13.6pt}\setlength\topsep{0pt}
+m
+\end{minipage}};
+% Text Node
+\draw (390,150) node   [align=left] {\begin{minipage}[lt]{68pt}\setlength\topsep{0pt}
+\begin{center}
+Input
+\end{center}
+
+\end{minipage}};
+% Text Node
+\draw (550,150) node   [align=left] {\begin{minipage}[lt]{81.6pt}\setlength\topsep{0pt}
+\begin{center}
+Feature maps
+\end{center}
+
+\end{minipage}};
+\end{tikzpicture}
+\caption[Example of a convolution layer]{Example of a convolution layer. The filter slides over the input from left to right top to bottom. At every position, the dot product of the filter and input image is computed. This value is added to the corresponding position of the feature map. This process is repeated for $m$ different filters leading to $m$ feature maps.}
+\label{fig:convolution}
+\end{figure}
+
 \section{Adversarial attacks}
 The expressiveness of \glspl{ann} is a double-edged sword. It is the cause for the near-human performance on some tasks, but also for counter-intuitive properties. As studied by Szegedy et al \cite{szegedy2014intriguing}, one of these properties is the presence of discontinuous decision boundaries. This might cause seemingly identically images to be classified differently. They first defined adversarial examples as \textit{imperceptibly small perturbations to a correctly classified input image, so that it is no longer classified correctly} \cite{szegedy2014intriguing}. This property of \glspl{ann} might not seem important at first glance, but it can be quite worrisome from a security point-of-view. Malicious users could craft images to bypass face recognition software \cite{face_recognition} or attack the camera of a self-driving car to misclassify traffic signs \cite{traffic_signs}. Other fields where adversarial examples are of interest include malware detection \cite{malware_detection}, natural language processing \cite{adversarial_nlp} and industrial control systems \cite{adversarial_industrial_control_system}. Adversarial attacks are algorithms used to craft such adversarial examples.\\ 
 
@@ -341,7 +459,21 @@ w_t = w_{end} + (w_{start} - w_{end})\left(1 - \frac{t}{t_{max}}\right) \label{e
 
 In a large search space, particles can be far apart, which can cause the velocities to explode. By limiting the value of velocities to $v_{max}$, the swarm can be stabilized and the probability of finding an optimum is increased \cite{pso}.\\
 
-TODO constriction factor, hybridization, multigroup
+Clerc and Kennedy \cite{constriction_factor} studied \gls{pso} from a dynamic systems point of view. They provided a theoretically backed solution to the problem of the exploding velocities. Instead of limiting the value of the velocity, something which has only been shown empirically that it works, they proposed the constriction factor $\chi$. The constriction factor is able to prevent the velocity explosion, whilst avoiding premature convergence to local optima. The velocity update of equation \ref{eq:velocity_update} is altered as follows:
+\begin{align*}
+	v_{t} &= \chi (v_{t-1} + c_pr_p(p_{t-1} - x_{t-1}) + c_gr_g(g_{t-1} - x_{t-1}))
+\end{align*}
+The inertia weight $w$ is dropped and the entire sum is multiplied with $\chi$. The value of $\chi$ is calculated as follows:
+\begin{align*}
+	\chi = 
+	\begin{cases}
+		\sqrt{\frac{2\kappa}{C-2+\sqrt{C^2-4C}}}, &C>4\\
+		\sqrt{\kappa}, 							&\text{else}
+	\end{cases}
+\end{align*}
+Here $C$ is the sum of the acceleration coefficients $c_p$ and $c_g$ and $\kappa$ is a user defined value to determine the rate of convergence.\\ 
+ 
+TODO hybridization, multigroup
 
 \begin{figure}
 \centering
