@@ -128,3 +128,9 @@ original_index,y_orig,y_target,n_particles,n_nodes,best_distance      ,n_detecti
 4426          ,9     ,7       ,10         ,1      ,1.8933693          ,89          ,25154  ,[89]                  ,round_robin                  ,mnist
 8322          ,9     ,5       ,10         ,1      ,2.379271           ,170         ,25001  ,[170]                 ,round_robin insert_1_uniform ,mnist
 860           ,6     ,7       ,5          ,1      ,3.6240742          ,154         ,25104  ,[154]                 ,round_robin                  ,mnist
+7270          ,1     ,3       ,5          ,1      ,2.4076076          ,203         ,25017  ,[203]                 ,round_robin                  ,mnist
+860           ,6     ,7       ,5          ,1      ,3.7782803          ,127         ,25029  ,[127]                 ,round_robin                  ,mnist
+6265          ,4     ,2       ,5          ,1      ,3.2908084          ,182         ,25046  ,[182]                 ,round_robin                  ,mnist
+4426          ,9     ,7       ,5          ,1      ,1.8306835          ,153         ,25001  ,[153]                 ,round_robin                  ,mnist
+8322          ,9     ,5       ,5          ,1      ,2.4176242          ,202         ,25065  ,[202]                 ,round_robin                  ,mnist
+7270          ,1     ,3       ,5          ,5      ,2.4076076          ,176         ,25017  ,"[34, 36, 37, 35, 34]",round_robin                  ,mnist
