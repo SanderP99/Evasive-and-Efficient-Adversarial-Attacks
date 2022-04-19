@@ -286,6 +286,7 @@ original image
 	Baseline \gls{bba}	&3.027		&339		&1.359			&475 \\
 	\gls{pso}-\gls{bba} (5 particles)	&2.691			&173			&1.133				&301 \\ 
 	\gls{pso}-\gls{bba} (10 particles)	&2.788			&107			&1.782				&243 \\
+	
 	\bottomrule
 	
 	\end{tabular}
@@ -298,7 +299,15 @@ By distributing the query submissions over multiple accounts, the number of tota
 
 It should be noted that there is only distribution at the query submission level. The algorithm itself will be executed on one machine without the need for distribution. Even the query submission can be done from one machine by constantly changing the \gls{api} key or by logging in and out of a specific account whenever it is needed. This approach makes the assumption that the \gls{api} under attack does not track the IP~address of the machine that submitted the query. Multiple machines might therefore be more convenient in a real attack setting.\\
 
-This work simulates the multiple machines setting by having separate node (or machine) objects on the same machine. Instead of having a detector buffer for each node at the location of the model, the responsibility is moved upstream to the nodes themselves. Each node will have a buffer to which the query will be added. All queries will be passed to the model afterwards. In Figure \ref{fig:distribution_overview}, the distribution is shown schematically. 
+This work simulates the multiple machines setting by having separate node (or machine) objects on the same machine. Instead of having a detector buffer for each node at the location of the model, the responsibility is moved upstream to the nodes themselves. Each node will have a buffer to which the query will be added. All queries will be passed to the model afterwards. In Figure \ref{fig:distribution_overview}, the distribution is shown schematically.\\
+
+The queries will be distributed over the nodes based on a distribution scheme. Three different distribution schemes will be used in the experiments. The first two schemes are inspired by the \gls{rr} scheduling algorithm \cite{round_robin} and will be called the \gls{rr} and \gls{mrr} distribution schemes. The third distribution scheme will be built on the assumption that the inter query distance in the detector buffers needs to be maximized.\\
+
+The \gls{rr} distribution scheme is fairly straightforward. The outgoing queries of the algorithm will be evenly distributed over the nodes in circular order. This scheme does not have a notion of the underlying attack. This can cause successive queries forwarded to the same node to be relatively close together by chance.\\  
+
+The \gls{mrr} distribution scheme maps a particle to a node for the entire duration of an attack iteration. The queries submitted by a single particle during one attack iteration are relatively close together, but this approach ensures that all particles will submit queries to all nodes. This might ultimately cause less detections. The \gls{mrr} distribution scheme maps a number of particles on a number of nodes. If the amount of particles is equal to the number of nodes then the mapping is straightforward. If the number of nodes is less than the number of particles then dummy nodes are introduced in the mapping. The dummy nodes forward their received queries to a random existing node. The random node changes every rotation. If the number of particles is less than the number of nodes then dummy particles that do not submit queries, are introduced. After every attack iteration, the mapping rotates. The mapping process is shown in Figure \ref{fig:round_robin}.\\ 
+
+The final goal of the attack is to evade the staeful detection mechanism that defends the model under attack. Potential attacks are flagged based on the inter query distance in a detector buffer. The distance-based distribution scheme tries to exploit the defense. Instead of distributing queries over nodes in a \gls{rr}-fashion, queries are submitted to nodes based on the distance to the previously submitted queries to this node. The node with the highest average distance to the previously submitted queries is selected. For this purpose, every node will hold an internal buffer of queries. The size of this buffer can be chosen by the attacker, as can the distance metric. Standard $L_2$-distance can be chosen, but this has the some pitfalls as discussed in section \ref{sec:stateful_detection}. It is also possible to train another similarity encoder and use the $L_2$-distance in the embedded space in order to resemble the defense more closely.\\
 
 \begin{figure}
 \centering
@@ -333,6 +342,204 @@ This work simulates the multiple machines setting by having separate node (or ma
 \end{tikzpicture}
 \caption[Schematic overview of the query submission distribution]{Schematic overview of the query submission distribution. Each arrow represents a query. The algorithm distributes the queries over the different nodes. Every node forwards its received queries to the model using the corresponding account. In a real setting, the model will have a detector buffer for every account. In this work the buffers are located on the nodes themselves.}
 \label{fig:distribution_overview}
+\end{figure}
+
+\begin{table}
+	\centering
+	\caption[Distributed PSO-BBA results]{Results for the distributed \gls{pso}-\gls{bba} approach on MNIST and CIFAR-10 dataset.}
+	\label{tbl:d_pso_bba}
+	\begin{tabular}{lrrrr}\toprule
+			& \multicolumn{2}{c}{MNIST} &\multicolumn{2}{c}{CIFAR} \\ \cmidrule(r){2-3} \cmidrule(r){4-5}
+	Attack				&Distance	&Detections	&Distance	&Detections \\ \midrule
+	Baseline \gls{bba}	&3.027		&339		&1.359			&475 \\
+	\gls{pso}-\gls{bba} 	&2.691			&173			&1.133				&301 \\ 
+	\gls{rr}-\gls{pso}-\gls{bba} (5 nodes) &2.691	&	&1.133	& \\
+	\gls{rr}-\gls{pso}-\gls{bba} (10 nodes) &2.691	&	&1.133	& \\	
+	\gls{mrr}-\gls{pso}-\gls{bba} (5 nodes)	&2.691			&148			&1.133				&280 \\
+	\gls{mrr}-\gls{pso}-\gls{bba} (10 nodes)	&2.691			&129			&1.133				&263 \\
+	\bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{figure}
+\centering
+\tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt        
+
+\begin{tikzpicture}[x=0.75pt,y=0.75pt,yscale=-.9,xscale=0.9]
+%uncomment if require: \path (0,300); %set diagram left start at 0, and has height of 300
+
+%Shape: Regular Polygon [id:dp6311837881944131] 
+\draw  [draw opacity=0] (164.04,130.38) -- (130.11,189.14) -- (62.26,189.14) -- (28.33,130.38) -- (62.26,71.61) -- (130.11,71.61) -- cycle ;
+%Shape: Regular Polygon [id:dp734210614935138] 
+\draw  [draw opacity=0] (128.18,130.38) -- (112.18,158.09) -- (80.18,158.09) -- (64.18,130.38) -- (80.18,102.67) -- (112.18,102.67) -- cycle ;
+%Shape: Circle [id:dp20420366237563004] 
+\draw   (121.18,130.38) .. controls (121.18,126.51) and (124.32,123.38) .. (128.18,123.38) .. controls (132.05,123.38) and (135.18,126.51) .. (135.18,130.38) .. controls (135.18,134.24) and (132.05,137.38) .. (128.18,137.38) .. controls (124.32,137.38) and (121.18,134.24) .. (121.18,130.38) -- cycle ;
+%Shape: Circle [id:dp5667720968503112] 
+\draw   (105.18,158.09) .. controls (105.18,154.22) and (108.32,151.09) .. (112.18,151.09) .. controls (116.05,151.09) and (119.18,154.22) .. (119.18,158.09) .. controls (119.18,161.96) and (116.05,165.09) .. (112.18,165.09) .. controls (108.32,165.09) and (105.18,161.96) .. (105.18,158.09) -- cycle ;
+%Shape: Circle [id:dp09001615776819638] 
+\draw   (105.18,102.67) .. controls (105.18,98.8) and (108.32,95.67) .. (112.18,95.67) .. controls (116.05,95.67) and (119.18,98.8) .. (119.18,102.67) .. controls (119.18,106.53) and (116.05,109.67) .. (112.18,109.67) .. controls (108.32,109.67) and (105.18,106.53) .. (105.18,102.67) -- cycle ;
+%Shape: Circle [id:dp25267892030876826] 
+\draw   (73.18,102.67) .. controls (73.18,98.8) and (76.32,95.67) .. (80.18,95.67) .. controls (84.05,95.67) and (87.18,98.8) .. (87.18,102.67) .. controls (87.18,106.53) and (84.05,109.67) .. (80.18,109.67) .. controls (76.32,109.67) and (73.18,106.53) .. (73.18,102.67) -- cycle ;
+%Shape: Circle [id:dp9011095802276641] 
+\draw   (57.18,130.38) .. controls (57.18,126.51) and (60.32,123.38) .. (64.18,123.38) .. controls (68.05,123.38) and (71.18,126.51) .. (71.18,130.38) .. controls (71.18,134.24) and (68.05,137.38) .. (64.18,137.38) .. controls (60.32,137.38) and (57.18,134.24) .. (57.18,130.38) -- cycle ;
+%Shape: Circle [id:dp9002579789917513] 
+\draw   (73.18,158.09) .. controls (73.18,154.22) and (76.32,151.09) .. (80.18,151.09) .. controls (84.05,151.09) and (87.18,154.22) .. (87.18,158.09) .. controls (87.18,161.96) and (84.05,165.09) .. (80.18,165.09) .. controls (76.32,165.09) and (73.18,161.96) .. (73.18,158.09) -- cycle ;
+%Straight Lines [id:da5872531499507816] 
+\draw    (64.18,130.38) -- (78.68,105.26) ;
+\draw [shift={(80.18,102.67)}, rotate = 120] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da6168359296990422] 
+\draw    (80.18,102.67) -- (109.18,102.67) ;
+\draw [shift={(112.18,102.67)}, rotate = 180] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da13846207252243437] 
+\draw    (112.18,102.67) -- (126.68,127.78) ;
+\draw [shift={(128.18,130.38)}, rotate = 240] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da15864835171123404] 
+\draw    (128.18,130.38) -- (113.68,155.49) ;
+\draw [shift={(112.18,158.09)}, rotate = 300] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da1570240528041873] 
+\draw    (80.18,158.09) -- (65.68,132.98) ;
+\draw [shift={(64.18,130.38)}, rotate = 60] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da6269615457025413] 
+\draw    (112.18,158.09) -- (83.18,158.09) ;
+\draw [shift={(80.18,158.09)}, rotate = 360] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Shape: Square [id:dp8251388573322678] 
+\draw   (117.81,176.84) -- (142.41,176.84) -- (142.41,201.44) -- (117.81,201.44) -- cycle ;
+%Shape: Square [id:dp205181392666675] 
+\draw   (151.74,118.08) -- (176.34,118.08) -- (176.34,142.68) -- (151.74,142.68) -- cycle ;
+%Shape: Square [id:dp29815936075322313] 
+\draw   (117.81,59.31) -- (142.41,59.31) -- (142.41,83.91) -- (117.81,83.91) -- cycle ;
+%Shape: Square [id:dp841488455537714] 
+\draw   (49.96,59.31) -- (74.56,59.31) -- (74.56,83.91) -- (49.96,83.91) -- cycle ;
+%Shape: Square [id:dp800192330604856] 
+\draw   (16.03,118.08) -- (40.63,118.08) -- (40.63,142.68) -- (16.03,142.68) -- cycle ;
+%Shape: Square [id:dp672047962326588] 
+\draw   (49.96,176.84) -- (74.56,176.84) -- (74.56,201.44) -- (49.96,201.44) -- cycle ;
+%Shape: Regular Polygon [id:dp4663627978496028] 
+\draw  [draw opacity=0] (360.04,130.37) -- (326.11,189.13) -- (258.26,189.13) -- (224.33,130.37) -- (258.26,71.6) -- (326.11,71.6) -- cycle ;
+%Shape: Regular Polygon [id:dp8460846766666963] 
+\draw  [draw opacity=0] (324.18,130.37) -- (308.18,158.08) -- (276.18,158.08) -- (260.18,130.37) -- (276.18,102.65) -- (308.18,102.65) -- cycle ;
+%Shape: Circle [id:dp28465961252669714] 
+\draw   (317.18,130.37) .. controls (317.18,126.5) and (320.32,123.37) .. (324.18,123.37) .. controls (328.05,123.37) and (331.18,126.5) .. (331.18,130.37) .. controls (331.18,134.23) and (328.05,137.37) .. (324.18,137.37) .. controls (320.32,137.37) and (317.18,134.23) .. (317.18,130.37) -- cycle ;
+%Shape: Circle [id:dp6382563352290074] 
+\draw   (301.18,158.08) .. controls (301.18,154.21) and (304.32,151.08) .. (308.18,151.08) .. controls (312.05,151.08) and (315.18,154.21) .. (315.18,158.08) .. controls (315.18,161.94) and (312.05,165.08) .. (308.18,165.08) .. controls (304.32,165.08) and (301.18,161.94) .. (301.18,158.08) -- cycle ;
+%Shape: Circle [id:dp3512284393979799] 
+\draw   (301.18,102.65) .. controls (301.18,98.79) and (304.32,95.65) .. (308.18,95.65) .. controls (312.05,95.65) and (315.18,98.79) .. (315.18,102.65) .. controls (315.18,106.52) and (312.05,109.65) .. (308.18,109.65) .. controls (304.32,109.65) and (301.18,106.52) .. (301.18,102.65) -- cycle ;
+%Shape: Circle [id:dp887478959629223] 
+\draw   (269.18,102.65) .. controls (269.18,98.79) and (272.32,95.65) .. (276.18,95.65) .. controls (280.05,95.65) and (283.18,98.79) .. (283.18,102.65) .. controls (283.18,106.52) and (280.05,109.65) .. (276.18,109.65) .. controls (272.32,109.65) and (269.18,106.52) .. (269.18,102.65) -- cycle ;
+%Shape: Circle [id:dp4353947442388322] 
+\draw   (253.18,130.37) .. controls (253.18,126.5) and (256.32,123.37) .. (260.18,123.37) .. controls (264.05,123.37) and (267.18,126.5) .. (267.18,130.37) .. controls (267.18,134.23) and (264.05,137.37) .. (260.18,137.37) .. controls (256.32,137.37) and (253.18,134.23) .. (253.18,130.37) -- cycle ;
+%Shape: Circle [id:dp7666259147336745] 
+\draw   (269.18,158.08) .. controls (269.18,154.21) and (272.32,151.08) .. (276.18,151.08) .. controls (280.05,151.08) and (283.18,154.21) .. (283.18,158.08) .. controls (283.18,161.94) and (280.05,165.08) .. (276.18,165.08) .. controls (272.32,165.08) and (269.18,161.94) .. (269.18,158.08) -- cycle ;
+%Straight Lines [id:da07218965576032499] 
+\draw    (260.18,130.37) -- (274.68,105.25) ;
+\draw [shift={(276.18,102.65)}, rotate = 120] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da9811847419843689] 
+\draw    (276.18,102.65) -- (305.18,102.65) ;
+\draw [shift={(308.18,102.65)}, rotate = 180] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da7696148363482385] 
+\draw    (308.18,102.65) -- (322.68,127.77) ;
+\draw [shift={(324.18,130.37)}, rotate = 240] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da4200412433935663] 
+\draw    (324.18,130.37) -- (309.68,155.48) ;
+\draw [shift={(308.18,158.08)}, rotate = 300] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da40745660979504894] 
+\draw    (276.18,158.08) -- (261.68,132.96) ;
+\draw [shift={(260.18,130.37)}, rotate = 60] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da582121084817373] 
+\draw    (308.18,158.08) -- (279.18,158.08) ;
+\draw [shift={(276.18,158.08)}, rotate = 360] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Shape: Square [id:dp21492323759545462] 
+\draw   (313.81,176.83) -- (338.41,176.83) -- (338.41,201.43) -- (313.81,201.43) -- cycle ;
+%Shape: Square [id:dp5670063733847699] 
+\draw   (347.74,118.07) -- (372.34,118.07) -- (372.34,142.67) -- (347.74,142.67) -- cycle ;
+%Shape: Square [id:dp2524758458611347] 
+\draw   (313.81,59.3) -- (338.41,59.3) -- (338.41,83.9) -- (313.81,83.9) -- cycle ;
+%Shape: Square [id:dp9717286372639087] 
+\draw   (212.03,118.07) -- (236.63,118.07) -- (236.63,142.67) -- (212.03,142.67) -- cycle ;
+%Shape: Square [id:dp6620936948123217] 
+\draw   (245.96,176.83) -- (270.56,176.83) -- (270.56,201.43) -- (245.96,201.43) -- cycle ;
+%Shape: Regular Polygon [id:dp25696076322247396] 
+\draw  [draw opacity=0] (556.04,130.37) -- (522.11,189.13) -- (454.26,189.13) -- (420.33,130.37) -- (454.26,71.6) -- (522.11,71.6) -- cycle ;
+%Shape: Regular Polygon [id:dp7752002993727685] 
+\draw  [draw opacity=0] (520.18,130.37) -- (504.18,158.08) -- (472.18,158.08) -- (456.18,130.37) -- (472.18,102.65) -- (504.18,102.65) -- cycle ;
+%Shape: Circle [id:dp4282548325608164] 
+\draw   (513.18,130.37) .. controls (513.18,126.5) and (516.32,123.37) .. (520.18,123.37) .. controls (524.05,123.37) and (527.18,126.5) .. (527.18,130.37) .. controls (527.18,134.23) and (524.05,137.37) .. (520.18,137.37) .. controls (516.32,137.37) and (513.18,134.23) .. (513.18,130.37) -- cycle ;
+%Shape: Circle [id:dp627412801288137] 
+\draw   (497.18,158.08) .. controls (497.18,154.21) and (500.32,151.08) .. (504.18,151.08) .. controls (508.05,151.08) and (511.18,154.21) .. (511.18,158.08) .. controls (511.18,161.94) and (508.05,165.08) .. (504.18,165.08) .. controls (500.32,165.08) and (497.18,161.94) .. (497.18,158.08) -- cycle ;
+%Shape: Circle [id:dp9810922397673572] 
+\draw   (497.18,102.65) .. controls (497.18,98.79) and (500.32,95.65) .. (504.18,95.65) .. controls (508.05,95.65) and (511.18,98.79) .. (511.18,102.65) .. controls (511.18,106.52) and (508.05,109.65) .. (504.18,109.65) .. controls (500.32,109.65) and (497.18,106.52) .. (497.18,102.65) -- cycle ;
+%Shape: Circle [id:dp119968019368071] 
+\draw   (449.18,130.37) .. controls (449.18,126.5) and (452.32,123.37) .. (456.18,123.37) .. controls (460.05,123.37) and (463.18,126.5) .. (463.18,130.37) .. controls (463.18,134.23) and (460.05,137.37) .. (456.18,137.37) .. controls (452.32,137.37) and (449.18,134.23) .. (449.18,130.37) -- cycle ;
+%Shape: Circle [id:dp6973531126517174] 
+\draw   (465.18,158.08) .. controls (465.18,154.21) and (468.32,151.08) .. (472.18,151.08) .. controls (476.05,151.08) and (479.18,154.21) .. (479.18,158.08) .. controls (479.18,161.94) and (476.05,165.08) .. (472.18,165.08) .. controls (468.32,165.08) and (465.18,161.94) .. (465.18,158.08) -- cycle ;
+%Straight Lines [id:da23714251095688255] 
+\draw    (456.18,130.37) -- (470.68,105.25) ;
+\draw [shift={(472.18,102.65)}, rotate = 120] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da4616900645231825] 
+\draw    (472.18,102.65) -- (501.18,102.65) ;
+\draw [shift={(504.18,102.65)}, rotate = 180] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da5267579315071775] 
+\draw    (504.18,102.65) -- (518.68,127.77) ;
+\draw [shift={(520.18,130.37)}, rotate = 240] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da9505202787658946] 
+\draw    (520.18,130.37) -- (505.68,155.48) ;
+\draw [shift={(504.18,158.08)}, rotate = 300] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da7388508062172074] 
+\draw    (472.18,158.08) -- (457.68,132.96) ;
+\draw [shift={(456.18,130.37)}, rotate = 60] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Straight Lines [id:da49767222306271375] 
+\draw    (504.18,158.08) -- (475.18,158.08) ;
+\draw [shift={(472.18,158.08)}, rotate = 360] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+%Shape: Square [id:dp2249971608892538] 
+\draw   (509.81,176.83) -- (534.41,176.83) -- (534.41,201.43) -- (509.81,201.43) -- cycle ;
+%Shape: Square [id:dp8558549424187152] 
+\draw   (543.74,118.07) -- (568.34,118.07) -- (568.34,142.67) -- (543.74,142.67) -- cycle ;
+%Shape: Square [id:dp9233292410483047] 
+\draw   (509.81,59.3) -- (534.41,59.3) -- (534.41,83.9) -- (509.81,83.9) -- cycle ;
+%Shape: Square [id:dp4721900595603197] 
+\draw   (441.96,59.3) -- (466.56,59.3) -- (466.56,83.9) -- (441.96,83.9) -- cycle ;
+%Shape: Square [id:dp382070178837574] 
+\draw   (408.03,118.07) -- (432.63,118.07) -- (432.63,142.67) -- (408.03,142.67) -- cycle ;
+%Shape: Square [id:dp653937666804854] 
+\draw   (441.96,176.83) -- (466.56,176.83) -- (466.56,201.43) -- (441.96,201.43) -- cycle ;
+%Straight Lines [id:da7387406286350939] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (276.18,102.65) -- (324.41,72.66) ;
+\draw [shift={(326.11,71.6)}, rotate = 148.12] [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]    (10.93,-3.29) .. controls (6.95,-1.4) and (3.31,-0.3) .. (0,0) .. controls (3.31,0.3) and (6.95,1.4) .. (10.93,3.29)   ;
+%Straight Lines [id:da7564893446546301] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (276.18,102.65) -- (358.14,129.74) ;
+\draw [shift={(360.04,130.37)}, rotate = 198.29] [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]    (10.93,-3.29) .. controls (6.95,-1.4) and (3.31,-0.3) .. (0,0) .. controls (3.31,0.3) and (6.95,1.4) .. (10.93,3.29)   ;
+%Straight Lines [id:da3592853529285662] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (276.18,102.65) -- (325.11,187.4) ;
+\draw [shift={(326.11,189.13)}, rotate = 240] [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]    (10.93,-3.29) .. controls (6.95,-1.4) and (3.31,-0.3) .. (0,0) .. controls (3.31,0.3) and (6.95,1.4) .. (10.93,3.29)   ;
+%Straight Lines [id:da1830784221769648] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (276.18,102.65) -- (226.09,129.42) ;
+\draw [shift={(224.33,130.37)}, rotate = 331.88] [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]    (10.93,-3.29) .. controls (6.95,-1.4) and (3.31,-0.3) .. (0,0) .. controls (3.31,0.3) and (6.95,1.4) .. (10.93,3.29)   ;
+%Straight Lines [id:da5578071555881838] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (276.18,102.65) -- (258.66,187.17) ;
+\draw [shift={(258.26,189.13)}, rotate = 281.71] [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]    (10.93,-3.29) .. controls (6.95,-1.4) and (3.31,-0.3) .. (0,0) .. controls (3.31,0.3) and (6.95,1.4) .. (10.93,3.29)   ;
+%Shape: Circle [id:dp4048121952463317] 
+\draw  [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][dash pattern={on 0.84pt off 2.51pt}] (465.18,102.65) .. controls (465.18,98.79) and (468.32,95.65) .. (472.18,95.65) .. controls (476.05,95.65) and (479.18,98.79) .. (479.18,102.65) .. controls (479.18,106.52) and (476.05,109.65) .. (472.18,109.65) .. controls (468.32,109.65) and (465.18,106.52) .. (465.18,102.65) -- cycle ;
+%Straight Lines [id:da7356397245529418] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (112.18,102.67) -- (129.11,73.34) ;
+\draw [shift={(130.11,71.61)}, rotate = 120] [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]    (10.93,-3.29) .. controls (6.95,-1.4) and (3.31,-0.3) .. (0,0) .. controls (3.31,0.3) and (6.95,1.4) .. (10.93,3.29)   ;
+%Straight Lines [id:da11967785054117797] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (128.18,130.38) -- (162.04,130.38) ;
+\draw [shift={(164.04,130.38)}, rotate = 180] [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]    (10.93,-3.29) .. controls (6.95,-1.4) and (3.31,-0.3) .. (0,0) .. controls (3.31,0.3) and (6.95,1.4) .. (10.93,3.29)   ;
+%Straight Lines [id:da6405640201975533] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (112.18,158.09) -- (129.11,187.41) ;
+\draw [shift={(130.11,189.14)}, rotate = 240] [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]    (10.93,-3.29) .. controls (6.95,-1.4) and (3.31,-0.3) .. (0,0) .. controls (3.31,0.3) and (6.95,1.4) .. (10.93,3.29)   ;
+%Straight Lines [id:da22388700195974232] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (80.18,102.67) -- (63.26,73.34) ;
+\draw [shift={(62.26,71.61)}, rotate = 60] [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]    (10.93,-3.29) .. controls (6.95,-1.4) and (3.31,-0.3) .. (0,0) .. controls (3.31,0.3) and (6.95,1.4) .. (10.93,3.29)   ;
+%Straight Lines [id:da15989931977428795] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (64.18,130.38) -- (30.33,130.38) ;
+\draw [shift={(28.33,130.38)}, rotate = 360] [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]    (10.93,-3.29) .. controls (6.95,-1.4) and (3.31,-0.3) .. (0,0) .. controls (3.31,0.3) and (6.95,1.4) .. (10.93,3.29)   ;
+%Straight Lines [id:da9569227463737737] 
+\draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (80.18,158.09) -- (63.26,187.41) ;
+\draw [shift={(62.26,189.14)}, rotate = 300] [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]    (10.93,-3.29) .. controls (6.95,-1.4) and (3.31,-0.3) .. (0,0) .. controls (3.31,0.3) and (6.95,1.4) .. (10.93,3.29)   ;
+\end{tikzpicture}
+\caption[Overview of the round-robin based distribution scheme]{Overview of the round-robin based distribution scheme. The particles are represented by the small circles and the squares represent the different nodes. If the number of particles is equal to the number of nodes (left), then particles submit their queries to the corresponding node. If the number of nodes is less than the number of particles (middle), then the particles without nodes will submit their queries to a random node. This random node will change every attack iteration. If the number of particles is less than the number of nodes (right), then a dummy particles are introduced. These dummy particles will not submit any queries, therefore some nodes will not receive queries. After every attack iteration the particle mapping will rotate.}
+\label{fig:round_robin}
 \end{figure}
 
 \section{Throwing the defense off the scent}
