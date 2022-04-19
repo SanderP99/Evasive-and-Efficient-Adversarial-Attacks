@@ -6,6 +6,7 @@ from keras.models import Model
 
 from Attacks.DistributedBBA.distribution_scheme import RoundRobinDistribution, DistanceBasedDistributionScheme
 from Attacks.DistributedBBA.node import Node
+from Attacks.DistributedBBA.node_manager import NodeManager
 from Attacks.TargetedBBA.utils import line_search_to_boundary
 
 
@@ -15,7 +16,7 @@ class Particle:
     def __init__(self, i: int, init: np.ndarray = None, target_img: np.ndarray = None, target_label: int = 0,
                  model: Model = None, swarm=None, is_targeted: bool = True, source_step: float = 1e-2,
                  spherical_step: float = 5e-2, steps_per_iteration: int = 50, source_step_multiplier_up: float = 1.05,
-                 source_step_multiplier_down: float = 0.6):
+                 source_step_multiplier_down: float = 0.6, use_node_manager: bool = False, dataset=None):
         self.id: int = i
         self.position: np.ndarray = init
         self.velocity: np.ndarray = np.random.randn(*self.position.shape) - 0.5
@@ -30,6 +31,10 @@ class Particle:
         self.model: Model = model
         self.swarm = swarm
         self.swarm.total_queries += calls
+
+        self.use_node_manager = use_node_manager
+        if self.use_node_manager:
+            self.node_manager = NodeManager(dataset=dataset, nodes=swarm.nodes)
 
         self.steps_per_iteration: int = steps_per_iteration
         self.fitness: float = np.infty
@@ -54,17 +59,20 @@ class Particle:
                 self.fitness == other.fitness and self.best_fitness < other.best_fitness)
 
     def get_node(self) -> Optional[Node]:
-        if self.swarm.distributed_attack is not None:
-            if isinstance(self.swarm.distributed_attack.distribution_scheme, RoundRobinDistribution):
-                mapping = self.swarm.distribution_scheme.get_mapping()
-                return self.swarm.nodes[mapping[self.id]]
-            elif isinstance(self.swarm.distributed_attack.distribution_scheme, DistanceBasedDistributionScheme):
-                mapping = self.swarm.distribution_scheme.get_mapping()
-                return self.swarm.nodes[mapping[self.id]]
+        if not self.use_node_manager:
+            if self.swarm.distributed_attack is not None:
+                if isinstance(self.swarm.distributed_attack.distribution_scheme, RoundRobinDistribution):
+                    mapping = self.swarm.distribution_scheme.get_mapping()
+                    return self.swarm.nodes[mapping[self.id]]
+                elif isinstance(self.swarm.distributed_attack.distribution_scheme, DistanceBasedDistributionScheme):
+                    mapping = self.swarm.distribution_scheme.get_mapping()
+                    return self.swarm.nodes[mapping[self.id]]
+                else:
+                    return None
             else:
                 return None
         else:
-            return None
+            return self.node_manager
 
     def calculate_fitness(self) -> None:
         prediction = np.argmax(self.model.predict(np.expand_dims(self.position, axis=0)))

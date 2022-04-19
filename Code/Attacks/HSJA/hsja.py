@@ -4,6 +4,8 @@ from typing import Optional, Union
 import numpy as np
 from keras.models import Model
 
+from Attacks.DistributedBBA.node import Node
+
 
 class HopSkipJumpAttack:
 

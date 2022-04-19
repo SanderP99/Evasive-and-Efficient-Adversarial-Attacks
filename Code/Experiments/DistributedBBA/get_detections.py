@@ -28,8 +28,8 @@ if __name__ == '__main__':
     n_experiments = 2
     n_particles = 5
     max_queries = 25000
-    for i in [1]:
-        for n_nodes in [1]:
+    for i in [0, 1, 2, 3, 4]:
+        for n_nodes in [10]:
             for insert_noise in ['uniform']:
                 for n in [1]:
                     np.random.seed(42)
@@ -48,13 +48,17 @@ if __name__ == '__main__':
                         np.array(targets)[np.random.choice(len(targets), size=n_particles, replace=False)]]
                     distribution_scheme = RoundRobinDistribution(mapping, n_nodes=n_nodes, n_particles=n_particles)
                     # distribution_scheme = DistanceBasedDistributionScheme(mapping, n_nodes, dataset='mnist')
+                    use_node_manager = True
                     attack = DistributedBiasedBoundaryAttack(n_particles=n_particles, model=bb_model,
-                                                                        target_img=x_orig,
-                                                                        target_label=experiment.y_target,
-                                                                        inits=random_inits,
-                                                                        distribution_scheme=distribution_scheme,
-                                                                        n_nodes=n_nodes, mapping=mapping,
-                                                                        dataset='mnist')
+                                                             target_img=x_orig,
+                                                             target_label=experiment.y_target,
+                                                             inits=random_inits,
+                                                             distribution_scheme=distribution_scheme,
+                                                             n_nodes=n_nodes, mapping=mapping,
+                                                             dataset='mnist', spherical_step=0.05, source_step=0.25,
+                                                             source_step_multiplier_up=1.05,
+                                                             source_step_multiplier_down=0.99,
+                                                             use_node_manager=use_node_manager)
                     previous_queries = 0
                     new_queries = 0
                     with tqdm(total=max_queries) as pbar:
@@ -68,6 +72,8 @@ if __name__ == '__main__':
 
                     detections_all = [node.detector.get_detections() for node in attack.nodes]
                     print(detections_all)
+                    a = [len(node.detector.buffer) for node in attack.nodes]
+                    print(a)
                     total_detections = np.sum([len(x) for x in detections_all])
                     print(total_detections)
 
@@ -77,4 +83,4 @@ if __name__ == '__main__':
                             [experiment.name, experiment.y_orig, experiment.y_target, n_particles, n_nodes,
                              attack.swarm.best_fitness,
                              total_detections, attack.swarm.total_queries, [len(x) for x in detections_all],
-                             str(distribution_scheme) + f' insert_{n}_' + insert_noise, 'mnist'])
+                             str(distribution_scheme), 'mnist'])

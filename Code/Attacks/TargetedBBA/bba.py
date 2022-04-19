@@ -44,7 +44,7 @@ class BiasedBoundaryAttack:
         else:
             mask = np.ones(x_orig.shape, dtype=np.float32)
 
-        current_label, best_distance = self._eval_sample(x_start, x_orig)
+        current_label, best_distance = self._eval_sample(x_start, x_orig, node=node)
         if (current_label == label) != is_targeted:
             print("WARN: Starting point is not a valid adversarial example! Continuing for now.")
             return
