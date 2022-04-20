@@ -79,7 +79,6 @@ class ParticleBiasedBoundaryAttack:
         #     plt.show()
 
         if current_best_fitness < self.best_fitness:
-            print(self.total_queries, current_best_fitness)
             self.best_fitness = current_best_fitness
             self.best_position = current_best_position
 
