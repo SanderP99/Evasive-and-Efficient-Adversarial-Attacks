@@ -8,7 +8,8 @@ from keras.models import load_model
 from tqdm import tqdm
 
 from Attacks.DistributedBBA.distributed_bba import DistributedBiasedBoundaryAttack
-from Attacks.DistributedBBA.distribution_scheme import RoundRobinDistribution, DistanceBasedDistributionScheme
+from Attacks.DistributedBBA.distribution_scheme import RoundRobinDistribution, DistanceBasedDistributionScheme, \
+    EmbeddedDistanceBasedDistributionScheme
 from MNIST.setup_cifar import CIFAR
 from MNIST.setup_mnist import MNIST
 
@@ -16,10 +17,11 @@ if __name__ == '__main__':
     # Settings
     dataset = 'mnist'  # mnist or cifar
     n_particles = [5]
-    n_nodes = [1, 5]
+    n_nodes = [5, 10]
     experiment_ids = list(range(20))
     max_queries = 25000
-    distribution_schemes = ['rr']  # rr or mrr or dbl2 or dbe
+    distribution_schemes = ['mrr', 'dbe', 'dbl2']  # rr or mrr or dbl2 or dbe
+    history_len = 20
     source_step_multiplier_up = 1.05
     source_step_multiplier_down = 0.99
     spherical_step = 0.05
@@ -54,6 +56,7 @@ if __name__ == '__main__':
                             ])
 
                     use_node_manager = False
+                    distance_based = None
                     experiment = experiments.iloc[experiment_id]
                     x_orig = data.test_data[experiment.name]
                     targets = ast.literal_eval(experiment.targets)
@@ -66,7 +69,15 @@ if __name__ == '__main__':
                     elif distribution_scheme == 'mrr':
                         scheme = RoundRobinDistribution(None, n_nodes=nodes, n_particles=particles)
                     elif distribution_scheme == 'dbl2':
-                        scheme = DistanceBasedDistributionScheme(None, n_nodes=nodes, dataset=dataset)
+                        use_node_manager = True
+                        distance_based = 'l2'
+                        scheme = DistanceBasedDistributionScheme(None, n_nodes=nodes, dataset=dataset,
+                                                                 history_len=history_len)
+                    elif distribution_scheme == 'dbe':
+                        use_node_manager = True
+                        distance_based = 'embedded'
+                        scheme = EmbeddedDistanceBasedDistributionScheme(None, n_nodes=nodes, dataset=dataset,
+                                                                         history_len=history_len)
                     else:
                         raise ValueError
 
@@ -79,7 +90,8 @@ if __name__ == '__main__':
                                                              source_step_multiplier_up=source_step_multiplier_up,
                                                              source_step_multiplier_down=source_step_multiplier_down,
                                                              use_node_manager=use_node_manager,
-                                                             source_step=source_step)
+                                                             distance_based=distance_based,
+                                                             source_step=source_step, history_len=history_len)
 
                     previous_queries = 0
                     new_queries = 0
@@ -97,6 +109,6 @@ if __name__ == '__main__':
                         writer.writerow([
                             experiment.name, experiment.y_orig, experiment.y_target, particles, nodes,
                             attack.swarm.best_fitness, total_detections, attack.swarm.total_queries,
-                            [len(x) for x in detections_all], distribution_scheme, source_step, spherical_step, dataset,
+                            [len(x) for x in detections_all], str(scheme), source_step, spherical_step, dataset,
                             source_step_multiplier_up, source_step_multiplier_down
                         ])

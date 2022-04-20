@@ -13,15 +13,15 @@ class DistributedBiasedBoundaryAttack:
                  distribution_scheme, mapping: Optional[deque] = None,
                  n_nodes: Optional[int] = None, dataset=None, source_step: float = 1e-2,
                  spherical_step: float = 5e-2, steps_per_iteration: int = 50, source_step_multiplier_up: float = 1.05,
-                 source_step_multiplier_down: float = 0.6, use_node_manager: bool = False):
+                 source_step_multiplier_down: float = 0.6, use_node_manager: bool = False,
+                 distance_based: Optional[str] = None, history_len=10):
         if n_nodes is None:
             self.n_nodes: int = n_particles
         else:
             self.n_nodes: int = n_nodes
 
-
-
-        self.nodes: list = [Node(i, dataset, weights_path_mnist=f'../../Defense/{str.upper(dataset)}encoder.h5') for i in
+        self.nodes: list = [Node(i, dataset, weights_path_mnist=f'../../Defense/{str.upper(dataset)}encoder.h5') for i
+                            in
                             range(self.n_nodes)]
         # self.mapping: deque = mapping
         self.distribution_scheme = distribution_scheme
@@ -34,11 +34,13 @@ class DistributedBiasedBoundaryAttack:
                                                                                 steps_per_iteration=steps_per_iteration,
                                                                                 spherical_step=spherical_step,
                                                                                 use_node_manager=use_node_manager,
-                                                                                dataset=dataset)
+                                                                                distance_based=distance_based,
+                                                                                dataset=dataset,
+                                                                                history_len=history_len)
 
     def attack(self) -> None:
         self.swarm.optimize()
-        self.process_query()
+        # self.process_query()
         self.distribution_scheme(positions=[particle.position for particle in self.swarm.particles])
 
     def add_to_nodes(self) -> None:

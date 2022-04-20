@@ -1,4 +1,5 @@
 from collections import deque
+from typing import Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -14,7 +15,8 @@ class ParticleBiasedBoundaryAttack:
     def __init__(self, n_particles: int, inits: np.ndarray, target_img: np.ndarray, target_label: int, model: Model,
                  distributed_attack=None, source_step: float = 1e-2,
                  spherical_step: float = 5e-2, steps_per_iteration: int = 50, source_step_multiplier_up: float = 1.05,
-                 source_step_multiplier_down: float = 0.6, use_node_manager: bool = False, dataset=None):
+                 source_step_multiplier_down: float = 0.6, use_node_manager: bool = False, dataset=None,
+                 distance_based: Optional[str] = None, history_len=10):
         assert n_particles == len(inits)
         self.n_particles: int = n_particles
         self.total_queries: int = 0
@@ -38,7 +40,8 @@ class ParticleBiasedBoundaryAttack:
                      source_step_multiplier_up=source_step_multiplier_up,
                      source_step_multiplier_down=source_step_multiplier_down, source_step=source_step,
                      spherical_step=spherical_step, steps_per_iteration=steps_per_iteration,
-                     use_node_manager=use_node_manager, dataset=dataset) for
+                     use_node_manager=use_node_manager, dataset=dataset, distance_based=distance_based,
+                     history_len=history_len) for
             i in range(n_particles)]
 
         self.best_position, self.best_fitness, _ = self.get_best_particle()

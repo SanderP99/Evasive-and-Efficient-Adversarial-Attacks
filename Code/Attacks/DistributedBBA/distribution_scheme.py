@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from collections import deque
 
 import numpy as np
+from keras.models import load_model
 
 
 class DistributionScheme(ABC):
@@ -85,12 +86,7 @@ class DistanceBasedDistributionScheme(DistributionScheme):
         self.best_deque: deque = deque([])
 
     def rotate(self, mapping: deque, **kwargs) -> None:
-        assert 'positions' in kwargs
-        distances = self.compute_distances(kwargs['positions'])
-        best_deque = self.compute_best_deque(distances)
-        self.add_positions_to_history(kwargs['positions'], best_deque)
-        self.idx += 1
-        self.mapping = best_deque
+        pass
 
     def __str__(self) -> str:
         return f'distance_based_{self.history_len}'
@@ -105,9 +101,29 @@ class DistanceBasedDistributionScheme(DistributionScheme):
 
     def compute_best_deque(self, distances: np.ndarray) -> deque:
         idxs = np.argmax(distances, axis=1)
-        assert len(idxs) == len(self.mapping)
+        # assert len(idxs) == len(self.mapping)
         return deque(idxs)
 
     def add_positions_to_history(self, positions: np.ndarray, best_deque: deque) -> None:
         for position, node in zip(positions, best_deque):
             self.history[node][self.idx % self.history_len] = position
+
+
+class EmbeddedDistanceBasedDistributionScheme(DistanceBasedDistributionScheme):
+    def __init__(self, mapping, n_nodes, history_len: int = 1, dataset: str = ''):
+        super().__init__(mapping, n_nodes, history_len, dataset)
+        self.history = np.zeros((self.n_nodes, self.history_len) + (128,))
+        if dataset == 'mnist':
+            self.encoder = load_model('../../Defense/MNISTAttackencoder.h5', compile=False)
+        elif dataset == 'cifar':
+            self.encoder = load_model('../../Defense/CIFARAttackencoder.h5', compile=False)
+        else:
+            raise ValueError
+
+    def __str__(self) -> str:
+        return f'embedded_distance_based_{self.history_len}'
+
+    def add_positions_to_history(self, positions: np.ndarray, best_deque: deque) -> None:
+        for position, node in zip(positions, best_deque):
+            embedded_position = self.encoder(position)
+            self.history[node][self.idx % self.history_len] = embedded_position
