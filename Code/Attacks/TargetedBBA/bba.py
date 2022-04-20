@@ -85,7 +85,7 @@ class BiasedBoundaryAttack:
 
     def _eval_sample(self, x: np.ndarray, x_orig_normed: Optional[np.ndarray] = None, node: Optional[Node] = None) -> \
             Union[int, Tuple[int, float]]:
-        pred = self.blackbox_model.predict(x.reshape((1,) + self.dimensions))
+        pred = self.blackbox_model(x.reshape((1,) + self.dimensions))
         if node is not None:
             node.add_to_detector(x.reshape(self.dimensions))
         self.calls += 1

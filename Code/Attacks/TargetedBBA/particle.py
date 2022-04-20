@@ -75,7 +75,7 @@ class Particle:
             return self.node_manager
 
     def calculate_fitness(self) -> None:
-        prediction = np.argmax(self.model.predict(np.expand_dims(self.position, axis=0)))
+        prediction = np.argmax(self.model(np.expand_dims(self.position, axis=0)))
         self.swarm.total_queries += 1
         self.current_label = prediction
 

@@ -120,4 +120,4 @@ class SimilarityDetector(Detector):
 
     def _init_encoder(self, weights_path: str) -> None:
         self.encoder = mnist_encoder(weights_path)
-        self.encode = lambda x: self.encoder.predict(x)
+        self.encode = lambda x: self.encoder(x)
