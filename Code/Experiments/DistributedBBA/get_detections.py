@@ -29,7 +29,7 @@ if __name__ == '__main__':
     n_particles = 5
     max_queries = 25000
     for i in [0, 1, 2, 3, 4]:
-        for n_nodes in [10]:
+        for n_nodes in [5]:
             for insert_noise in ['uniform']:
                 for n in [1]:
                     np.random.seed(42)

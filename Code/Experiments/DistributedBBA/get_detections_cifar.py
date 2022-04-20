@@ -52,7 +52,8 @@ if __name__ == '__main__':
                                                      distribution_scheme=distribution_scheme,
                                                      n_nodes=n_nodes, mapping=mapping, dataset='cifar',
                                                      source_step_multiplier_up=1.05, source_step_multiplier_down=0.99,
-                                                     spherical_step=0.05, source_step=0.2)
+                                                     spherical_step=0.05, source_step=0.2,
+                                                     use_node_manager=True)
             previous_queries = 0
             new_queries = 0
             with tqdm(total=max_queries) as pbar:
