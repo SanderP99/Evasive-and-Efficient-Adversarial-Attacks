@@ -29,8 +29,9 @@ assistant={V. Rimmer \and I. Tsingenopoulos}
 \usepackage[caption=false]{subfig}
 \usepackage{booktabs}
 \usepackage{siunitx}
-%\usepgfplotslibrary{external}
-%\tikzexternalize
+\usepgfplotslibrary{fillbetween}
+\usepgfplotslibrary{external} 
+\tikzexternalize[shell escape=-enable-write18]
 
 \usepackage[acronym]{glossaries}
 \makenoidxglossaries

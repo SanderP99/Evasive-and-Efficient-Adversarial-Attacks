@@ -105,7 +105,7 @@ Where $x$ is the position of the particle, $x^\prime$ is the original image, $p_
 	\end{cases}
 \end{align}
 
-The infinite value for the fitness function inside non-adversarial decision regions acts as a penalty, causing the particles to quickly move out of these regions.\\
+The infinite value for the fitness function inside non-adversarial decision regions acts as a penalty, causing the particles to quickly diverge from these regions.\\
 
 The same set of experiments as in section \ref{sec:baseline} has been performed. The experiments have been done using attacks with both five and ten particles. The initial step sizes have been set to 0.25 and 0.20 for MNIST and CIFAR respectively. The values for the increasing and decreasing multiplier have been set to 1.05 and 0.99 for both datasets. The results of the experiments can be found in Table \ref{tbl:pso_bba}.\\
 
@@ -265,14 +265,28 @@ original image
 \centering
 \begin{tikzpicture}
 \begin{axis}[width=12cm, height=5cm, xmin=0,xmax=25000, xlabel=Calls, ylabel=Detections, tick label style={/pgf/number format/fixed}, scaled ticks=false, enlarge x limits=0.01, xtick={0,5000,10000,15000,20000,25000},legend pos=north west,	legend style={draw=none},]
-\addplot table[col sep=comma,x index=1,y expr=\thisrowno{0} + 1,mark=none] {Data/detections_bba.csv};
+\addplot table[blue,col sep=comma,x index=1,y expr=\thisrowno{0},mark=none] {Data/detections_bba.csv};
 \addlegendentry{\gls{bba}};
-\addplot table[col sep=comma,x index=1,y expr=\thisrowno{0} + 1,mark=none] {Data/detections_pso_bba.csv};
+\addplot table[color=red,col sep=comma,x index=1,y expr=\thisrowno{0},mark=none] {Data/detections_bba_pso.csv};
 \addlegendentry{\gls{pso}-\gls{bba}};
+
+\addplot [name path=lower_bba, fill=none, draw=none] table [
+    x index=1, y expr=\thisrowno{0} - \thisrow{ci},col sep=comma]{Data/detections_bba.csv};
+\addplot [name path=upper_bba, fill=none, draw=none] table [
+    x index=1, y expr=\thisrowno{0} + \thisrow{ci},col sep=comma]{Data/detections_bba.csv};
+\addplot[blue!60, fill opacity=0.2] fill between[of=lower_bba and upper_bba];
+
+
+\addplot [name path=lower_pso, fill=none, draw=none] table [
+    x index=1, y expr=\thisrowno{0} - \thisrow{ci},col sep=comma]{Data/detections_bba_pso.csv};
+\addplot [name path=upper_pso, fill=none, draw=none] table [
+    x index=1, y expr=\thisrowno{0} + \thisrow{ci},col sep=comma]{Data/detections_bba_pso.csv};
+\addplot[red!60, fill opacity=0.2] fill between[of=lower_pso and upper_pso];
+
 
 \end{axis}
 \end{tikzpicture}
-\caption[Detections of the different attacks]{The cumulative number of detections for different attack algorithms for one specific MNIST experiment. The number of detections of the \gls{bba} algorithm steadily increases with the number of calls. The number of detections of the \gls{pso}-\gls{bba} algorithm increases more slowly in the beginning due to the dispersed nature of the attack. The increase is more sharp near the end of the attack.}
+\caption[Detections of the different attacks]{The cumulative number of detections for different attack algorithms for the MNIST experiments. The number of detections of the \gls{bba} algorithm steadily increases with the number of calls. The number of detections of the \gls{pso}-\gls{bba} algorithm increases more slowly in the beginning due to the dispersed nature of the attack. The increase is more sharp near the end of the attack. The plot shows the 95\% confidence regions around the graphs.}
 \label{fig:detections_bba_vs_pso_bba}
 \end{figure}
 
