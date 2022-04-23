@@ -9,7 +9,7 @@ from MNIST.setup_mnist import MNIST
 def make_predictions(mnist, model):
     preds = []
     for x in mnist.test_data:
-        preds.append(np.argmax(model.predict(np.expand_dims(x, axis=0))))
+        preds.append(np.argmax(model(np.expand_dims(x, axis=0))))
     return preds
 
 
@@ -38,8 +38,8 @@ if __name__ == '__main__':
     # model = load_model('../MNIST/models/cifar', compile=False)
     # predictions = make_predictions(cifar, model)
     # df = create_dataframe(cifar, predictions)
-    # df.to_csv('predictions_cifar.csv', index_label='index')
-    df = pd.read_csv('predictions_cifar.csv', index_col='index')
+    # df.to_csv('predictions_cifar2.csv', index_label='index')
+    df = pd.read_csv('predictions_cifar2.csv', index_col='index')
     dfs = split_dataframe(df)
     experiments = {}
     i = 0
@@ -63,5 +63,5 @@ if __name__ == '__main__':
     experiments['y_orig'] = y_orig
     experiments['y_target'] = y_target
     experiments_df = pd.DataFrame(data=experiments)
-    experiments_df.to_csv('experiments_cifar.csv', index=False)
+    experiments_df.to_csv('experiments_cifar2.csv', index=False)
 #

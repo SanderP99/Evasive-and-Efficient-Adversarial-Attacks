@@ -13,7 +13,7 @@ def distance(target):
 
 
 if __name__ == '__main__':
-    df = pd.read_csv('experiments_cifar.csv', index_col='index')
+    df = pd.read_csv('experiments_cifar2.csv', index_col='index')
     sorted_i = []
     cifar = CIFAR()
     for i, data in df.iterrows():
@@ -22,5 +22,5 @@ if __name__ == '__main__':
         sorted_indices = sorted(target_indices, key=distance)
         sorted_i.append(sorted_indices)
     df['sorted_targets'] = sorted_i
-    df.to_csv('experiments_cifar_sorted.csv')
+    df.to_csv('experiments_cifar_sorted2.csv')
 
