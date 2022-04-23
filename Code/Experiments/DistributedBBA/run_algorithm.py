@@ -9,18 +9,18 @@ from tqdm import tqdm
 
 from Attacks.DistributedBBA.distributed_bba import DistributedBiasedBoundaryAttack
 from Attacks.DistributedBBA.distribution_scheme import RoundRobinDistribution, DistanceBasedDistributionScheme, \
-    EmbeddedDistanceBasedDistributionScheme
+    EmbeddedDistanceBasedDistributionScheme, ModifiedRoundRobinDistribution
 from MNIST.setup_cifar import CIFAR
 from MNIST.setup_mnist import MNIST
 
 if __name__ == '__main__':
     # Settings
-    dataset = 'mnist'  # mnist or cifar
+    dataset = 'cifar'  # mnist or cifar
     n_particles = [5]
     n_nodes = [5, 10]
     experiment_ids = list(range(20))
     max_queries = 25000
-    distribution_schemes = ['mrr', 'dbe', 'dbl2']  # rr or mrr or dbl2 or dbe
+    distribution_schemes = ['rr', 'mrr', 'dbe']  # rr or mrr or dbl2 or dbe
     history_len = 20
     source_step_multiplier_up = 1.05
     source_step_multiplier_down = 0.99
@@ -67,7 +67,7 @@ if __name__ == '__main__':
                         use_node_manager = True
                         scheme = RoundRobinDistribution(None, n_nodes=nodes, n_particles=particles)
                     elif distribution_scheme == 'mrr':
-                        scheme = RoundRobinDistribution(None, n_nodes=nodes, n_particles=particles)
+                        scheme = ModifiedRoundRobinDistribution(None, n_nodes=nodes, n_particles=particles)
                     elif distribution_scheme == 'dbl2':
                         use_node_manager = True
                         distance_based = 'l2'

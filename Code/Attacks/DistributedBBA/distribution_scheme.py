@@ -68,6 +68,11 @@ class RoundRobinDistribution(DistributionScheme):
         return 'round_robin'
 
 
+class ModifiedRoundRobinDistribution(RoundRobinDistribution):
+    def __str__(self):
+        return 'modified_round_robin'
+
+
 class DistanceBasedDistributionScheme(DistributionScheme):
 
     def __init__(self, mapping, n_nodes, history_len: int = 1, dataset: str = ''):
