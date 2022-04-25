@@ -20,10 +20,11 @@ def write_to_file(detections, file):
 
 
 def compare_detections():
-    df = pd.read_csv('../Experiments/DistributedBBA/results/results_mnist_vanilla.csv')
+    dataset = 'mnist'
+    df = pd.read_csv(f'../Experiments/DistributedBBA/results/results_{dataset}_vanilla.csv')
 
     detections = fill_detections_array(df)
-    write_to_file(detections, 'detections_bba.csv')
+    write_to_file(detections, f'detections_bba_{dataset}.csv')
 
     fig, ax = plt.subplots()
     y = np.mean(detections, axis=0)
@@ -31,10 +32,11 @@ def compare_detections():
     ci = 1.96 * np.std(detections, axis=0) / np.sqrt(20)
     ax.fill_between(range(25000), (y - ci), (y + ci), color='b', alpha=.1)
 
-    df = pd.read_csv('../Experiments/DistributedBBA/results/results_mnist_rr.csv')
+    df = pd.read_csv(f'../Experiments/DistributedBBA/results/results_{dataset}_rr.csv')
+    df = df[df.n_nodes == 1]
     df = df[df.n_particles == 1]
     detections = fill_detections_array(df)
-    write_to_file(detections, 'detections_bba_pso.csv')
+    write_to_file(detections, f'detections_bba_pso_{dataset}.csv')
 
     y = np.mean(detections, axis=0)
     ax.plot(y)

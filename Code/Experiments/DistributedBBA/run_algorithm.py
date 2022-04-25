@@ -17,10 +17,10 @@ if __name__ == '__main__':
     # Settings
     dataset = 'cifar'  # mnist or cifar
     n_particles = [5]
-    n_nodes = [5, 10]
+    n_nodes = [10]
     experiment_ids = list(range(20))
     max_queries = 25000
-    distribution_schemes = ['rr', 'mrr', 'dbe']  # rr or mrr or dbl2 or dbe
+    distribution_schemes = ['rr']  # rr or mrr or dbl2 or dbe
     history_len = 20
     source_step_multiplier_up = 1.05
     source_step_multiplier_down = 0.99
@@ -32,7 +32,7 @@ if __name__ == '__main__':
         source_step = 0.25
     elif dataset == 'cifar':
         data = CIFAR()
-        experiments = pd.read_csv('../experiments_cifar_sorted.csv', index_col='index')
+        experiments = pd.read_csv('../experiments_cifar_sorted2.csv', index_col='index')
         source_step = 0.20
     else:
         raise ValueError
@@ -52,7 +52,7 @@ if __name__ == '__main__':
                                 'original_index', 'y_orig', 'y_target', 'n_particles', 'n_nodes', 'distance',
                                 'n_detections', 'calls', 'detections_per_node', 'distribution_scheme',
                                 'source_step', 'spherical_step', 'dataset', 'source_step_multiplier_up',
-                                'source_step_multiplier_down'
+                                'source_step_multiplier_down', 'detections_all'
                             ])
 
                     use_node_manager = False
@@ -110,5 +110,5 @@ if __name__ == '__main__':
                             experiment.name, experiment.y_orig, experiment.y_target, particles, nodes,
                             attack.swarm.best_fitness, total_detections, attack.swarm.total_queries,
                             [len(x) for x in detections_all], str(scheme), source_step, spherical_step, dataset,
-                            source_step_multiplier_up, source_step_multiplier_down
+                            source_step_multiplier_up, source_step_multiplier_down, detections_all
                         ])
