@@ -9,14 +9,14 @@ The trained models are then used to classify all instances in the test set of th
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{Images/mnist.png}
-\caption[Some examples of the MNIST dataset]{Some examples of the MNIST dataset.}
+\caption[Some examples of the MNIST dataset]{Some examples of the MNIST \cite{mnist} dataset.}
 \label{fig:mnist}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{Images/cifar.png}
-\caption[Some examples of the CIFAR-10 dataset]{Some examples of the CIFAR-10 dataset.}
+\caption[Some examples of the CIFAR-10 dataset]{Some examples of the CIFAR-10 \cite{cifar} dataset.}
 \label{fig:cifar}
 \end{figure}
 
@@ -55,7 +55,7 @@ Table \ref{tbl:baseline} reports the average $L_2$-distance and the average numb
 	\begin{tabular}{lrrrr}\toprule
 			& \multicolumn{2}{c}{MNIST} &\multicolumn{2}{c}{CIFAR} \\ \cmidrule(r){2-3} \cmidrule(r){4-5}
 	Attack				&Distance	&Detections	&Distance	&Detections \\ \midrule
-	Baseline \gls{bba}	&3.027		&339		&1.359			&475 \\ \bottomrule
+	Baseline \gls{bba}	&2.807		&413		&1.306			&474 \\ \bottomrule
 	
 	\end{tabular}
 \end{table}
@@ -67,7 +67,7 @@ Vanilla \gls{bba} has the disadvantage that, depending on the starting position,
 
 The efficiency reduction does not have to pose a problem due to the implicit communication in the swarm. Particles can move to promising regions in the search space based on the information of their peers. The promising regions are therefore more queried.\\ 
 
-The proposed \gls{pso}-\gls{bba} algorithm works as follows. Particles will perform a more aggressive version of \gls{bba}. The initial source step~$\epsilon$ is set significantly higher than in the vanilla version. The increased source step might cause the particle to end up in a non-adversarial decision region. Once this happens, the standard \gls{pso} equations (\ref{eq:velocity_update} and \ref{eq:position_update}) are used to guide the particle back to the adversarial region.\\
+The proposed \gls{pso}-\gls{bba} algorithm works as follows. Particles will perform a more aggressive version of \gls{bba}. The initial source step~$\epsilon$ is set significantly higher than in the vanilla version. The increased source step might cause the particle to end up in a non-adversarial decision region. Once this happens, the standard \gls{pso} equations (\ref{eq:velocity_update} and \ref{eq:position_update}) are used to guide the particle back to the adversarial region. Later refinements of this algorithms will deal with attack iterations. An attack iteration is defined as a specified budget of the aggressive \gls{bba} (50 queries in all experiments) or a single query submission using the \gls{pso} rules.\\
 
 The inertia weight of the \gls{pso} equations is determined by the linearly decaying scheme of equation \ref{eq:weight}, with the weight decaying from 1 to 0. The acceleration coefficients $c$ are set based on an idea of multi-group \gls{pso}. Two groups with opposite acceleration coefficients are created. This approach helps escape local optima \cite{opposite_cs}. The equations for both $c_p$ and $c_g$ are:
 
@@ -109,9 +109,9 @@ The infinite value for the fitness function inside non-adversarial decision regi
 
 The same set of experiments as in section \ref{sec:baseline} has been performed. The experiments have been done using attacks with both five and ten particles. The initial step sizes have been set to 0.25 and 0.20 for MNIST and CIFAR respectively. The values for the increasing and decreasing multiplier have been set to 1.05 and 0.99 for both datasets. The results of the experiments can be found in Table \ref{tbl:pso_bba}.\\
 
-The \gls{pso}-\gls{bba} algorithm outperforms the baseline in terms of distance to the original image, except for the ten particle version on the CIFAR dataset. The high number of particles requires sufficient queries in the beginning of the attack in order to discover promising regions in the high dimensional search space of CIFAR. The number of detections is lower for all variants of \gls{pso}-\gls{bba}. The different starting points have the added advantage that initial queries are more spread out over the search space. These queries are therefore less similar and the detector will not flag as much attacks. This effect can be seen in Figure \ref{fig:detections_bba_vs_pso_bba} for one experiment.\\
+The five particle \gls{pso}-\gls{bba} algorithm outperforms the baseline in terms of distance to the original image on both datasets. This is not the case for the ten particle version. The high number of particles requires sufficient queries in the beginning of the attack in order to discover promising regions in the high dimensional search space of CIFAR. This exploration requires more queries than the query budget allows. The number of detections is lower for all variants of \gls{pso}-\gls{bba}. The different starting points have the added advantage that initial queries are more spread out over the search space. These queries are therefore less similar and the detector will not flag as much attacks. This effect can be seen in Figure \ref{fig:detections_bba_vs_pso_bba} for the MNIST experiments.\\
 
-The number of detections drops as the number of particles increases. This was to be expected from the intuition behind \gls{pso}-\gls{bba}. However, the average $L_2$-distance to the original image is higher is higher for ten particles compared to five. To reduce the number of different parameters in future refinements, only swarms with five particles will be considered from here on.\\ 
+The number of detections drops as the number of particles increases. This was to be expected from the intuition behind \gls{pso}-\gls{bba}. However, the average $L_2$-distance to the original image is higher for ten particles compared to five. To reduce the number of different parameters in future refinements, only swarms with five particles will be considered from here on.\\ 
 
 \begin{figure}
 	\centering
@@ -257,7 +257,7 @@ original image
 
 
 \end{tikzpicture}	
-\caption[Intuition of multiple starting points]{The vanilla version of \gls{bba} might get stuck in a local optimum depending on the starting point (left plot). By starting from multiple positions, the probability that \gls{bba} gets stuck in a local optimum is reduced (right plot). The multiple starting points are particles in a \gls{pso} swarm.}
+\caption[Intuition of multiple starting points]{The vanilla version of \gls{bba} might get stuck in a local optimum depending on the starting point (left plot). By starting from multiple positions, the probability that \gls{bba} gets stuck in a local optimum is reduced (right plot). The multiple starting points are particles in a \gls{pso} swarm. Image inspired by \cite{boundary_attack}.}
 \label{fig:applying_pso_to_bba}
 \end{figure}
 
@@ -265,28 +265,28 @@ original image
 \centering
 \begin{tikzpicture}
 \begin{axis}[width=12cm, height=5cm, xmin=0,xmax=25000, xlabel=Calls, ylabel=Detections, tick label style={/pgf/number format/fixed}, scaled ticks=false, enlarge x limits=0.01, xtick={0,5000,10000,15000,20000,25000},legend pos=north west,	legend style={draw=none},]
-\addplot table[blue,col sep=comma,x index=1,y expr=\thisrowno{0},mark=none] {Data/detections_bba.csv};
+\addplot table[blue,col sep=comma,x index=1,y expr=\thisrowno{0},mark=none] {Data/detections_bba_mnist.csv};
 \addlegendentry{\gls{bba}};
-\addplot table[color=red,col sep=comma,x index=1,y expr=\thisrowno{0},mark=none] {Data/detections_bba_pso.csv};
+\addplot table[color=red,col sep=comma,x index=1,y expr=\thisrowno{0},mark=none] {Data/detections_bba_pso_mnist.csv};
 \addlegendentry{\gls{pso}-\gls{bba}};
 
 \addplot [name path=lower_bba, fill=none, draw=none] table [
-    x index=1, y expr=\thisrowno{0} - \thisrow{ci},col sep=comma]{Data/detections_bba.csv};
+    x index=1, y expr=\thisrowno{0} - \thisrow{ci},col sep=comma]{Data/detections_bba_mnist.csv};
 \addplot [name path=upper_bba, fill=none, draw=none] table [
-    x index=1, y expr=\thisrowno{0} + \thisrow{ci},col sep=comma]{Data/detections_bba.csv};
+    x index=1, y expr=\thisrowno{0} + \thisrow{ci},col sep=comma]{Data/detections_bba_mnist.csv};
 \addplot[blue!60, fill opacity=0.2] fill between[of=lower_bba and upper_bba];
 
 
 \addplot [name path=lower_pso, fill=none, draw=none] table [
-    x index=1, y expr=\thisrowno{0} - \thisrow{ci},col sep=comma]{Data/detections_bba_pso.csv};
+    x index=1, y expr=\thisrowno{0} - \thisrow{ci},col sep=comma]{Data/detections_bba_pso_mnist.csv};
 \addplot [name path=upper_pso, fill=none, draw=none] table [
-    x index=1, y expr=\thisrowno{0} + \thisrow{ci},col sep=comma]{Data/detections_bba_pso.csv};
+    x index=1, y expr=\thisrowno{0} + \thisrow{ci},col sep=comma]{Data/detections_bba_pso_mnist.csv};
 \addplot[red!60, fill opacity=0.2] fill between[of=lower_pso and upper_pso];
 
 
 \end{axis}
 \end{tikzpicture}
-\caption[Detections of the different attacks]{The cumulative number of detections for different attack algorithms for the MNIST experiments. The number of detections of the \gls{bba} algorithm steadily increases with the number of calls. The number of detections of the \gls{pso}-\gls{bba} algorithm increases more slowly in the beginning due to the dispersed nature of the attack. The increase is more sharp near the end of the attack. The plot shows the 95\% confidence regions around the graphs.}
+\caption[Detections of the different attacks]{The cumulative number of detections for different attack algorithms for the MNIST experiments. The number of detections of the \gls{bba} algorithm steadily increases with the number of calls. The number of detections of the \gls{pso}-\gls{bba} algorithm increases more slowly in the beginning due to the dispersed nature of the attack. The increase is more sharp near the end of the attack when the particles converge. The plot shows the 95\% confidence regions around the graphs.}
 \label{fig:detections_bba_vs_pso_bba}
 \end{figure}
 
@@ -297,9 +297,9 @@ original image
 	\begin{tabular}{lrrrr}\toprule
 			& \multicolumn{2}{c}{MNIST} &\multicolumn{2}{c}{CIFAR} \\ \cmidrule(r){2-3} \cmidrule(r){4-5}
 	Attack				&Distance	&Detections	&Distance	&Detections \\ \midrule
-	Baseline \gls{bba}	&3.027		&339		&1.359			&475 \\
-	\gls{pso}-\gls{bba} (5 particles)	&2.691			&173			&1.133				&301 \\ 
-	\gls{pso}-\gls{bba} (10 particles)	&2.788			&107			&1.782				&243 \\
+	Baseline \gls{bba}	&2.807		&413		&1.306			&474 \\
+	\gls{pso}-\gls{bba} (5 particles)	&2.712			&138			&1.239				&257 \\ 
+	\gls{pso}-\gls{bba} (10 particles)	&3.157			&44			&2.290				&184 \\
 	
 	\bottomrule
 	
@@ -321,7 +321,11 @@ The \gls{rr} distribution scheme is fairly straightforward. The outgoing queries
 
 The \gls{mrr} distribution scheme maps a particle to a node for the entire duration of an attack iteration. The queries submitted by a single particle during one attack iteration are relatively close together, but this approach ensures that all particles will submit queries to all nodes. This might ultimately cause less detections. The \gls{mrr} distribution scheme maps a number of particles on a number of nodes. If the amount of particles is equal to the number of nodes then the mapping is straightforward. If the number of nodes is less than the number of particles then dummy nodes are introduced in the mapping. The dummy nodes forward their received queries to a random existing node. The random node changes every rotation. If the number of particles is less than the number of nodes then dummy particles that do not submit queries, are introduced. After every attack iteration, the mapping rotates. The mapping process is shown in Figure \ref{fig:round_robin}.\\ 
 
-The final goal of the attack is to evade the staeful detection mechanism that defends the model under attack. Potential attacks are flagged based on the inter query distance in a detector buffer. The distance-based distribution scheme tries to exploit the defense. Instead of distributing queries over nodes in a \gls{rr}-fashion, queries are submitted to nodes based on the distance to the previously submitted queries to this node. The node with the highest average distance to the previously submitted queries is selected. For this purpose, every node will hold an internal buffer of queries. The size of this buffer can be chosen by the attacker, as can the distance metric. Standard $L_2$-distance can be chosen, but this has the some pitfalls as discussed in section \ref{sec:stateful_detection}. It is also possible to train another similarity encoder and use the $L_2$-distance in the embedded space in order to resemble the defense more closely.\\
+The ultimate goal of the attack is to evade the stateful detection mechanism that defends the model under attack. Potential attacks are flagged based on the inter query distance in a detector buffer. The distance-based distribution scheme tries to exploit the defense. Instead of distributing queries over nodes in a \gls{rr}-fashion, queries are submitted to nodes based on the distance to the previously submitted queries to this node. The node with the highest average distance to the previously submitted queries is selected. For this purpose, every node will hold an internal buffer of queries. The size of this buffer can be chosen by the attacker, as can the distance metric. Standard $L_2$-distance can be chosen, but this has the same pitfalls as discussed in section \ref{sec:stateful_detection}. It is also possible to train another similarity encoder and use the $L_2$-distance in the embedded space in order to resemble the defense more closely. The distribution schemes will be called \gls{db} and \gls{edb} distribution schemes respectively.\\
+
+The experiments performed in this section will use a buffer size at each node of 20 for both the \gls{db} and \gls{edb} distribution schemes. The similarity encoder in the case of the \gls{edb} scheme will be trained on the test data of the respective dataset and has an output dimension of 128. The results of the experiments can be found in Table \ref{tbl:d_pso_bba}.\\
+
+
 
 \begin{figure}
 \centering
@@ -360,17 +364,21 @@ The final goal of the attack is to evade the staeful detection mechanism that de
 
 \begin{table}
 	\centering
-	\caption[Distributed PSO-BBA results]{Results for the distributed \gls{pso}-\gls{bba} approach on MNIST and CIFAR-10 dataset.}
+	\caption[Distributed PSO-BBA results]{Results for the distributed \gls{pso}-\gls{bba} approaches on MNIST and CIFAR-10 dataset.}
 	\label{tbl:d_pso_bba}
 	\begin{tabular}{lrrrr}\toprule
 			& \multicolumn{2}{c}{MNIST} &\multicolumn{2}{c}{CIFAR} \\ \cmidrule(r){2-3} \cmidrule(r){4-5}
 	Attack				&Distance	&Detections	&Distance	&Detections \\ \midrule
-	Baseline \gls{bba}	&3.027		&339		&1.359			&475 \\
-	\gls{pso}-\gls{bba} 	&2.691			&173			&1.133				&301 \\ 
-	\gls{rr}-\gls{pso}-\gls{bba} (5 nodes) &2.691	&147	&1.133	&311 \\
-	\gls{rr}-\gls{pso}-\gls{bba} (10 nodes) &2.691	&129	&1.133	&292 \\	
-	\gls{mrr}-\gls{pso}-\gls{bba} (5 nodes)	&2.691			&148			&1.133				&280 \\
-	\gls{mrr}-\gls{pso}-\gls{bba} (10 nodes)	&2.691			&129			&1.133				&263 \\
+	Baseline \gls{bba}							&2.807	&413	&1.306	&474 \\
+	\gls{pso}-\gls{bba} 						&2.712	&138	&1.329	&257 \\ \addlinespace[\linespace] 
+	\gls{rr}-\gls{pso}-\gls{bba} (5 nodes) 		&2.712	&124	&1.239	&224 \\
+	\gls{rr}-\gls{pso}-\gls{bba} (10 nodes) 	&2.712	&104	&1.239	&202 \\	\addlinespace[\linespace]
+	\gls{mrr}-\gls{pso}-\gls{bba} (5 nodes)		&2.712	&110	&1.239	&227 \\
+	\gls{mrr}-\gls{pso}-\gls{bba} (10 nodes)	&2.712	&93		&1.239	&206 \\ \addlinespace[\linespace]
+	\gls{db}-\gls{pso}-\gls{bba} (5 nodes)		&2.712	&107	&1.239	&230 \\
+	\gls{db}-\gls{pso}-\gls{bba} (10 nodes)		&2.712	&87		&1.239	&207 \\ \addlinespace[\linespace]
+	\gls{edb}-\gls{pso}-\gls{bba} (5 nodes)		&2.712	&108	&1.239	&229 \\
+	\gls{edb}-\gls{pso}-\gls{bba} (10 nodes)	&2.712	&88		&1.239	&205 \\
 	\bottomrule
 	\end{tabular}
 \end{table}

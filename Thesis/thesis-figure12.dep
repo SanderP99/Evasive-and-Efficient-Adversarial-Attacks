@@ -1,6 +1,6 @@
-thesis-figure12.pdf: Data/detections_bba.csv
-thesis-figure12.pdf: Data/detections_bba_pso.csv
-thesis-figure12.pdf: Data/detections_bba.csv
-thesis-figure12.pdf: Data/detections_bba.csv
-thesis-figure12.pdf: Data/detections_bba_pso.csv
-thesis-figure12.pdf: Data/detections_bba_pso.csv
+thesis-figure12.pdf: Data/detections_bba_mnist.csv
+thesis-figure12.pdf: Data/detections_bba_pso_mnist.csv
+thesis-figure12.pdf: Data/detections_bba_mnist.csv
+thesis-figure12.pdf: Data/detections_bba_mnist.csv
+thesis-figure12.pdf: Data/detections_bba_pso_mnist.csv
+thesis-figure12.pdf: Data/detections_bba_pso_mnist.csv
