@@ -257,6 +257,107 @@ original image
 \label{fig:hsja_intuition}
 \end{figure}
 
+\begin{figure}
+\centering
+\begin{tikzpicture}[xscale=0.75, yscale=0.75]
+\definecolor{clr2}{RGB}{31,182,83}
+\tikzset{
+dot/.style = {circle, fill, minimum size=#1,
+              inner sep=0pt, outer sep=0pt},
+dot/.default = 6pt % size of the circle diameter 
+}
+\draw [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=0.5, draw=none] (0,7.5) -- (10,2.5) -- (10,10) -|cycle; % Fill above line
+
+\path[name path=DB,draw, line width=0.5mm] (0,7.5) -- (10, 2.5); % Decision boundary
+
+\begin{scope}[every node/.style={dot,thick,draw,anchor=base,fill=black}] % Circles
+	\node[] (xo) at (3,3){}; %xo
+	\node[] (xb) at (9,3){}; %xb
+\end{scope}
+
+\begin{scope}[red,line width=0.5mm]
+\draw[] (xb) arc [
+	start angle = 0,
+	end angle = 180,
+	radius = 3
+];
+\draw[] (xb) arc [
+	start angle = 0,
+	delta angle = -20,
+	radius = 3
+];
+\draw[] (xo) arc [
+	start angle = 180,
+	delta angle = 20,
+	radius = 3
+];
+\end{scope}
+
+\begin{scope}[every node/.style={dot,thick,draw,anchor=base,fill=black}] % Circles
+	\node[label=225:$x_o$] (xo) at (3,3){}; %xo
+	\node[label=45:$x_b$] (xb) at (9,3){}; %xb
+\end{scope}
+
+\node[label=270:$u$] (xu) at (4.5,3){};
+\node[label=180:$v$] (xv) at (3,4.5){};
+\node[] (dl) at (3,1.5){};
+\node[] (dr) at (9,1.5){};
+\node[] (dal) at (3,0.5){};
+\node[] (dar) at (7,0.5){};
+\node[] (rpx) at (7,3){};
+\path [-,line width=0.1mm, name path=guideline] (xo.east) edge (xb.west); % Guideline xo xb
+\path [-latex, line width=0.5mm] (xo.east) edge (xu.west); % U arrow
+\path [-latex, line width=0.5mm] (xo.north) edge (xv.south); % V arrow
+\draw [spath/save=black, name path=blackarc, dashed] (rpx.center) arc (0:60:4);
+\draw[dashed] (rpx) arc [start angle = 0, delta angle = -10, radius=4];
+\path[spath/save=red, name path=redcircle] (xb) arc [
+	start angle = 0,
+	end angle = 180,
+	radius = 3
+];
+\tikzset{
+	spath/split at intersections={red}{black},
+	spath/get components of ={black}\blackCpt,
+}
+
+\path[name intersections={of=DB and redcircle,by={Z, Z1}}];
+\path [name intersections={of=blackarc and redcircle, by=intersect}];
+\node[label=45:$z^*(\theta)$,dot,draw=red,anchor=base,fill=red] (i) at (intersect){};
+\node[label=$z^*(\theta^*)$,dot,thick,draw=red,anchor=base,fill=red] (i2) at (Z1){};
+
+\draw[spath/use={\getComponentOf\blackCpt{1}}, -latex, line width=0.5mm] node[right, pos=0.5] {$\theta$};
+\path [dashed] (xo.center) edge (i.center);
+
+
+
+\begin{scope}[color={rgb, 255:red, 31; green, 182; blue, 83}]
+	\path [dashed] (dal.center) edge (xo.center);
+	\path [dashed] (dr.center) edge (xb.center);
+	\path [dashed] (dar.center) edge (rpx.center);
+	\path [latex-latex, line width=0.5mm] (dl.center) edge node[fill=white] {$d$} (dr.center);
+	\path [latex-latex, line width=0.5mm] (dal.center) edge node[fill=white] {$d(1-\alpha)$} (dar.center);
+\end{scope}
+
+\node[] (p) at (2,9){};
+\draw [-latex, line width=0.5mm, blue, spath/save=normal] ($(xb)!(p)!(0,7.5)$) -- (p) node[]{$n$};
+\draw [dashed, blue, line width=0.5mm] ($(xb)!(p)!(0,7.5)$) -- ($(xb)!(p)!(0,7.5) + (2,0)$);
+\path[spath/save=dash] ($(xb)!(p)!(0,7.5) + (1.5,0)$) arc [start angle = 0, end angle = 90, radius = 1.5];
+\tikzset{
+	spath/split at intersections={normal}{dash},
+	spath/get components of ={dash}\blueCpt,
+}
+\draw[spath/use={\getComponentOf\blueCpt{1}}, -latex, line width=0.5mm, blue] node[right, pos=0.5] {$\psi$};
+
+\node[] at (8,9.5) {$\mathcal{O} \cap \mathcal{P}$};
+\node[] (text) at (1,5.5) {$\partial\mathcal{O} \cap \mathcal{P}$};
+\node[] (line) at (0.5,7.25) {};
+\draw (text) to[out=0,in=-70] (line);
+\end{tikzpicture}
+\caption[Geographical configuration of SurFree]{•}
+\label{fig:surfree}
+\end{figure}
+
+
 \section{Stateful defense}\label{sec:stateful_detection}
 The defensive schemes discussed in section \ref{sec:adversarial_defenses} all operate on the query level. They try to detect and flag possible attacks based on a single query without taking other context into account. The stateful detection mechanism by Chen, Carlini and Wagner \cite{chen_stateful_2019} is different in this aspect. As the name suggests, it holds state of previously submitted queries. It is similar to the defenses that use proximity measurements, but the measurement is between queries instead of between the query and training data.\\
 
