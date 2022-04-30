@@ -20,6 +20,7 @@ from foolbox.attacks.blended_noise import LinearSearchBlendedUniformNoiseAttack
 from foolbox import PyTorchModel, TensorFlowModel
 from keras.models import load_model
 
+from Attacks.DistributedBBA.node import Node
 from MNIST.setup_mnist import MNIST
 from surfree_source import SurFree
 
@@ -104,10 +105,13 @@ if __name__ == "__main__":
     print("Attack !")
     time_start = time.time()
 
-    f_attack = SurFree(**config["init"])
+    node = Node(0, 'mnist')
+    f_attack = SurFree(**config["init"], nodes=[node])
 
     elements, advs, success = f_attack(fmodel, images, labels, **config["run"])
     print("{:.2f} s to run".format(time.time() - time_start))
+
+    print('Detections: ', len(node.detector.get_detections()))
 
     ###############################
     print("Results")

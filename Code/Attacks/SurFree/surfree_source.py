@@ -41,7 +41,8 @@ class SurFree(MinimizationAttack):
             quantification=False,
             with_alpha_line_search: bool = True,
             with_distance_line_search: bool = False,
-            with_interpolation: bool = False):
+            with_interpolation: bool = False,
+            nodes=None):
         """
         Args:
             steps (int, optional): run steps. Defaults to 1000.
@@ -69,6 +70,7 @@ class SurFree(MinimizationAttack):
         self.rho = rho
         self.T = T
         assert 1 >= self.rho > 0
+        self.theta_min = 1e-2
 
         # Add or remove some parts of the attack
         self.with_alpha_line_search = with_alpha_line_search
@@ -84,6 +86,7 @@ class SurFree(MinimizationAttack):
         self._directions_ortho: Dict[int, ep.Tensor] = {}
         self._nqueries: Dict[int, int] = {}
         self._basis: Basis = None
+        self.nodes = nodes
 
     def get_nqueries(self) -> Dict:
         return self._nqueries
@@ -172,6 +175,12 @@ class SurFree(MinimizationAttack):
             if not (p == 0).all():
                 self._nqueries[i] += 1
         a = ep.astensor(self._criterion_is_adversarial(ep.astensor(perturbed).astype(np.float32)))
+        if self.nodes is not None:
+            try:
+                b = perturbed.numpy()
+            except ValueError:
+                b = perturbed
+            self.nodes[0].add_to_detector(np.expand_dims(b.squeeze(), axis=2).astype(np.float32))
         return a
 
     def _get_candidates(self, originals: ep.Tensor, best_advs: ep.Tensor) -> ep.Tensor:
@@ -202,7 +211,9 @@ class SurFree(MinimizationAttack):
             self.theta_max = ep.where(new_epsilons == 0, self.theta_max * self.rho, self.theta_max)
             self.theta_max = ep.where((new_epsilons != 0) * (epsilons == 0), self.theta_max / self.rho, self.theta_max)
             epsilons = new_epsilons
-            if all(v > self._max_queries for v in self._nqueries.values()):
+
+            if all(v > self._max_queries for v in self._nqueries.values()) or all(
+                    t < self.theta_min for t in self.theta_max):
                 raise RuntimeError
 
             # print(self.theta_max.raw)
