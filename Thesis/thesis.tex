@@ -19,6 +19,7 @@ assistant={V. Rimmer \and I. Tsingenopoulos}
 
 % Hier kun je dan nog andere pakketten laden of eigen definities voorzien
 \usepackage{amsmath, amssymb}
+\DeclareMathOperator{\sgn}{sgn}
 \setlength{\mathindent}{1cm}
 \setlength{\parindent}{0mm}
 \usepackage{tikz}
@@ -32,6 +33,8 @@ assistant={V. Rimmer \and I. Tsingenopoulos}
 \usepgfplotslibrary{fillbetween}
 \usepgfplotslibrary{external} 
 \tikzexternalize[shell escape=-enable-write18]
+
+\newcommand*{\annot}[1]{\tag*{\footnotesize{\textcolor{black!50}{#1}}}}
 
 \usepackage[acronym]{glossaries}
 \makenoidxglossaries
@@ -88,6 +91,11 @@ assistant={V. Rimmer \and I. Tsingenopoulos}
 \include{Chapters/experiments}
 \include{Chapters/results}
 
+\appendixpage*          % indien gewenst
+\appendix
+\include{Chapters/surfree_calculations}
+
+\backmatter
 \bibliographystyle{unsrt}
 \bibliography{bibliography}
 \end{document}

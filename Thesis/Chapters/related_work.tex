@@ -6,7 +6,7 @@ The attack has to be initialized with an already adversarial input. Two differen
 
 \gls{ba} iteratively updates the adversarial image by performing a step orthogonal to the original image and a step towards this image. In iteration $k$, a perturbation $\eta_k$ is sampled from a uniform distribution. This perturbation is rescaled and added to the adversarial image. From this new position in search space, the step towards the original image is taken. This way the path of the attack follows the decision boundary, hence the name of the attack. The intuition of the \gls{ba} is shown in Figure~\ref{fig:boundary_attack_intuition}. The attack can only follow the boundary if the adversarial image is already near the boundary. The starting image is projected onto the boundary using binary search to ensure that the adversarial image is in the vicinity of the boundary.\\
 
-The step sizes are adjusted according to local geometry of the boundary. The orthogonal step size $\delta$ is adjusted so that approximately half of the orthogonal perturbations is still adversarial. This approach is based on trust region methods \cite{trm}. The step size towards the original image $\epsilon$ is adjusted using the same principle, but here a user specified threshold is used. The decision boundary tends to become flatter, the closer to the original image the attack gets. Therefore the algorithm converges when $\epsilon$ converges to zero.\\
+The step sizes are adjusted according to local geometry of the boundary. The orthogonal step size $\delta$ is adjusted so that approximately half of the orthogonal perturbations is still adversarial. This approach is based on trust region methods \cite{trm}. The step size towards the original image $\epsilon$ is adjusted using the same principle, but here a user specified threshold is used. The decision boundary tends to become flatter, the closer to the original image the attack gets \cite{straight_boundaries}. Therefore the algorithm converges when $\epsilon$ converges to zero.\\
 
 \gls{bba} \cite{brunner_guessing_2019} (previously known as \textit{Boundary Attack++}) is an improvement on the original \gls{ba} in three different ways. All three improvements will be discussed in order of the strength of their effect. The first improvement is a biased sampling technique. The key idea behind this is that most previous attacks yield adversarial examples with high frequencies in the image. By sampling the perturbations in the first step of the \gls{ba} from a low frequency distribution, the frequency of the created adversarial example will be lowered as well. \gls{bba} does this by sampling from a Perlin noise \cite{perlin} distribution instead of a uniform distribution. Lower frequency images yield more natural results and can more easily bypass simple preprocessing defense schemes. The difference between the two noise patterns can be seen in Figure \ref{fig:noise_differences}. The noise patterns can be influenced by a frequency value. This value can be tuned depending on the size of the images at hand. Higher frequency values yield less smooth noise patterns. Figure \ref{fig:perlin_noise_frequencies} visually shows the influence of the frequency values.\\
 
@@ -257,6 +257,30 @@ original image
 \label{fig:hsja_intuition}
 \end{figure}
 
+
+\section{SurFree attack}
+SurFree attack \cite{surfree} is a decision-based attack, similar to \gls{hsja}. The authors of the paper observed that \gls{hsja} uses a significant part of the query budget to estimate the gradients of the decision boundary. These queries will not improve the distance of the best adversarial example to the original image and will therefore cause the progress to stall. In order for the attack to require less queries to be successful, SurFree works without any surrogate gradient estimation, hence the name. Instead directions are sampled randomly and a geometrical mechanism determines the biggest distortion in this direction.\\
+
+\subsection{Geometrical mechanism}
+The geometrical mechanism starts from a point on the decision boundary: $x_b \in \partial\mathcal{A}$. This boundary point is located at distance $d := \| x_b - x_o\|_2 $ from the original image $x_o$. A unit vector $\mathbf{u}$ is constructed starting in $x_o$, pointing towards $x_b$. The search space for a better adversarial point will be restricted to a two-dimensional random plane $\mathcal{P}$. The plane $\mathcal{P}$ is spanned by vectors $\mathbf{u}$ and $\mathbf{v}$, where $\mathbf{v}$ is a random unit vector orthogonal to $\mathbf{u}$. The vector $v$ will be sampled from a distribution $\mathcal{T}$ as explained in section \ref{sec:surfree_direction_sampling} and orthogonalized using the Gram-Schmidt process \cite{gram_schmidt}. Both $x_o$ and $x_b$ are part of $\mathcal{P}$.\\
+
+New adversarial candidates are points at a distance $d(1 - \alpha)$ from $x_o$ in $\mathcal{P}$. In polar coordinates, this results in the following equation:
+\begin{align}
+ \mathbf{z}(\alpha, \theta) = d(1-\alpha) (\cos(\theta)\mathbf{u} + \sin(\theta)\mathbf{v}) + x_o \label{eq:surfree_polar}
+\end{align}
+with $\alpha \in [0,1]$, $\theta \in [-\pi, \pi]$ and with $\theta$ being the angle with $\mathbf{u}$. If the new adversarial candidate yields to be adversarial, then the distance to the original image is decreased by $100\cdot\alpha \%$.\\
+
+Equation \ref{eq:surfree_polar} has two parameters that can be chosen independently. However, $\alpha$ can be set based on $\theta$ in order to increase the probability of $\mathbf{z}(\alpha, \theta)$ being adversarial. Lets assume that the intersection of the decision boundary and the random two-dimensional plane $\partial\mathcal{A}\cap\mathcal{P}$ is a line through $x_b$. This line has a normal unit vector $\mathbf{n}$ in $\mathcal{P}$. This vector makes an angle~$\psi$ with $\mathbf{u}$. The polar form of $\mathbf{n}$ is the following:
+\begin{align}
+\mathbf{n} = \cos(\psi)\mathbf{u} + \sin(\psi)\mathbf{v}. \label{eq:surfree_n}
+\end{align}
+The optimal adversarial point, minimizing the distance to $x_o$, would be the orthogonal projection of $x_o$ on $\partial\mathcal{A}\cap\mathcal{P}$. This projection is achieved when $\theta = \psi$ and $\alpha = 1 - \cos(\psi)$. However, it is not possible to create this projection in practice, since the attacker has no knowledge about the angle~$\psi$. The calculation in appendix \ref{app:surfree_calculations} shows that $z(\alpha, \theta)$ is adversarial if the following equation holds:
+\begin{align}
+\left| \frac{1 - (1-\alpha)\cos(\theta)}{(1-\alpha)\sin(\theta)}\right| \leq \tan(\psi)\sgn(\theta) \label{eq:surfree_adversarial}
+\end{align}
+
+\subsection{Sampling random directions}\label{sec:surfree_direction_sampling}
+
 \begin{figure}
 \centering
 \begin{tikzpicture}[xscale=0.75, yscale=0.75]
@@ -298,8 +322,8 @@ dot/.default = 6pt % size of the circle diameter
 	\node[label=45:$x_b$] (xb) at (9,3){}; %xb
 \end{scope}
 
-\node[label=270:$u$] (xu) at (4.5,3){};
-\node[label=180:$v$] (xv) at (3,4.5){};
+\node[label=270:$\mathbf{u}$] (xu) at (4.5,3){};
+\node[label=180:$\mathbf{v}$] (xv) at (3,4.5){};
 \node[] (dl) at (3,1.5){};
 \node[] (dr) at (9,1.5){};
 \node[] (dal) at (3,0.5){};
@@ -339,7 +363,7 @@ dot/.default = 6pt % size of the circle diameter
 \end{scope}
 
 \node[] (p) at (2,9){};
-\draw [-latex, line width=0.5mm, blue, spath/save=normal] ($(xb)!(p)!(0,7.5)$) -- (p) node[]{$n$};
+\draw [-latex, line width=0.5mm, blue, spath/save=normal] ($(xb)!(p)!(0,7.5)$) -- (p) node[]{$\mathbf{n}$};
 \draw [dashed, blue, line width=0.5mm] ($(xb)!(p)!(0,7.5)$) -- ($(xb)!(p)!(0,7.5) + (2,0)$);
 \path[spath/save=dash] ($(xb)!(p)!(0,7.5) + (1.5,0)$) arc [start angle = 0, end angle = 90, radius = 1.5];
 \tikzset{
@@ -348,12 +372,12 @@ dot/.default = 6pt % size of the circle diameter
 }
 \draw[spath/use={\getComponentOf\blueCpt{1}}, -latex, line width=0.5mm, blue] node[right, pos=0.5] {$\psi$};
 
-\node[] at (8,9.5) {$\mathcal{O} \cap \mathcal{P}$};
-\node[] (text) at (1,5.5) {$\partial\mathcal{O} \cap \mathcal{P}$};
+\node[] at (8,9.5) {$\mathcal{A} \cap \mathcal{P}$};
+\node[] (text) at (1,5.5) {$\partial\mathcal{A} \cap \mathcal{P}$};
 \node[] (line) at (0.5,7.25) {};
 \draw (text) to[out=0,in=-70] (line);
 \end{tikzpicture}
-\caption[Geographical configuration of SurFree]{•}
+\caption[Geometric configuration of SurFree]{•}
 \label{fig:surfree}
 \end{figure}
 

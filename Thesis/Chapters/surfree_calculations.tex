@@ -1,0 +1,14 @@
+\chapter{SurFree calculations}\label{app:surfree_calculations}
+The following calculations will show how equation \ref{eq:surfree_adversarial} was derived. Assume that the normal vector $\mathbf{n}$ is pointing outside, i.e. to the adversarial region $\mathcal{A}$. A candidate point $\mathbf{z} \in \mathcal{P}$ is adversarial if $(\mathbf{z}-x_b)^\top \mathbf{n} \geq 0$. Under the assumption of a (local) flat decision boundary, this means that both vector $n$ and vector $(\mathbf{z}-x_b)$ are pointing outside. This assumption is justified according to \cite{straight_boundaries}. Below follows the derivation of equation \ref{eq:surfree_adversarial}:\\
+\begin{align*}
+&(\mathbf{z}-x_b)^\top \mathbf{n} \geq 0 \\
+&\Leftrightarrow \left[ d(1-\alpha)(\cos(\theta)\mathbf{u} + \sin(\theta)\mathbf{v}) + x_o - x_b)\right]^\top \mathbf{n} &\geq 0 \annot{Equation \ref{eq:surfree_polar}}\\
+&\Leftrightarrow \left[ d(1-\alpha)(\cos(\theta)\mathbf{u} + \sin(\theta)\mathbf{v}) - d\mathbf{u})\right]^\top \mathbf{n} &\geq 0 \annot{$\mathbf{u} = (x_b - x_o) / d$}\\
+&\Leftrightarrow [((1-\alpha)\cos(\theta) - 1)\mathbf{u} + ((1-\alpha)\sin(\theta))\mathbf{v}]^\top \mathbf{n} &\geq 0\\
+&\Leftrightarrow ((1-\alpha)\cos(\theta) - 1)\cos(\psi) + ((1-\alpha)\sin(\theta))\sin(\psi) &\geq 0 \annot{Equation \ref{eq:surfree_n}}\\
+&\Leftrightarrow ((1-\alpha)\cos(\theta) - 1)\cos(\psi) \geq -((1-\alpha)\sin(\theta))\sin(\psi)\\
+&\Leftrightarrow (1 - (1-\alpha)\cos(\theta))\cos(\psi) \leq ((1-\alpha)\sin(\theta))\sin(\psi) \annot{$x \geq y \Leftrightarrow -x \leq -y$}\\
+&\Leftrightarrow \left| \frac{1 - (1-\alpha)\cos(\theta)}{(1-\alpha)\sin(\theta)}\right| \leq \tan(\psi)\sgn(\theta) \annot{$\tan(x) = \frac{\sin(x)}{\cos(x)}$}
+\end{align*}
+
+The absolute value and sign operator are present due to the fact that the inequality should reverse in case of a division by a negative number.
