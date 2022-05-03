@@ -261,8 +261,8 @@ original image
 \section{SurFree attack}
 SurFree attack \cite{surfree} is a decision-based attack, similar to \gls{hsja}. The authors of the paper observed that \gls{hsja} uses a significant part of the query budget to estimate the gradients of the decision boundary. These queries will not improve the distance of the best adversarial example to the original image and will therefore cause the progress to stall. In order for the attack to require less queries to be successful, SurFree works without any surrogate gradient estimation, hence the name. Instead directions are sampled randomly and a geometrical mechanism determines the biggest distortion in this direction.\\
 
-\subsection{Geometrical mechanism}
-The geometrical mechanism starts from a point on the decision boundary: $x_b \in \partial\mathcal{A}$. This boundary point is located at distance $d := \| x_b - x_o\|_2 $ from the original image $x_o$. A unit vector $\mathbf{u}$ is constructed starting in $x_o$, pointing towards $x_b$. The search space for a better adversarial point will be restricted to a two-dimensional random plane $\mathcal{P}$. The plane $\mathcal{P}$ is spanned by vectors $\mathbf{u}$ and $\mathbf{v}$, where $\mathbf{v}$ is a random unit vector orthogonal to $\mathbf{u}$. The vector $v$ will be sampled from a distribution $\mathcal{T}$ as explained in section \ref{sec:surfree_direction_sampling} and orthogonalized using the Gram-Schmidt process \cite{gram_schmidt}. Both $x_o$ and $x_b$ are part of $\mathcal{P}$.\\
+\subsection{Geometrical mechanism}\label{subsec:geometrical}
+The geometrical mechanism starts from a point on the decision boundary: $x_b \in \partial\mathcal{A}$. This boundary point is located at distance $d := \| x_b - x_o\|_2 $ from the original image $x_o$. A unit vector $\mathbf{u}$ is constructed starting in $x_o$, pointing towards $x_b$. The search space for a better adversarial point will be restricted to a two-dimensional random plane $\mathcal{P}$. The plane $\mathcal{P}$ is spanned by vectors $\mathbf{u}$ and $\mathbf{v}$, where $\mathbf{v}$ is a random unit vector orthogonal to $\mathbf{u}$. The vector $\mathbf{v}$ will be sampled from a distribution $\mathcal{T}$ as explained in section \ref{sec:surfree_direction_sampling} and orthogonalized using the Gram-Schmidt process \cite{gram_schmidt}. Both $x_o$ and $x_b$ are part of $\mathcal{P}$.\\
 
 New adversarial candidates are points at a distance $d(1 - \alpha)$ from $x_o$ in $\mathcal{P}$. In polar coordinates, this results in the following equation:
 \begin{align}
@@ -274,12 +274,25 @@ Equation \ref{eq:surfree_polar} has two parameters that can be chosen independen
 \begin{align}
 \mathbf{n} = \cos(\psi)\mathbf{u} + \sin(\psi)\mathbf{v}. \label{eq:surfree_n}
 \end{align}
-The optimal adversarial point, minimizing the distance to $x_o$, would be the orthogonal projection of $x_o$ on $\partial\mathcal{A}\cap\mathcal{P}$. This projection is achieved when $\theta = \psi$ and $\alpha = 1 - \cos(\psi)$. However, it is not possible to create this projection in practice, since the attacker has no knowledge about the angle~$\psi$. The calculation in appendix \ref{app:surfree_calculations} shows that $z(\alpha, \theta)$ is adversarial if the following equation holds:
+The optimal adversarial point, minimizing the distance to $x_o$, would be the orthogonal projection of $x_o$ on $\partial\mathcal{A}\cap\mathcal{P}$. This projection is achieved when $\theta = \psi$ and $\alpha = 1 - \cos(\psi)$. However, it is not possible to create this projection in practice, since the attacker has no knowledge about the angle~$\psi$.\\
+
+The calculation in appendix \ref{app:surfree_calculations} shows that $z(\alpha, \theta)$ is adversarial if the following equation holds:
 \begin{align}
 \left| \frac{1 - (1-\alpha)\cos(\theta)}{(1-\alpha)\sin(\theta)}\right| \leq \tan(\psi)\sgn(\theta) \label{eq:surfree_adversarial}
 \end{align}
+Since the left hand side of this equation is always positive due to the absolute value operator, the inequality can only hold if the right hand side is positive as well. This is the case when $\theta$ and $\psi$ share the same sign.\\
+
+By minimizing the left hand side of the equation, the probability of the inequality holding, increases. The $\theta$ parameter can be discarded from the equation by inserting the previously attained coupling $\alpha = 1 - \cos(\theta)$. This causes the left hand side of the equation to be equal to $|\tan(\theta^*(\alpha))|$, where $\theta^*(\alpha)$ denotes that the coupling between $\alpha$ and $\theta$ is used. $z^*(\theta)$ is therefore also equal to $z(1-\cos(\theta), \theta)$. The derivation of this result is also shown in appendix \ref{app:surfree_calculations}. The result is an increasing function in terms of $\alpha$. Minimizing the left hand side of equation \ref{eq:surfree_adversarial} is therefore the same as finding the minimal value of $\alpha$ for which the inequality holds. Minimal values of $\alpha$ are attained for higher values of $\theta$ when using the coupling. The geometrical mechanism is visualized in Figure \ref{fig:surfree}.\\
+
+The attack proposes the following technique in order to determine the best value for $\theta$. A maximal angle $\theta_{max}$ is set at the beginning of the attack. This maximal angle is then multiplied with a fraction from the following list:
+\begin{align*}
+1, -1, (T - 1)/T, -(T-1)/T, \ldots, 1/T, -1/T
+\end{align*}
+The biggest fractions are at the beginning of the list in order to test these first. As soon as an adversarial position is found, the search is stopped. If no fraction results in an adversarial position, then the value of $\theta_{max}$ is decreased and the search is restarted using another direction $\mathbf{v}$.
 
 \subsection{Sampling random directions}\label{sec:surfree_direction_sampling}
+As explained in section \ref{subsec:geometrical}, the SurFree attack \cite{surfree} algorithm requires random directions $\mathbf{v}$ in order to restrict the search to a random plane $\mathcal{P}$. The random sampling is done from a distribution $\mathcal{T}$ using a custom sampling algorithm. The advantage of this sampling algorithm over uniform sampling is twofold. The first advantage is dimensionality reduction. This is done using a \gls{dct} \cite{dct}. The original image is transformed using a \gls{dct}. Some components are set to zero, while other components are shaped like the visual content of $x_o$. This adaptivity to the contents of $x_o$ is the second advantage of the sampling algorithm. It makes the final perturbation less perceptible and is based on the masking used in watermarking techniques \cite{watermarking}. The final result is then transformed using the inverse \gls{dct}.
+
 
 \begin{figure}
 \centering
@@ -377,7 +390,7 @@ dot/.default = 6pt % size of the circle diameter
 \node[] (line) at (0.5,7.25) {};
 \draw (text) to[out=0,in=-70] (line);
 \end{tikzpicture}
-\caption[Geometric configuration of SurFree]{•}
+\caption[Geometric configuration of SurFree]{The geometrical mechanism of the SurFree attack. A random position is projected onto the decision boundary $\partial\mathcal{A}\cap\mathcal{P}$ using a binary search algorithm. This position is called $x_b$ and is located at a distance $d$ from the original image $x_o$. The goal of the attack is to find a new position $z(\alpha,\theta)$ in the adversarial region $\mathcal{A}$ that lays at distance $d(1-\alpha)$ from $x_o$. In this process a unit vector $\mathbf{u}$ pointing from $x_o$ to $x_b$ is constructed as well as another random unit vector $\mathbf{v}$ orthogonal to $\mathbf{u}$. The search for new adversarial positions is restricted to a plane $\mathcal{P}$ spanned by $\mathbf{u}$ and $\mathbf{v}$ containing $x_o$. In this case, the plane $\mathcal{P}$ is the piece of paper or the monitor you are reading this text from. There exists a coupling between $\alpha$ and $\theta$ ($\alpha = 1 - \cos(\theta)$). Points adhering to this coupling are located on the red circle and are referred to using $z^*(\theta)$. The optimal adversarial point $z^*(\theta^*)$, is the point on this circle laying in $\mathcal{A}$ with the minimal distance to $x_o$, i.e. maximal $\alpha$. SurFree determines this point by repeatedly testing decreasing angle amplitudes until an adversarial position is found. The image is inspired by \cite{surfree}.}
 \label{fig:surfree}
 \end{figure}
 

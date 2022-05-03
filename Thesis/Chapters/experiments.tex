@@ -39,7 +39,24 @@ The trained models are then used to classify all instances in the test set of th
     \label{tbl:architectures}
 \end{table}
 
-The stateful defense mechanism \cite{chen_stateful_2019} will use a query bounded detector buffer of 1000 queries per user. The value of $k$ will be set to 50, as suggested by the authors of the paper. A threshold is determined in order to achieve a 0.1\% false positive detection rate on the training data. The detector buffer will be cleared after each detection to simulate the creation of a new account.\\
+\begin{table}
+	\centering
+	\caption[Model architectures for the MNIST and CIFAR similarity encoders]{Model architectures for the MNIST and CIFAR similarity encoders. Both datasets use the same architecture.}
+	\begin{tabular}{ll}\toprule
+        Layer type     & Size\\ \midrule
+        Convolution + \gls{relu}	&$3\times3\times32$\\
+        Convolution + \gls{relu}	&$3\times3\times32$\\
+        Max Pooling					&$2\times2$\\
+        Convolution + \gls{relu}	&$3\times3\times64$\\
+        Convolution + \gls{relu}	&$3\times3\times64$\\
+        Max Pooling					&$2\times2$\\
+        Fully Connected + \gls{relu}&$512$\\
+        Fully Connected + linear	&$256$ \\ \bottomrule
+    \end{tabular}
+    \label{tbl:architectures_encoders}
+\end{table}
+
+The stateful defense mechanism \cite{chen_stateful_2019} will use a query bounded detector buffer of 1000 queries per user and the value of $k$ will be set to 50, as suggested by the authors of the paper. A threshold is determined in order to achieve a 0.1\% false positive detection rate on the training data. The detector buffer will be cleared after each detection to simulate the creation of a new account. The mechanism will have a similarity encoder with an output dimension of 256. The detailed architecture of the encoder is shown in Table \ref{tbl:architectures_encoders} and is identical for both datasets.\\
 
 The algorithm receives a budget of \num{25000} queries to create an adversarial example. The final adversarial example will be evaluated on the $L_2$-distance to the original image and the total number of detections by the stateful defense mechanism.
 

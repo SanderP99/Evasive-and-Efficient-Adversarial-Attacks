@@ -11,4 +11,34 @@ The following calculations will show how equation \ref{eq:surfree_adversarial} w
 &\Leftrightarrow \left| \frac{1 - (1-\alpha)\cos(\theta)}{(1-\alpha)\sin(\theta)}\right| \leq \tan(\psi)\sgn(\theta) \annot{$\tan(x) = \frac{\sin(x)}{\cos(x)}$}
 \end{align*}
 
-The absolute value and sign operator are present due to the fact that the inequality should reverse in case of a division by a negative number.
+The absolute value and sign operator are present due to the fact that the inequality should reverse in case of a division by a negative number. Since $\psi$ is restricted to $[-\frac{\pi}{2},\frac{\pi}{2}]$, the cosine of $\psi$ is always positive. Therefore this correction is only needed because of $\sin(\theta)$.\\
+
+The derivative of equation \ref{eq:surfree_adversarial} is derived as follows:
+\begin{align*}
+\frac{d}{d\theta^*(\alpha)}\frac{1 - (1-\alpha)\cos(\theta)}{(1-\alpha)\sin(\theta)} &=\frac{1 - (1-\alpha)\cos(\arccos(1-\alpha))}{(1-\alpha)\sin(\arccos(1-\alpha))} \annot{$\theta = \pm \arccos(1-\alpha)$} \\
+&=\frac{1 - (1-\alpha)(1-\alpha)}{(1-\alpha)\sin(\arccos(1-\alpha))} \annot{$\cos(\arccos(x)) = x$}\\
+&=\frac{1 - (1-\alpha)(1-\alpha)}{(1-\alpha)\sqrt{1-(1-\alpha)^2}} \annot{$\sin(\arccos(x)) = \sqrt{1-x^2}$}  \\
+&= \frac{\sqrt{1-(1-\alpha)^2}(1-(1-\alpha)^2)}{(1-\alpha)(1-(1-\alpha)^2))}\\
+&= \frac{\sqrt{1 - (1-\alpha)^2}}{1-\alpha}\\
+&= |\tan(\theta^*(\alpha))|
+\end{align*}
+
+The final step is based on the Pythagorean theorem. The tangent of $\theta^*$ is the equal to the fraction on the line before. This is shown visually in Figure \ref{fig:pythagoras}.\\
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+d/.style = {draw, fill=teal!30,
+                   angle radius=7mm, 
+                   angle eccentricity=1.1, 
+                   right, inner sep=1pt,
+                   font=\footnotesize} 
+                   ]
+\draw   (0,0) coordinate[] (a) -- node[midway, below]{$x$}
+        (5,0) coordinate[] (c) -- node[midway, right]{$\sqrt{1-x^2}$}
+        (5,3) coordinate[] (b) -- node[midway, above]{$1$} cycle pic[d] {angle = c--a--b};
+\path node[label = {[label distance=5mm]3:$\theta^*$}] (t) at (a) {};
+\end{tikzpicture}
+\caption[Visual guide to a step in the derivation.]{Visual guide to the final step of the derivation of the derivative of equation \ref{eq:surfree_adversarial}. The tangent of the teal angle is equal to the length of the opposite right angled side divided by the adjacent right angled side.}
+\label{fig:pythagoras}
+\end{figure}
