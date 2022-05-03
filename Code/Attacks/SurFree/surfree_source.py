@@ -42,7 +42,8 @@ class SurFree(MinimizationAttack):
             with_alpha_line_search: bool = True,
             with_distance_line_search: bool = False,
             with_interpolation: bool = False,
-            nodes=None):
+            nodes=None,
+            targeted=False):
         """
         Args:
             steps (int, optional): run steps. Defaults to 1000.
@@ -87,6 +88,8 @@ class SurFree(MinimizationAttack):
         self._nqueries: Dict[int, int] = {}
         self._basis: Basis = None
         self.nodes = nodes
+        self.targeted = targeted
+        self.target_label = None
 
     def get_nqueries(self) -> Dict:
         return self._nqueries
@@ -106,8 +109,14 @@ class SurFree(MinimizationAttack):
         self._nqueries = {i: 0 for i in range(len(originals))}
         self._set_cos_sin_function(originals)
         self.theta_max = ep.ones(originals, len(originals)) * self._theta_max
+        self.labels = np.argmax(model(originals), axis=1)
         criterion = get_criterion(criterion)
+        if self.targeted:
+            assert 'target_label' in kwargs
+            self.target_label = kwargs['target_label']
+
         self._criterion_is_adversarial = get_is_adversarial(criterion, model)
+        self.model = model
 
         # Get Starting Point
         if starting_points is not None:
@@ -132,6 +141,7 @@ class SurFree(MinimizationAttack):
         else:
             self._basis = Basis(originals)
 
+        previous_best_advs = best_advs
         for k in range(self._steps):
             print(k)
             # Get candidates. Shape: (n_candidates, batch_size, image_size)
@@ -142,27 +152,35 @@ class SurFree(MinimizationAttack):
                 best_candidates = np.zeros_like(best_advs)
                 for i, o in enumerate(originals):
                     o_repeated = ep.concatenate([ep.astensor(o).expand_dims(0)] * len(candidates[i]), axis=0)
-                    index = ep.argmax(np.linalg.norm(o_repeated.numpy() - candidates[i].numpy()))
+                    index = np.argmax(np.linalg.norm(o_repeated.numpy() - candidates[i].numpy()))
                     best_candidates[i] = candidates[i][index].raw
 
                 try:
                     best_advs = best_advs.numpy()
+                except AttributeError:
+                    pass
+                try:
                     originals = originals.numpy()
                 except AttributeError:
                     pass
-
                 is_success = np.linalg.norm(best_candidates - originals) < np.linalg.norm(
                     best_advs - originals)
                 best_advs = np.where(atleast_kd(is_success, best_candidates.ndim), ep.astensor(best_candidates).numpy(),
                                      best_advs)
+                if not self.targeted:
+                    if np.argmax(self.model(ep.astensor(best_advs).astype(np.float32))) != self.labels:
+                        previous_best_advs = best_advs
+                else:
+                    if np.argmax(self.model(ep.astensor(best_advs).astype(np.float32))) == self.target_label:
+                        previous_best_advs = best_advs
 
                 if all(v > self._max_queries for v in self._nqueries.values()):
                     print("Max queries attained for all the images.")
                     break
             except RuntimeError:
-                print("Max queries attained for all the images.")
+                print("No direction found.")
                 break
-        return restore_type(best_advs)
+        return restore_type(previous_best_advs)
 
     def _quantify(self, x: ep.Tensor) -> ep.Tensor:
         x = (x * 255).astype(int)
@@ -175,12 +193,19 @@ class SurFree(MinimizationAttack):
             if not (p == 0).all():
                 self._nqueries[i] += 1
         a = ep.astensor(self._criterion_is_adversarial(ep.astensor(perturbed).astype(np.float32)))
+        # print(a, ep.argmax(self.model(ep.astensor(perturbed).astype(np.float32)), axis=1))
         if self.nodes is not None:
             try:
                 b = perturbed.numpy()
+            except AttributeError:
+                b = perturbed
             except ValueError:
                 b = perturbed
-            self.nodes[0].add_to_detector(np.expand_dims(b.squeeze(), axis=2).astype(np.float32))
+            if b.shape[1] == 1:
+                self.nodes[0].add_to_detector(np.expand_dims(b.squeeze(), axis=2).astype(np.float32))
+            else:
+                self.nodes[0].add_to_detector(np.transpose(b.squeeze(), (1, 2, 0)).astype(np.float32))
+
         return a
 
     def _get_candidates(self, originals: ep.Tensor, best_advs: ep.Tensor) -> ep.Tensor:
@@ -290,9 +315,9 @@ class SurFree(MinimizationAttack):
             x = ep.where(
                 atleast_kd(best_params == 0, v_type.ndim),
                 x_evol,
-                ep.zeros_like(v_type))
+                ep.zeros_like(v_type)).astype(np.float32)
 
-            is_advs = self._is_adversarial(x * 255)
+            is_advs = self._is_adversarial(x)
 
             best_params = ep.where(
                 (best_params == 0) * is_advs.numpy(),

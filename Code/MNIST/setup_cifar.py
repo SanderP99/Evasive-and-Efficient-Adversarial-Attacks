@@ -61,7 +61,7 @@ def load_batch(fpath):
 
 
 class CIFAR:
-    def __init__(self):
+    def __init__(self, reverse=False):
         train_data = []
         train_labels = []
 
@@ -87,6 +87,10 @@ class CIFAR:
         self.train_data = train_data[VALIDATION_SIZE:, :, :, :]
         self.train_labels = train_labels[VALIDATION_SIZE:]
 
+        if reverse:
+            self.train_data = np.transpose(self.train_data, (0, 3, 1, 2))
+            self.test_data = np.transpose(self.test_data, (0, 3, 1, 2))
+            self.validation_data = np.transpose(self.validation_data, (0, 3, 1, 2))
 
 class CIFARModel:
     def __init__(self, restore=None, session=None, use_log=False):

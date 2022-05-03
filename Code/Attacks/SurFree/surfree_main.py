@@ -17,10 +17,11 @@ from PIL import Image
 from foolbox.utils import samples
 from foolbox.distances import l2
 from foolbox.attacks.blended_noise import LinearSearchBlendedUniformNoiseAttack
-from foolbox import PyTorchModel, TensorFlowModel
+from foolbox import PyTorchModel, TensorFlowModel, TargetedMisclassification
 from keras.models import load_model
 
 from Attacks.DistributedBBA.node import Node
+from MNIST.setup_cifar import CIFAR
 from MNIST.setup_mnist import MNIST
 from surfree_source import SurFree
 
@@ -43,7 +44,7 @@ from surfree_source import SurFree
 #     return fmodel
 
 def get_model():
-    model = load_model('../../MNIST/models/mnist_reverse', compile=False)
+    model = load_model('../../MNIST/models/cifar_reverse', compile=False)
     return TensorFlowModel(model, bounds=(0, 1))
 
 
@@ -65,6 +66,7 @@ def get_args():
 
 
 if __name__ == "__main__":
+    targeted = False
     args = get_args()
     ###############################
     output_folder = args.output_folder
@@ -82,7 +84,8 @@ if __name__ == "__main__":
             raise ValueError("{} doesn't exist.".format(args.config_path))
         config = json.load(open(args.config_path, "r"))
     else:
-        config = {"init": {'steps': 100, 'T': 4}, "run": {"epsilons": None, 'basis_params': {'dct_type': 'full'}}}
+        config = {"init": {'steps': 1000, 'T': 30, 'max_queries': 25000},
+                  "run": {"epsilons": None, 'basis_params': {'dct_type': 'full'}}}
 
     # ###############################
     # print("Get understandable ImageNet labels")
@@ -95,20 +98,37 @@ if __name__ == "__main__":
 
     ###############################
     print("Load Data")
-    mnist = MNIST()
-    images = np.array([mnist.test_data[42]])
+    # mnist = MNIST()
+    # images = np.array([data.test_data[42], data.test_data[0]])
+    # images = np.transpose(images, (0, 3, 1, 2))
+    # labels = np.vstack(np.array([np.argmax(data.test_labels[42]), np.argmax(data.test_labels[0])]))
+    # print("{} images loaded with the following labels: {}".format(len(images), labels))
+
+    data = CIFAR()
+    images = np.array([data.test_data[42], data.test_data[0]])
     images = np.transpose(images, (0, 3, 1, 2))
-    labels = np.array([np.argmax(mnist.test_labels[42])])
+    labels = np.vstack(np.array([np.argmax(data.test_labels[42]), np.argmax(data.test_labels[0])]))
     print("{} images loaded with the following labels: {}".format(len(images), labels))
 
     ###############################
     print("Attack !")
     time_start = time.time()
 
-    node = Node(0, 'mnist')
-    f_attack = SurFree(**config["init"], nodes=[node])
+    node = Node(0, 'cifar', weights_path_mnist='../../Defense/CIFARencoder.h5')
+    f_attack = SurFree(**config["init"], nodes=[node], targeted=targeted)
 
-    elements, advs, success = f_attack(fmodel, images, labels, **config["run"])
+    if targeted:
+        elements, advs, success = f_attack(fmodel, np.expand_dims(images[0], axis=0),
+                                           TargetedMisclassification(ep.astensor(labels[1])),
+                                           starting_points=np.expand_dims(images[1], axis=0),
+                                           **config["run"], targeted=True, target_label=labels[1]
+                                           )
+    else:
+        images = np.array([data.test_data[7270]])
+        images = np.transpose(images, (0, 3, 1, 2))
+        labels = np.array([np.argmax(data.test_labels[7270])])
+        elements, advs, success = f_attack(fmodel, images,
+                                           labels, **config["run"])
     print("{:.2f} s to run".format(time.time() - time_start))
 
     print('Detections: ', len(node.detector.get_detections()))
@@ -118,7 +138,7 @@ if __name__ == "__main__":
     labels_advs = fmodel(ep.expand_dims(ep.astensor(advs[0]).astype(np.float32), 0)).argmax(1)
     nqueries = f_attack.get_nqueries()
     advs_l2 = np.linalg.norm(images - advs[0])
-    for image_i in range(len(images)):
+    for image_i in range(1):
         print("Adversarial Image {}:".format(image_i))
         label_o = int(labels[image_i])
         label_adv = int(labels_advs[image_i].numpy())
@@ -137,3 +157,4 @@ if __name__ == "__main__":
         adv_i = np.array(advs[0][image_i] * 255).astype(np.uint8)
         img_adv_i = Image.fromarray(adv_i)
         img_adv_i.save(os.path.join(output_folder, "{}_adversarial.jpg".format(image_i)))
+        break

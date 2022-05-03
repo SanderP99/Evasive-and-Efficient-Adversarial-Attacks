@@ -38,7 +38,7 @@ def extract_labels(filename, num_images):
 
 
 class MNIST:
-    def __init__(self):
+    def __init__(self, reverse: bool = False):
         if not os.path.exists("data"):
             os.mkdir("data")
             files = ["train-images-idx3-ubyte.gz",
@@ -59,6 +59,11 @@ class MNIST:
         self.validation_labels = train_labels[:VALIDATION_SIZE]
         self.train_data = train_data[VALIDATION_SIZE:, :, :, :]
         self.train_labels = train_labels[VALIDATION_SIZE:]
+
+        if reverse:
+            self.train_data = np.transpose(self.train_data, (0, 3, 1, 2))
+            self.test_data = np.transpose(self.test_data, (0, 3, 1, 2))
+            self.validation_data = np.transpose(self.validation_data, (0, 3, 1, 2))
 
 
 class MNISTModel:

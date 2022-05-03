@@ -8,7 +8,7 @@
 
 import numpy as np
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.layers import Dense, Dropout, Activation, Flatten, Permute
 from keras.layers import Conv2D, MaxPooling2D
 from tensorflow.keras.optimizers import SGD
 
@@ -24,10 +24,12 @@ def train(data, file_name, params, num_epochs=50, batch_size=128, train_temp=1, 
     """
     model = Sequential()
 
-    print(data.train_data.shape)
-
+    print(data.train_data.shape[1:])
+    model.add(Permute((2,3,1), input_shape=(3, 32, 32)))
+    output_shape = model.output_shape
+    print(output_shape)
     model.add(Conv2D(params[0], (3, 3),
-                     input_shape=data.train_data.shape[1:]))
+                     input_shape=output_shape[1:]))
     model.add(Activation('relu'))
     model.add(Conv2D(params[1], (3, 3)))
     model.add(Activation('relu'))
@@ -49,6 +51,8 @@ def train(data, file_name, params, num_epochs=50, batch_size=128, train_temp=1, 
 
     if init != None:
         model.load_weights(init)
+
+    print(model.summary())
 
     def fn(correct, predicted):
         return tf.nn.softmax_cross_entropy_with_logits(labels=correct,
@@ -107,8 +111,8 @@ def train_distillation(data, file_name, params, num_epochs=50, batch_size=128, t
 if not os.path.isdir('models'):
     os.makedirs('models')
 
-train(CIFAR(), "models/cifar", [64, 64, 128, 128, 256, 256], num_epochs=50)
-# train(MNIST(), "models/mnist", [32, 32, 64, 64, 200, 200], num_epochs=50)
+train(CIFAR(reverse=True), "models/cifar_reverse", [64, 64, 128, 128, 256, 256], num_epochs=50)
+# train(MNIST(reverse=True), "models/mnist_reverse", [32, 32, 64, 64, 200, 200], num_epochs=50)
 
 # train_distillation(MNIST(), "models/mnist-distilled-100", [32, 32, 64, 64, 200, 200],
 #                    num_epochs=50, train_temp=100)
