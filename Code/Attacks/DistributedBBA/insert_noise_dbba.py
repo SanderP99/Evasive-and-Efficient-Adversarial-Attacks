@@ -16,11 +16,14 @@ class InsertNoiseDistributedBiasedBoundaryAttack(DistributedBiasedBoundaryAttack
                  n_nodes: Optional[int] = None, dataset=None, source_step: float = 1e-2,
                  spherical_step: float = 5e-2, steps_per_iteration: int = 50, source_step_multiplier_up: float = 1.05,
                  source_step_multiplier_down: float = 0.6, insert_every: int = 50, insert_from: np.array = None,
-                 insert_n: int = 1, insert_noise: Optional[str] = None):
+                 insert_n: int = 1, insert_noise: Optional[str] = None, use_node_manager: bool = False,
+                 distance_based: Optional[str] = None, history_len=10):
         super().__init__(n_particles, inits, target_img, target_label, model, distribution_scheme, mapping=mapping,
                          n_nodes=n_nodes, dataset=dataset, source_step=source_step, spherical_step=spherical_step,
                          steps_per_iteration=steps_per_iteration, source_step_multiplier_up=source_step_multiplier_up,
-                         source_step_multiplier_down=source_step_multiplier_down)
+                         source_step_multiplier_down=source_step_multiplier_down, use_node_manager=use_node_manager,
+                         distance_based=distance_based, history_len=history_len)
+        self.swarm.distributed_attack = self
         self.insert_every = insert_every
         self.insert_n = insert_n
         self.node_calls = [0] * self.n_nodes
@@ -51,11 +54,13 @@ class InsertNoiseDistributedBiasedBoundaryAttack(DistributedBiasedBoundaryAttack
             self.insert_from = insert_from
 
     def process_query(self) -> None:
+        print('AAAAAAAAAAAA')
         mapping = self.distribution_scheme.get_mapping(
             positions=[particle.position for particle in self.swarm.particles])
         for p, m in zip(self.swarm.particles, mapping):
             self.nodes[m].add_to_detector(p.position)
             self.node_calls[m] += 1
+            print(self.node_calls)
             if self.node_calls[m] == self.insert_every:
                 self.swarm.total_queries += self.insert_n
                 self.node_calls[m] = 0
@@ -75,6 +80,7 @@ class InsertNoiseDistributedBiasedBoundaryAttack(DistributedBiasedBoundaryAttack
                             random_query = create_perlin_noise(np.array(self.insert_shape))
                             self.nodes[m].add_to_detector(random_query)
                     elif self.insert_noise == 'mixed':
+                        print('aaaaaaaaaaaaa')
                         for _ in range(self.insert_n):
                             idx = np.random.randint(0, 2)
                             if idx == 0:
