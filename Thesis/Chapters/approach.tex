@@ -4,7 +4,7 @@ The research concerning adversarial attacks and defenses is predominantly driven
 \section{Distribution}
 The stateful detection mechanism \cite{chen_stateful_2019} makes the assumption that queries can be traced back to their adversary and that there is no cooperation between different adversaries. This assumption can be problematic as $N$~collaborating adversaries can theoretically reduce the number of submitted queries per adversary by a factor~$1/N$. Even a single adversary could set up multiple accounts and submit queries on each account until it is banned. Due to the reduced number of submitted queries, less attacks will be detected since each buffer of the defense mechanism only holds a fraction of all queries.\\
 
-This work will aim to evade the detection mechanism by distributing the query submissions over multiple nodes. Each node will represent a different user of the model under attack. The users could in theory be all different persons or they could be different accounts of the same person.\\
+This work will aim to evade the detection mechanism by distributing the query submissions over multiple nodes. Each node will represent a different user of the model under attack. The users could theoretically be all different persons or they could be different accounts of the same person.\\
 
 As described in section \ref{sec:pso_and_distributed_attacks}, several attempts have been made to distribute adversarial attacks \cite{distributed_pso_attack, suryanto2020}. However, none of these attacks have been evaluated against the stateful detection mechanism, since the goal of the distribution was to make the attack more efficient. This work will distribute the query submission over multiple nodes in order to avoid detection.\\
 
