@@ -44,12 +44,14 @@ def calculate_thresholds(training_data: np.ndarray, k: int, encoder: Callable[[n
 class Detector:
 
     def __init__(self, k: int, threshold: float = None, training_data: np.ndarray = None, chunk_size: int = 1000,
-                 weights_path: str = './encoder_1.h5', clear_buffer_after_detection: bool = True, output: bool = False):
+                 weights_path: str = './encoder_1.h5', clear_buffer_after_detection: bool = True, output: bool = False,
+                 notify: bool = False):
         self.k = k
         self.threshold = threshold
         self.training_data = training_data
         self.clear_buffer_after_detection = clear_buffer_after_detection
         self.output = output
+        self.notify = notify
 
         if self.threshold is None and self.training_data is None:
             raise ValueError("Must provide explicit detection threshold or training data to calculate threshold!")
@@ -75,7 +77,7 @@ class Detector:
         self.encode = lambda x: x
         raise NotImplementedError("Must implement your own encode function!")
 
-    def process(self, queries: np.ndarray) -> Optional[list]:
+    def process(self, queries: np.ndarray) -> Union[Optional[list], Optional[bool]]:
         queries = self.encode(queries)
         dists = []
         for query in queries:
@@ -84,38 +86,44 @@ class Detector:
                 if result is not False:
                     dists.append(result)
             else:
-                self.process_query(query)
+                is_attack = self.process_query(query)
         if self.output:
             return dists
+        if self.notify:
+            return is_attack
 
     def process_query(self, query: np.ndarray) -> Optional[Union[bool, np.ndarray]]:
         if len(self.buffer) < self.k:
             self.buffer.append(query)
             self.num_queries += 1
-            return False
+            if self.notify:
+                return False
+        else:
 
-        all_dists = []
-        if len(self.buffer) > 0:
-            queries = np.stack(self.buffer, axis=0)
-            dists = np.linalg.norm(queries - query, axis=-1)
-            all_dists.append(dists)
+            all_dists = []
+            if len(self.buffer) > 0:
+                queries = np.stack(self.buffer, axis=0)
+                dists = np.linalg.norm(queries - query, axis=-1)
+                all_dists.append(dists)
 
-        dists = np.concatenate(all_dists)
-        k_nearest_dists = np.partition(dists, self.k - 1)[:self.k, None]
-        k_avg_dist = np.mean(k_nearest_dists)
+            dists = np.concatenate(all_dists)
+            k_nearest_dists = np.partition(dists, self.k - 1)[:self.k, None]
+            k_avg_dist = np.mean(k_nearest_dists)
 
-        self.buffer.append(query)
-        self.num_queries += 1
+            self.buffer.append(query)
+            self.num_queries += 1
 
-        is_attack = k_avg_dist < self.threshold
-        if is_attack:
-            self.history.append(self.num_queries)
-            self.detected_dists.append(k_avg_dist)
-            if self.clear_buffer_after_detection:
-                self.clear_memory()
+            is_attack = k_avg_dist < self.threshold
+            if is_attack:
+                self.history.append(self.num_queries)
+                self.detected_dists.append(k_avg_dist)
+                if self.clear_buffer_after_detection:
+                    self.clear_memory()
 
-        if self.output:
-            return k_avg_dist
+            if self.output:
+                return k_avg_dist
+            if self.notify:
+                return is_attack
 
     def clear_memory(self) -> None:
         self.buffer = deque(maxlen=self.chunk_size)

@@ -68,6 +68,7 @@ class EmbeddedNodeManager(NodeManager):
         embedded_query = self.encoder(np.expand_dims(query, axis=0))
         distances = self.calculate_distances(embedded_query)
         best_idx = np.argmax(distances)
+        best_distance = distances[best_idx]
         self.nodes[best_idx].add_to_detector(query)
         self.history[best_idx][self.idx % self.history_len] = embedded_query
         self.idx += 1
@@ -80,4 +81,28 @@ class EmbeddedNodeManager(NodeManager):
                     distances[node_idx] += np.linalg.norm(historic_position - query)
                 else:
                     distances[node_idx] += 1
+        return distances
+
+
+class ResettingEmbeddedNodeManager(EmbeddedNodeManager):
+    def add_to_detector(self, query: np.ndarray) -> None:
+        embedded_query = self.encoder(np.expand_dims(query, axis=0))
+        distances = self.calculate_distances(embedded_query)
+        best_idx = np.argmax(distances)
+        best_distance = distances[best_idx]
+        is_attack = self.nodes[best_idx].add_to_detector(query)
+        if is_attack:
+            self.history[best_idx] = 0  # Attack flagged so remove buffer
+        else:
+            self.history[best_idx][self.idx % self.history_len] = embedded_query
+        self.idx += 1
+
+    def calculate_distances(self, query):
+        distances = np.zeros(self.n_nodes)
+        for node_idx, node in enumerate(self.history):
+            for historic_position in node:
+                if np.any(historic_position):
+                    distances[node_idx] += np.linalg.norm(historic_position - query)
+                else:
+                    distances[node_idx] += 2
         return distances

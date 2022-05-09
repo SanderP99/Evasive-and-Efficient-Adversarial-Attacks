@@ -132,3 +132,8 @@ class EmbeddedDistanceBasedDistributionScheme(DistanceBasedDistributionScheme):
         for position, node in zip(positions, best_deque):
             embedded_position = self.encoder(position)
             self.history[node][self.idx % self.history_len] = embedded_position
+
+
+class ResettingEmbeddedDistanceBasedDistributionScheme(EmbeddedDistanceBasedDistributionScheme):
+    def __str__(self):
+        return f'resetting_embedded_distance_based_{self.history_len}'
