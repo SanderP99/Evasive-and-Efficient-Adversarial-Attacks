@@ -19,7 +19,7 @@ if __name__ == '__main__':
     # Settings
     dataset = 'cifar'  # mnist or cifar
     n_particles = [5]
-    n_nodes = [10]
+    n_nodes = [1]
     experiment_ids = list(range(20))
     max_queries = 25000
     distribution_schemes = ['mrr']  # rr or mrr or dbl2 or dbe
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     source_step_multiplier_up = 1.05
     source_step_multiplier_down = 0.99
     spherical_step = 0.05
-    insert_noise = InsertNoise(10, 50, 'perlin', dataset)
+
 
     if dataset == 'mnist':
         data = MNIST()
@@ -45,6 +45,7 @@ if __name__ == '__main__':
         for nodes in n_nodes:
             for particles in n_particles:
                 for distribution_scheme in distribution_schemes:
+                    insert_noise = InsertNoise(20, 500, 'train', dataset, True, n_nodes=nodes)
                     np.random.seed(42)
 
                     output_file = f'results/results_{dataset}_{distribution_scheme}_insert.csv'
@@ -56,7 +57,7 @@ if __name__ == '__main__':
                                 'n_detections', 'calls', 'detections_per_node', 'distribution_scheme',
                                 'source_step', 'spherical_step', 'dataset', 'source_step_multiplier_up',
                                 'source_step_multiplier_down', 'detections_all', 'insert_n',
-                                'insert_every', 'insert_noise'
+                                'insert_every', 'insert_noise', 'decay'
                             ])
 
                     use_node_manager = False
@@ -118,5 +119,6 @@ if __name__ == '__main__':
                             attack.swarm.best_fitness, total_detections, attack.swarm.total_queries,
                             [len(x) for x in detections_all], str(scheme), source_step, spherical_step, dataset,
                             source_step_multiplier_up, source_step_multiplier_down, detections_all,
-                            insert_noise.insert_n, insert_noise.insert_every, insert_noise.insert_noise
+                            insert_noise.insert_n, insert_noise.insert_every, insert_noise.insert_noise,
+                            insert_noise.decay
                         ])

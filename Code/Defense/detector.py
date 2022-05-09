@@ -85,7 +85,6 @@ class Detector:
                     dists.append(result)
             else:
                 self.process_query(query)
-        print(dists)
         if self.output:
             return dists
 

@@ -20,23 +20,56 @@ def write_to_file(detections, file):
 
 
 def compare_detections():
-    dataset = 'mnist'
-    df = pd.read_csv(f'../Experiments/DistributedBBA/results/results_{dataset}_vanilla.csv')
-
-    detections = fill_detections_array(df)
-    write_to_file(detections, f'detections_bba_{dataset}.csv')
-
+    dataset = 'cifar'
+    # df = pd.read_csv(f'../Experiments/DistributedBBA/results/results_{dataset}_vanilla.csv')
+    #
+    # detections = fill_detections_array(df)
+    # # write_to_file(detections, f'detections_bba_{dataset}.csv')
+    #
     fig, ax = plt.subplots()
+    # y = np.mean(detections, axis=0)
+    # ax.plot(y)
+    # ci = 1.96 * np.std(detections, axis=0) / np.sqrt(20)
+    # ax.fill_between(range(25000), (y - ci), (y + ci), color='b', alpha=.1)
+    #
+    df = pd.read_csv(f'../Experiments/DistributedBBA/results/results_{dataset}_rr.csv')
+    df = df[df.n_nodes == 1]
+    df = df[df.n_particles == 5]
+    detections = fill_detections_array(df)
+    # write_to_file(detections, f'detections_bba_pso_{dataset}.csv')
+
     y = np.mean(detections, axis=0)
     ax.plot(y)
     ci = 1.96 * np.std(detections, axis=0) / np.sqrt(20)
     ax.fill_between(range(25000), (y - ci), (y + ci), color='b', alpha=.1)
 
-    df = pd.read_csv(f'../Experiments/DistributedBBA/results/results_{dataset}_rr.csv')
+    df = pd.read_csv(f'../Experiments/DistributedBBA/results/results_{dataset}_mrr_insert.csv')
     df = df[df.n_nodes == 1]
-    df = df[df.n_particles == 1]
+    df = df[df.insert_noise.apply(str.strip) == 'train']
+    df.columns = [col.strip() for col in df.columns]
     detections = fill_detections_array(df)
-    write_to_file(detections, f'detections_bba_pso_{dataset}.csv')
+
+    y = np.mean(detections, axis=0)
+    ax.plot(y)
+    ci = 1.96 * np.std(detections, axis=0) / np.sqrt(20)
+    ax.fill_between(range(25000), (y - ci), (y + ci), color='orange', alpha=.1)
+
+    df = pd.read_csv(f'../Experiments/DistributedBBA/results/results_{dataset}_mrr_insert.csv')
+    df = df[df.n_nodes == 1]
+    df = df[df.insert_noise.apply(str.strip) == 'uniform']
+    df.columns = [col.strip() for col in df.columns]
+    detections = fill_detections_array(df)
+
+    y = np.mean(detections, axis=0)
+    ax.plot(y)
+    ci = 1.96 * np.std(detections, axis=0) / np.sqrt(20)
+    ax.fill_between(range(25000), (y - ci), (y + ci), color='g', alpha=.1)
+
+    df = pd.read_csv(f'../Experiments/DistributedBBA/results/results_{dataset}_mrr_insert.csv')
+    df = df[df.n_nodes == 1]
+    df = df[df.insert_noise.apply(str.strip) == 'perlin']
+    df.columns = [col.strip() for col in df.columns]
+    detections = fill_detections_array(df)
 
     y = np.mean(detections, axis=0)
     ax.plot(y)
@@ -54,7 +87,7 @@ def fill_detections_array(df):
         indexes = np.cumsum(lst)
         previous_index = 0
         for n_detections, index in enumerate(indexes):
-            for j in range(previous_index, index):
+            for j in range(previous_index, min(25000, index)):
                 detections[i][j] = n_detections
             previous_index = index
         for j in range(previous_index, 25000):
