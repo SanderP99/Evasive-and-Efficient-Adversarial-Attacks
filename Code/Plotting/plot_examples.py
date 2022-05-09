@@ -10,7 +10,7 @@ def plot_mnist_examples():
     mnist = MNIST()
 
     for i, ax in enumerate(axes):
-        ax.imshow(mnist.test_data[indexes[i]], cmap='Greys')
+        ax.imshow(mnist.test_data[indexes[i]], cmap='Greys_r')
         ax.set_xticks([])
         ax.set_yticks([])
     fig.tight_layout()
