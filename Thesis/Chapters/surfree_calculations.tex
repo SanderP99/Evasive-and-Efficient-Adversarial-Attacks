@@ -13,9 +13,9 @@ The following calculations will show how equation \ref{eq:surfree_adversarial} w
 
 The absolute value and sign operator are present due to the fact that the inequality should reverse in case of a division by a negative number. Since $\psi$ is restricted to $[-\frac{\pi}{2},\frac{\pi}{2}]$, the cosine of $\psi$ is always positive. Therefore this correction is only needed because of $\sin(\theta)$.\\
 
-The derivative of equation \ref{eq:surfree_adversarial} is derived as follows:
+The minimum of equation \ref{eq:surfree_adversarial} is derived as follows:
 \begin{align*}
-\frac{d}{d\theta^*(\alpha)}\frac{1 - (1-\alpha)\cos(\theta)}{(1-\alpha)\sin(\theta)} &=\frac{1 - (1-\alpha)\cos(\arccos(1-\alpha))}{(1-\alpha)\sin(\arccos(1-\alpha))} \annot{$\theta = \pm \arccos(1-\alpha)$} \\
+\frac{1 - (1-\alpha)\cos(\theta)}{(1-\alpha)\sin(\theta)} &=\frac{1 - (1-\alpha)\cos(\arccos(1-\alpha))}{(1-\alpha)\sin(\arccos(1-\alpha))} \annot{$\theta = \pm \arccos(1-\alpha)$} \\
 &=\frac{1 - (1-\alpha)(1-\alpha)}{(1-\alpha)\sin(\arccos(1-\alpha))} \annot{$\cos(\arccos(x)) = x$}\\
 &=\frac{1 - (1-\alpha)(1-\alpha)}{(1-\alpha)\sqrt{1-(1-\alpha)^2}} \annot{$\sin(\arccos(x)) = \sqrt{1-x^2}$}  \\
 &= \frac{\sqrt{1-(1-\alpha)^2}(1-(1-\alpha)^2)}{(1-\alpha)(1-(1-\alpha)^2))}\\
