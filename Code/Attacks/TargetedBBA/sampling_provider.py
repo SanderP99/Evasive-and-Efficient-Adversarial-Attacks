@@ -23,26 +23,30 @@ def create_perlin_noise(px: np.ndarray, seed: Optional[int] = None, color: Optio
     if seed is not None:
         np.random.seed(seed)
 
-    output = np.empty(px, dtype=np.float32)
+    output = np.zeros(px, dtype=np.float32)
 
     if px[2] == 3:
         color = True
+    while np.all(output == 0):
 
-    if color:
-        # Draw 3 separate Perlin samples per image, one for each channel
-        batch = perlin_batch(px[0], n_samples=3, freq=freq, precalc_fade=precalc_fade)
-        for i in range(1):
-            output[:, :, 0] = batch[i * 3]
-            output[:, :, 1] = batch[i * 3 + 1]
-            output[:, :, 2] = batch[i * 3 + 2]
-    else:
-        # Draw 1 Perlin sample per image and repeat it
-        batch = perlin_batch(px[0], n_samples=1, freq=freq, precalc_fade=precalc_fade)
-        for i in range(1):
-            output[:, :, 0] = batch[i]
+        if color:
+            # Draw 3 separate Perlin samples per image, one for each channel
+            batch = perlin_batch(px[0], n_samples=3, freq=freq, precalc_fade=precalc_fade)
+            for i in range(1):
+                output[:, :, 0] = batch[i * 3]
+                output[:, :, 1] = batch[i * 3 + 1]
+                output[:, :, 2] = batch[i * 3 + 2]
+        else:
+            # Draw 1 Perlin sample per image and repeat it
+            batch = perlin_batch(px[0], n_samples=1, freq=freq, precalc_fade=precalc_fade)
+            for i in range(1):
+                output[:, :, 0] = batch[i]
+        freq += 1
 
     # Normalize to L2=1
     if normalize:
+        if np.linalg.norm(output.reshape(1, -1), axis=1) == [0.]:
+            print(output)
         output /= np.linalg.norm(output.reshape(1, -1), axis=1)
     return output
 

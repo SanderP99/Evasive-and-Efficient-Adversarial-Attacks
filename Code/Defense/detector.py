@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Optional, Callable
+from typing import Optional, Callable, Union
 
 import numpy as np
 import sklearn.metrics.pairwise as pairwise
@@ -44,11 +44,12 @@ def calculate_thresholds(training_data: np.ndarray, k: int, encoder: Callable[[n
 class Detector:
 
     def __init__(self, k: int, threshold: float = None, training_data: np.ndarray = None, chunk_size: int = 1000,
-                 weights_path: str = './encoder_1.h5', clear_buffer_after_detection: bool = True):
+                 weights_path: str = './encoder_1.h5', clear_buffer_after_detection: bool = True, output: bool = False):
         self.k = k
         self.threshold = threshold
         self.training_data = training_data
         self.clear_buffer_after_detection = clear_buffer_after_detection
+        self.output = output
 
         if self.threshold is None and self.training_data is None:
             raise ValueError("Must provide explicit detection threshold or training data to calculate threshold!")
@@ -74,12 +75,21 @@ class Detector:
         self.encode = lambda x: x
         raise NotImplementedError("Must implement your own encode function!")
 
-    def process(self, queries: np.ndarray) -> None:
+    def process(self, queries: np.ndarray) -> Optional[list]:
         queries = self.encode(queries)
+        dists = []
         for query in queries:
-            self.process_query(query)
+            if self.output:
+                result = self.process_query(query)
+                if result is not False:
+                    dists.append(result)
+            else:
+                self.process_query(query)
+        print(dists)
+        if self.output:
+            return dists
 
-    def process_query(self, query: np.ndarray) -> Optional[bool]:
+    def process_query(self, query: np.ndarray) -> Optional[Union[bool, np.ndarray]]:
         if len(self.buffer) < self.k:
             self.buffer.append(query)
             self.num_queries += 1
@@ -104,6 +114,9 @@ class Detector:
             self.detected_dists.append(k_avg_dist)
             if self.clear_buffer_after_detection:
                 self.clear_memory()
+
+        if self.output:
+            return k_avg_dist
 
     def clear_memory(self) -> None:
         self.buffer = deque(maxlen=self.chunk_size)

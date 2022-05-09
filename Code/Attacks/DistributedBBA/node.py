@@ -1,4 +1,5 @@
 from collections import deque
+from typing import Optional
 
 import numpy as np
 
@@ -8,21 +9,23 @@ from Defense.detector import SimilarityDetector
 
 class Node:
     def __init__(self, idx, dataset, k=50, chunk_size=1000, weights_path_mnist='../../Defense/MNISTencoder.h5',
-                 flush_buffer_after_detection=True, insert_noise=None):
+                 flush_buffer_after_detection=True, insert_noise=None, output=False):
         self.idx = idx
         self.queries = deque(maxlen=chunk_size)
         self.particles = deque(maxlen=chunk_size)
         self.insert_noise = insert_noise
+        self.output = output
         self.node_calls = 0
+        self.total_node_calls = 0
         if dataset == 'mnist':
             self.detector = SimilarityDetector(k=k, chunk_size=chunk_size, threshold=0.00926118174381554,
                                                # Threshold autoencoder: 0.449137
                                                weights_path=weights_path_mnist,
-                                               clear_buffer_after_detection=flush_buffer_after_detection)
+                                               clear_buffer_after_detection=flush_buffer_after_detection, output=output)
         elif dataset == 'cifar':
             self.detector = SimilarityDetector(k=k, chunk_size=chunk_size, threshold=0.021234,
                                                weights_path=weights_path_mnist,
-                                               clear_buffer_after_detection=flush_buffer_after_detection)
+                                               clear_buffer_after_detection=flush_buffer_after_detection, output=output)
         else:
             raise ValueError
 
@@ -33,11 +36,12 @@ class Node:
         self.queries.append(query)
         self.particles.append(particle_id)
 
-    def add_to_detector(self, query: np.ndarray) -> None:
-        self.detector.process(np.expand_dims(query, axis=0))
+    def add_to_detector(self, query: np.ndarray) -> Optional[list]:
+        result = self.detector.process(np.expand_dims(query, axis=0))
         self.node_calls += 1
+        self.total_node_calls += 1
         if self.insert_noise is not None:
-            if self.node_calls == self.insert_noise.insert_every:
+            if self.node_calls == self.insert_noise.decay_rate:
                 self.node_calls = 0
                 if self.insert_noise.insert_noise is None:
                     random_indexes = np.random.choice(self.insert_noise.insert_from.shape[0],
@@ -45,16 +49,22 @@ class Node:
                     for random_index in random_indexes:
                         random_query = self.insert_noise.insert_from[random_index]
                         self.detector.process(np.expand_dims(random_query, axis=0))
+                    if self.insert_noise.decay:
+                        self.insert_noise.set_decay_rate(self.total_node_calls)
                 else:
                     if self.insert_noise.insert_noise == 'uniform':
                         for _ in range(self.insert_noise.insert_n):
                             random_query = np.random.uniform(0, 1, size=self.insert_noise.insert_shape)
                             self.detector.process(np.expand_dims(random_query, axis=0))
+                        if self.insert_noise.decay:
+                            self.insert_noise.set_decay_rate(self.total_node_calls)
                     elif self.insert_noise.insert_noise == 'perlin':
                         for _ in range(self.insert_noise.insert_n):
                             random_query = create_perlin_noise(np.array(self.insert_noise.insert_shape),
                                                                freq=np.random.randint(1, 40))
                             self.detector.process(np.expand_dims(random_query, axis=0))
+                        if self.insert_noise.decay:
+                            self.insert_noise.set_decay_rate(self.total_node_calls)
                     elif self.insert_noise.insert_noise == 'mixed':
                         for _ in range(self.insert_noise.insert_n):
                             idx = np.random.randint(0, 2)
@@ -68,5 +78,15 @@ class Node:
                             else:
                                 raise ValueError
                             self.detector.process(np.expand_dims(random_query, axis=0))
+                        if self.insert_noise.decay:
+                            self.insert_noise.set_decay_rate(self.total_node_calls)
+                    elif self.insert_noise.insert_noise == 'train':
+                        for _ in range(self.insert_noise.insert_n):
+                            random_query = self.insert_noise.insert_from[
+                                np.random.randint(0, self.insert_noise.insert_from.shape[0])]
+                            self.detector.process(np.expand_dims(random_query, axis=0))
                     else:
                         raise ValueError
+
+        if self.output:
+            return result
