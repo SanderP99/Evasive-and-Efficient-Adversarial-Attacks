@@ -53,7 +53,29 @@
 	\hfill	{\large \parbox{.961\textwidth}{\tableofcontents[hideothersubsections]}}
 \end{frame}
 
+\begin{frame}{Adversarial Attacks}
+\begin{quote}
+Imperceptibly small perturbations to a correctly classified input image, so that it is no longer classified correctly. \footcite{szegedy2014intriguing}
+\end{quote}
+
+
 \section{Background}
+\begin{itemize}
+	\item White box attacks
+	\item Black box attacks
+	\begin{itemize}
+		\item Subset of white box attacks
+		\item More relevant in security use-cases		 
+	\end{itemize}
+	\item Adversarial defenses
+	\begin{itemize}
+	\item Adversarial training
+	\item Gradient hiding
+	\item Denoising
+\end{itemize}
+\end{itemize}
+\end{frame}
+
 \begin{frame}{Boundary attack\footcite{boundary_attack}}
 \begin{figure}
 \centering
@@ -745,21 +767,26 @@ original image
 \begin{frame}{Distributing the query submission}
 \begin{table}
 	\centering
-	\begin{tabular}{lrrrr}\toprule
-			& \multicolumn{2}{c}{MNIST} &\multicolumn{2}{c}{CIFAR} \\ \cmidrule(r){2-3} \cmidrule(r){4-5}
-	Attack				&Distance	&Detections	&Distance	&Detections \\ \midrule
-	Baseline BBA							&2.807	&413	&1.306	&474 \\
-	PSO-BBA 						&2.712	&138	&1.239	&257 \\ \addlinespace[\linespace] 
-	RR-PSO-BBA (5 nodes) 		&2.712	&124	&1.239	&224 \\
-	RR-PSO-BBA (10 nodes) 	&2.712	&104	&1.239	&\textbf{202} \\	\addlinespace[\linespace]
-	MRR-PSO-BBA (5 nodes)		&2.712	&110	&1.239	&227 \\
-	MRR-PSO-BBA (10 nodes)	&2.712	&93		&1.239	&206 \\ \addlinespace[\linespace]
-	DB-PSO-BBA (5 nodes)		&2.712	&107	&1.239	&230 \\
-	DB-PSO-BBA (10 nodes)		&2.712	&\textbf{87}		&1.239	&207 \\ \addlinespace[\linespace]
-	EDB-PSO-BBA (5 nodes)		&2.712	&108	&1.239	&229 \\
-	EDB-PSO-BBA (10 nodes)	&2.712	&88		&1.239	&205 \\
+	\scalebox{0.9}{
+	\begin{tabular}{lrrrrr}\toprule
+			&& \multicolumn{2}{c}{MNIST} &\multicolumn{2}{c}{CIFAR} \\ \cmidrule(r){3-4} \cmidrule(r){5-6}
+	Attack				&&Distance	&Detections	&Distance	&Detections \\ \midrule
+	Baseline BBA							&&2.807	&413	&1.306	&474 \\
+	PSO-BBA 						&&2.712	&138	&1.239	&257 \\ \addlinespace[\linespace] 
+	RR-PSO-BBA &(5 nodes) 		&2.712	&124	&1.239	&224 \\
+	MRR-PSO-BBA &(5 nodes)		&2.712	&110	&1.239	&227 \\
+	DB-PSO-BBA &(5 nodes)		&2.712	&107	&1.239	&230 \\
+	EDB-PSO-BBA &(5 nodes)		&2.712	&108	&1.239	&229 \\ 
+	RR-PSO-BBA &(10 nodes) 	&2.712	&104	&1.239	&\textbf{202} \\	\addlinespace[\linespace]
+	MRR-PSO-BBA &(10 nodes)	&2.712	&93		&1.239	&206 \\ \addlinespace[\linespace]
+	DB-PSO-BBA &(10 nodes)		&2.712	&\textbf{87}		&1.239	&207 \\ \addlinespace[\linespace]	
+	EDB-PSO-BBA &(10 nodes)	&2.712	&88		&1.239	&205 \\
+
+
+
 	\bottomrule
 	\end{tabular}
+	}
 \end{table}
 \end{frame}
 
