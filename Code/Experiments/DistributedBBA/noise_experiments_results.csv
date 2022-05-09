@@ -1,0 +1,21 @@
+dataset,noise_type  ,distance             ,detections,calls
+mnist  ,uniform     ,0.141315974617873    ,0         ,10000
+mnist  ,mixed       ,0.24485821702072968  ,0         ,10000
+mnist  ,perlin      ,0.11043840900915278  ,0         ,10000
+mnist  ,perlin_fixed,0.11166885996134437  ,0         ,10000
+mnist  ,train_data  ,0.22217597233665048  ,0         ,10000
+cifar  ,uniform     ,0.023245894965626786 ,6346      ,10000
+cifar  ,mixed       ,0.20400489139815223  ,1497      ,10000
+cifar  ,perlin      ,0.004522021543749388 ,9643      ,10000
+cifar  ,perlin_fixed,0.003878644161984025 ,9934      ,10000
+cifar  ,train_data  ,0.2745425217707253   ,0         ,10000
+mnist  ,uniform     ,0.1392681085282848   ,0         ,20000
+mnist  ,mixed       ,0.23752620577326694  ,0         ,20000
+mnist  ,perlin      ,0.10799191271428737  ,0         ,20000
+mnist  ,perlin_fixed,0.1104955822899751   ,0         ,20000
+mnist  ,train_data  ,0.21203786970137206  ,0         ,20000
+cifar  ,uniform     ,0.02257633687321442  ,12993     ,20000
+cifar  ,mixed       ,0.19799526576830406  ,3056      ,20000
+cifar  ,perlin      ,0.004449333895688158 ,19350     ,20000
+cifar  ,perlin_fixed,0.0037694527994010384,19927     ,20000
+cifar  ,train_data  ,0.2647817309839385   ,0         ,20000
