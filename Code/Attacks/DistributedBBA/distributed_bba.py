@@ -14,14 +14,15 @@ class DistributedBiasedBoundaryAttack:
                  n_nodes: Optional[int] = None, dataset=None, source_step: float = 1e-2,
                  spherical_step: float = 5e-2, steps_per_iteration: int = 50, source_step_multiplier_up: float = 1.05,
                  source_step_multiplier_down: float = 0.6, use_node_manager: bool = False,
-                 distance_based: Optional[str] = None, history_len=10, insert_noise=None):
+                 distance_based: Optional[str] = None, history_len=10, insert_noise=None, notify=False,
+                 threshold: float = 0.02):
         if n_nodes is None:
             self.n_nodes: int = n_particles
         else:
             self.n_nodes: int = n_nodes
 
         self.nodes: list = [Node(i, dataset, weights_path_mnist=f'../../Defense/{str.upper(dataset)}encoder.h5',
-                                 insert_noise=insert_noise) for i
+                                 insert_noise=insert_noise, notify=notify) for i
                             in
                             range(self.n_nodes)]
         # self.mapping: deque = mapping
@@ -37,7 +38,8 @@ class DistributedBiasedBoundaryAttack:
                                                                                 use_node_manager=use_node_manager,
                                                                                 distance_based=distance_based,
                                                                                 dataset=dataset,
-                                                                                history_len=history_len)
+                                                                                history_len=history_len,
+                                                                                threshold=threshold)
 
     def attack(self) -> None:
         self.swarm.optimize()

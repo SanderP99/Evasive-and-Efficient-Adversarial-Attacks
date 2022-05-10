@@ -7,7 +7,7 @@ from keras.models import Model
 from Attacks.DistributedBBA.distribution_scheme import RoundRobinDistribution, DistanceBasedDistributionScheme
 from Attacks.DistributedBBA.node import Node
 from Attacks.DistributedBBA.node_manager import NodeManager, L2NodeManager, EmbeddedNodeManager, \
-    ResettingEmbeddedNodeManager
+    ResettingEmbeddedNodeManager, InsertResettingEmbeddedNodeManager
 from Attacks.TargetedBBA.utils import line_search_to_boundary
 
 
@@ -18,7 +18,7 @@ class Particle:
                  model: Model = None, swarm=None, is_targeted: bool = True, source_step: float = 1e-2,
                  spherical_step: float = 5e-2, steps_per_iteration: int = 50, source_step_multiplier_up: float = 1.05,
                  source_step_multiplier_down: float = 0.6, use_node_manager: bool = False, dataset=None,
-                 distance_based: Optional[str] = None, history_len=10):
+                 distance_based: Optional[str] = None, history_len=10, threshold: float = 0.02):
         self.id: int = i
         self.position: np.ndarray = init
         self.velocity: np.ndarray = np.random.randn(*self.position.shape) - 0.5
@@ -46,6 +46,10 @@ class Particle:
             elif distance_based == 'resetting_embedded':
                 self.node_manager = ResettingEmbeddedNodeManager(dataset=dataset, nodes=swarm.nodes,
                                                                  history_len=history_len)
+            elif distance_based == 'insert_resetting_embedded':
+                self.node_manager = InsertResettingEmbeddedNodeManager(dataset=dataset, nodes=swarm.nodes,
+                                                                       threshold=threshold,
+                                                                       history_len=history_len)
             else:
                 raise ValueError
 

@@ -17,7 +17,7 @@ def analyse_results(path: str) -> None:
     pd.set_option('display.width', None)
     pd.set_option('display.max_colwidth', None)
 
-    print(df.groupby(['dataset', 'distribution_scheme', 'n_particles', 'n_nodes', 'insert_noise', 'decay']).agg({'distance':
+    print(df.groupby(['dataset', 'distribution_scheme', 'n_particles', 'n_nodes']).agg({'distance':
                                                                                             [np.mean, np.std],
                                                                                         'n_detections':
                                                                                             [np.mean, np.std]

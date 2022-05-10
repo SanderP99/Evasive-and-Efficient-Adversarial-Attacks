@@ -10,22 +10,23 @@ from tqdm import tqdm
 from Attacks.DistributedBBA.distributed_bba import DistributedBiasedBoundaryAttack
 from Attacks.DistributedBBA.distribution_scheme import RoundRobinDistribution, DistanceBasedDistributionScheme, \
     EmbeddedDistanceBasedDistributionScheme, ModifiedRoundRobinDistribution, \
-    ResettingEmbeddedDistanceBasedDistributionScheme
+    ResettingEmbeddedDistanceBasedDistributionScheme, InsertResettingEmbeddedDistanceBasedDistributionScheme
 from MNIST.setup_cifar import CIFAR
 from MNIST.setup_mnist import MNIST
 
 if __name__ == '__main__':
     # Settings
-    dataset = 'mnist'  # mnist or cifar
+    dataset = 'cifar'  # mnist or cifar
     n_particles = [5]
-    n_nodes = [5, 10]
+    n_nodes = [10]
     experiment_ids = list(range(20))
     max_queries = 25000
-    distribution_schemes = ['rdbe']  # rr or mrr or dbl2 or dbe or rdbe
+    distribution_schemes = ['irdbe']  # rr or mrr or dbl2 or dbe or rdbe or irdbe
     history_len = 20
     source_step_multiplier_up = 1.05
     source_step_multiplier_down = 0.99
     spherical_step = 0.05
+    threshold = 1.
 
     if dataset == 'mnist':
         data = MNIST()
@@ -53,7 +54,7 @@ if __name__ == '__main__':
                                 'original_index', 'y_orig', 'y_target', 'n_particles', 'n_nodes', 'distance',
                                 'n_detections', 'calls', 'detections_per_node', 'distribution_scheme',
                                 'source_step', 'spherical_step', 'dataset', 'source_step_multiplier_up',
-                                'source_step_multiplier_down', 'detections_all'
+                                'source_step_multiplier_down', 'detections_all', 'threshold'
                             ])
 
                     use_node_manager = False
@@ -86,6 +87,12 @@ if __name__ == '__main__':
                         scheme = ResettingEmbeddedDistanceBasedDistributionScheme(None, n_nodes=nodes, dataset=dataset,
                                                                                   history_len=history_len)
                         notify = True
+                    elif distribution_scheme == 'irdbe':
+                        use_node_manager = True
+                        distance_based = 'insert_resetting_embedded'
+                        scheme = InsertResettingEmbeddedDistanceBasedDistributionScheme(None, n_nodes=nodes,
+                                                                                        dataset=dataset,
+                                                                                        history_len=history_len)
                     else:
                         raise ValueError
 
@@ -100,7 +107,7 @@ if __name__ == '__main__':
                                                              use_node_manager=use_node_manager,
                                                              distance_based=distance_based,
                                                              source_step=source_step, history_len=history_len,
-                                                             notify=notify)
+                                                             notify=notify, threshold=threshold)
 
                     previous_queries = 0
                     new_queries = 0
@@ -119,5 +126,5 @@ if __name__ == '__main__':
                             experiment.name, experiment.y_orig, experiment.y_target, particles, nodes,
                             attack.swarm.best_fitness, total_detections, attack.swarm.total_queries,
                             [len(x) for x in detections_all], str(scheme), source_step, spherical_step, dataset,
-                            source_step_multiplier_up, source_step_multiplier_down, detections_all
+                            source_step_multiplier_up, source_step_multiplier_down, detections_all, threshold
                         ])

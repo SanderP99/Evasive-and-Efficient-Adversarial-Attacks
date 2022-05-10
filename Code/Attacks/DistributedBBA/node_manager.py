@@ -4,6 +4,8 @@ import numpy as np
 from keras.models import load_model
 
 from Attacks.DistributedBBA.node import Node
+from MNIST.setup_cifar import CIFAR
+from MNIST.setup_mnist import MNIST
 
 
 class NodeManager(Node):
@@ -68,7 +70,6 @@ class EmbeddedNodeManager(NodeManager):
         embedded_query = self.encoder(np.expand_dims(query, axis=0))
         distances = self.calculate_distances(embedded_query)
         best_idx = np.argmax(distances)
-        best_distance = distances[best_idx]
         self.nodes[best_idx].add_to_detector(query)
         self.history[best_idx][self.idx % self.history_len] = embedded_query
         self.idx += 1
@@ -89,7 +90,6 @@ class ResettingEmbeddedNodeManager(EmbeddedNodeManager):
         embedded_query = self.encoder(np.expand_dims(query, axis=0))
         distances = self.calculate_distances(embedded_query)
         best_idx = np.argmax(distances)
-        best_distance = distances[best_idx]
         is_attack = self.nodes[best_idx].add_to_detector(query)
         if is_attack:
             self.history[best_idx] = 0  # Attack flagged so remove buffer
@@ -106,3 +106,40 @@ class ResettingEmbeddedNodeManager(EmbeddedNodeManager):
                 else:
                     distances[node_idx] += 2
         return distances
+
+
+class InsertResettingEmbeddedNodeManager(ResettingEmbeddedNodeManager):
+    def __init__(self, nodes: List[Node], dataset: str, threshold: float, history_len=10):
+        super().__init__(nodes, dataset, history_len)
+        self.threshold = threshold
+        if dataset == 'mnist':
+            self.training_data = MNIST().train_data
+        elif dataset == 'cifar':
+            self.training_data = CIFAR().train_data
+        else:
+            raise ValueError
+
+    def add_to_detector(self, query: np.ndarray) -> None:
+        embedded_query = self.encoder(np.expand_dims(query, axis=0))
+        distances = self.calculate_distances(embedded_query)
+        best_idx = np.argmax(distances)
+        best_distance = distances[best_idx]
+        if best_distance < self.threshold:
+            # Very close to detection
+            self.add_noise_to_detector(best_idx)
+        is_attack = self.nodes[best_idx].add_to_detector(query)
+        if is_attack:
+            self.history[best_idx] = 0  # Attack flagged so remove buffer
+        else:
+            self.history[best_idx][self.idx % self.history_len] = embedded_query
+        self.idx += 1
+
+    def add_noise_to_detector(self, node_idx) -> None:
+        random_query = self.training_data[np.random.randint(0, self.training_data.shape[0])]
+        embedded_query = self.encoder(np.expand_dims(random_query, axis=0))
+        is_attack = self.nodes[node_idx].add_to_detector(random_query)
+        if is_attack:
+            self.history[node_idx] = 0  # Attack flagged so remove buffer
+        else:
+            self.history[node_idx][self.idx % self.history_len] = embedded_query
+        self.idx += 1

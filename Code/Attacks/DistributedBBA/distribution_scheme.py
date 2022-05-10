@@ -137,3 +137,8 @@ class EmbeddedDistanceBasedDistributionScheme(DistanceBasedDistributionScheme):
 class ResettingEmbeddedDistanceBasedDistributionScheme(EmbeddedDistanceBasedDistributionScheme):
     def __str__(self):
         return f'resetting_embedded_distance_based_{self.history_len}'
+
+
+class InsertResettingEmbeddedDistanceBasedDistributionScheme(ResettingEmbeddedDistanceBasedDistributionScheme):
+    def __str__(self):
+        return f'insert_resetting_embedded_distance_based_{self.history_len}'
