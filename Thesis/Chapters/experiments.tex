@@ -383,7 +383,7 @@ Since there is no real gain in having a complicated distribution scheme, the \gl
 
 \begin{table}
 	\centering
-	\caption[Distributed PSO-BBA results]{Results for the distributed \gls{pso}-\gls{bba} approaches on MNIST and CIFAR-10 dataset.}
+	\caption[Distributed PSO-BBA results]{Results for the distributed \gls{pso}-\gls{bba} approaches on MNIST and CIFAR-10 dataset. There is no real advantage of one distribution scheme over the others. Increasing the number of nodes however, does have a clear advantage. The distribution over ten nodes is flagged less than the five node distribution for all schemes. The \gls{rr} scheme performs best for the MNIST dataset, while the \gls{db} scheme is the best performer for the CIFAR dataset. Their respectie values are shown in bold in the table.}
 	\label{tbl:d_pso_bba}
 	\begin{tabular}{lrrrrr}\toprule
 			&& \multicolumn{2}{c}{MNIST} &\multicolumn{2}{c}{CIFAR} \\ \cmidrule(r){3-4} \cmidrule(r){5-6}
@@ -394,9 +394,9 @@ Since there is no real gain in having a complicated distribution scheme, the \gl
 	\gls{mrr}-\gls{pso}-\gls{bba} &(5 nodes)		&2.712	&110	&1.239	&227 \\
 	\gls{db}-\gls{pso}-\gls{bba} &(5 nodes)		&2.712	&107	&1.239	&230 \\
 	\gls{edb}-\gls{pso}-\gls{bba} &(5 nodes)		&2.712	&108	&1.239	&229 \\ \addlinespace[\linespace] 
-	\gls{rr}-\gls{pso}-\gls{bba} &(10 nodes) 	&2.712	&104	&1.239	&202 \\
+	\gls{rr}-\gls{pso}-\gls{bba} &(10 nodes) 	&2.712	&104	&1.239	&\textbf{202} \\
 	\gls{mrr}-\gls{pso}-\gls{bba} &(10 nodes)	&2.712	&93		&1.239	&206 \\
-	\gls{db}-\gls{pso}-\gls{bba} &(10 nodes)		&2.712	&87		&1.239	&207 \\
+	\gls{db}-\gls{pso}-\gls{bba} &(10 nodes)		&2.712	&\textbf{87}		&1.239	&207 \\
 	\gls{edb}-\gls{pso}-\gls{bba} &(10 nodes)	&2.712	&88		&1.239	&205 \\
 	\bottomrule
 	\end{tabular}
@@ -584,5 +584,31 @@ Since there is no real gain in having a complicated distribution scheme, the \gl
 \end{figure}
 
 \section{Throwing the defense off the scent}
+As previously mentioned, the two goals of the proposed attack are conflicting. In order for the attack to be efficient, subsequent queries will be clumped together in search space, causing the evasiveness of the attack to drop. This is an important trade-off that has to be made depending on the type of attack, cost of detection, efficiency thresholds and many other criteria. In this subsection changes will be made to the algorithm to be more evasive at the cost of efficiency.\\
+
+Remember that the model under attack holds a query-bounded detector buffer per account. The buffer contains a history of the last submitted queries by a specific account. Every time a new query is inserted in the buffer, the distances to their nearest neighbors is determined and averaged. In the case of an attempted attack, the nearest neighbors will be relatively close together, causing the average distance to fall below a set threshold. Appropriate actions, such as banning the account, can now be taken.\\
+
+The key idea behind the approach to increase the evasiveness is the following. Benign queries can be submitted by the attacker in order to flood the buffer with noise. The insertion of the benign queries will cause the average inter query distance to be raised, which in turn will lower the number of detections.\\
+
+The approach raises two questions that will need to be answered: what sort of noise should be inserted and when should it be inserted. The former question will be answered first. Five types of noise are considered. The first one being uniform noise, as has been depicted in Figure \ref{fig:uniform_noise}. The second and third options are Perlin noise with a fixed frequency value and a random frequency value respectively. Perlin noise has been shown in Figure \ref{fig:perlin_noise}, while Figure \ref{fig:perlin_noise_frequencies} shows the influence of the frequency on the Perlin patterns. The fourth option will be random samples from the test data of the dataset on which the attack is being performed. The fifth and final option is a combination of the previous four strategies. Every time a benign query has to be inserted, one of the for options is chosen at random.\\
+
+A similarity encoder will encode the submitted queries in an embedded space. The detector buffer will calculate the distances in this embedded space. Therefore it makes sense to determine the strategy with the highest inter query distance in the embedded space. The following experiment has been set up in order to establish the best strategy. The similarity encoder used in the \gls{edb} distribution scheme is reused to encode the benign queries. A fixed amount of queries (\num{20000}) is encoded and added to a detector buffer of size \num{1000}. Every time a query is added, the nearest neighbors are determined and the average distance to these neighbors is calculated. These distances are finally averaged over all submitted queries. The results of this experiment can be found in Table \ref{tbl:noise_distances}.\\
+
+The most promising noise strategy is the test data strategy. This makes sense as the similarity encoder is trained to maximize the distance between images representing different concepts. The uniform and perlin noise patterns are probably very similar to the encoder, although they might be further apart in terms of $L_2$-distance. This causes these patterns to reside in the same regions of the embedded space. The mixed strategy is another promising candidate. It even outperforms the test data strategy on the MNIST dataset. However this is likely due to a large distance between the patterns and test data clusters in the embedded space as the mixed strategy triggers more detections (3056) compared to the test data strategy (0). 
+
+\begin{table}
+\centering
+\caption[The average inter query distances for different types of noise]{The average inter query distance ($L_2$-distance in embedded space) for different noise strategies. Higher values correspond to better strategies as a detector is less likely to flag a potential attack.}
+\label{tbl:noise_distances}
+\begin{tabular}{lrr}\toprule
+	&MNIST &CIFAR \\ \midrule
+Uniform noise&0.140&0.023\\ 
+Perlin noise (fixed frequency)&0.110&0.004\\ 
+Perlin noise&0.108&0.004\\ 
+Test data&0.212&\textbf{0.265}\\ 
+Mixed noise&\textbf{0.238}&0.198\\ \bottomrule
+
+\end{tabular}
+\end{table}
 
 \section{Optimizing the attack}
