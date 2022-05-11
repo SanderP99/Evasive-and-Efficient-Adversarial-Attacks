@@ -344,6 +344,10 @@ The experiments performed in this section will use a buffer size at each node of
 
 The results shown in Table \ref{tbl:d_pso_bba} reveal that the different distribution schemes have similar performance in terms of the number of detections. The distance is identical for all distribution schemes since the underlying algorithm is the same. They only differ in the way that the queries are distributed over the nodes. The ten node distribution is always better than the five node version. An attacker has to make a trade-off between the number of nodes and the number of detections (and consequently accounts). More nodes require less accounts, depending on the cost of nodes and accounts, the optimal amounts might differ. It is straightforward that having a number of nodes so that each node will submit less queries than the number of neighbors~$k$ taken into account in the detector buffer, will cause not a single detection to be flagged. \\
 
+An improvement on the \gls{db} and \gls{edb} schemes can be made based on the assumption that the attacking user has knowledge about the status of its account. If the user receives a notification whenever its account is banned, then this knowledge can be incorporated in the distribution scheme. The standard \gls{db} and \gls{edb} schemes distribute queries based on the distance to the most recently submitted queries from this node. If an attack is flagged based on a submitted query, then this means that the corresponding account is banned and a new account has to be set up on the node. The new account will have a fresh detector buffer, therefore the previous queries submitted from this node are no longer relevant. By flushing the list of previously submitted queries whenever an account is banned, the distribution can happen more effectively. This distribution scheme will be called the \gls{fedb} distribution scheme. The results compared to the \gls{edb} scheme are shown in Table \ref{tbl:resetting_db}.\\
+
+The \gls{fedb} scheme is more evasive than its non-flushing counterpart, both for five and ten nodes. However the gain is marginal. It is also based on the assumption that the attacker is notified of its account being banned. This might not always be the case. Users might be shadow banned \cite{shadow_banning} momentarily or even permanently, which violates the assumption\footnote{The entire attack might fail in case of a permanent shadow ban.}. \\
+
 Since there is no real gain in having a complicated distribution scheme, the \gls{rr} distribution scheme will be used for the remaining experiments since the distance based schemes have more computational overhead. These experiments will also be performed using ten nodes, unless mentioned otherwise. 
 
 \begin{figure}
@@ -582,6 +586,23 @@ Since there is no real gain in having a complicated distribution scheme, the \gl
 \caption[Overview of the round-robin based distribution scheme]{Overview of the round-robin based distribution scheme. The particles are represented by the small circles and the squares represent the different nodes. If the number of particles is equal to the number of nodes (left), then particles submit their queries to the corresponding node. If the number of nodes is less than the number of particles (middle), then the particles without nodes will submit their queries to a random node. This random node will change every attack iteration. If the number of particles is less than the number of nodes (right), then a dummy particles are introduced. These dummy particles will not submit any queries, therefore some nodes will not receive queries. After every attack iteration the particle mapping will rotate.}
 \label{fig:round_robin}
 \end{figure}
+
+\begin{table}
+\centering
+\caption[Flushing-Embedded-Distance-Based distribution results]{Results for the \gls{fedb} distribution scheme compared to \gls{edb} on the MNIST and CIFAR-10 dataset. The \gls{fedb} scheme outperforms its non-flushing counterpart by a slight margin.}
+\label{tbl:resetting_db}
+	\begin{tabular}{lrrrrr}\toprule
+			&& \multicolumn{2}{c}{MNIST} &\multicolumn{2}{c}{CIFAR} \\ \cmidrule(r){3-4} \cmidrule(r){5-6}
+	Attack				&&Distance	&Detections	&Distance	&Detections \\ \midrule
+	Baseline \gls{bba}							&&2.807	&413	&1.306	&474 \\
+	\gls{pso}-\gls{bba} 						&&2.712	&138	&1.239	&257 \\ \addlinespace[\linespace]
+	\gls{edb}-\gls{pso}-\gls{bba} &(5 nodes)	&2.712	&108		&1.239	&229 \\
+	\gls{fedb}-\gls{pso}-\gls{bba} &(5 nodes)	&2.712	&105		&1.239	&224 \\ \addlinespace[\linespace]
+	\gls{edb}-\gls{pso}-\gls{bba} &(10 nodes)	&2.712	&88		&1.239	&205 \\
+	\gls{fedb}-\gls{pso}-\gls{bba} &(10 nodes)	&2.712	&\textbf{84}		&1.239	&\textbf{197} \\
+	\bottomrule
+	\end{tabular}
+\end{table}
 
 \section{Throwing the defense off the scent}
 As previously mentioned, the two goals of the proposed attack are conflicting. In order for the attack to be efficient, subsequent queries will be clumped together in search space, causing the evasiveness of the attack to drop. This is an important trade-off that has to be made depending on the type of attack, cost of detection, efficiency thresholds and many other criteria. In this subsection changes will be made to the algorithm to be more evasive at the cost of efficiency.\\

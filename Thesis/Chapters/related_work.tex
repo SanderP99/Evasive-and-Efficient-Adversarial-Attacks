@@ -400,9 +400,253 @@ The defensive schemes discussed in section \ref{sec:adversarial_defenses} all op
 
 All queries submitted to the model equipped with a stateful detection mechanism are stored in a history buffer. Each user of the model has a distinct history buffer, where its queries are stored. These buffers can be bounded by time or number of queries depending on the resources available and the use case of the model. Each time a query is submitted to the model, the average distance to its $k$ nearest neighbors is calculated and if this distance is lower than a certain threshold, then the user gets flagged by the mechanism. Appropriate actions such as banning the account can be taken.\\
 
-The distance metric is not calculated in input space. Each query is encoded by a deep similarity encoder \cite{deep_similarity_encoder} to an encoded space, typically of a lower dimension. In this encoded space, images which represent perceptually similar objects are clustered together. The advantage of the encoded space is twofold. Firstly, the dimension of the encoded space is smaller than the dimension of the input space. Therefore less space is needed to store the history buffers. Secondly, simpler distance metrics such as $L_2$-distance in input space can easily be evaded by an attacker. For example the $L_2$-distance can be significantly increased by simply rotating or shifting the input image.\\
+The distance metric is not calculated in input space. Each query is encoded by a deep similarity encoder \cite{deep_similarity_encoder} to an encoded space, typically of a lower dimension. In this encoded space, images which represent perceptually similar objects are clustered together. A visual of the idea behind the similarity encoder is shown in Figure \ref{fig:deep_similarity_encoder}. The advantage of the encoded space is twofold. Firstly, the dimension of the encoded space is smaller than the dimension of the input space. Therefore less space is needed to store the history buffers. Secondly, simpler distance metrics such as $L_2$-distance in input space can easily be evaded by an attacker. For example the $L_2$-distance can be significantly increased by simply rotating or shifting the input image.\\
 
 The parameter $k$, the number of neighbors to consider is picked as follows. As the training data of the model consists of only benign queries, no attacks should be flagged when feeding the stateful detection mechanism with this data. To allow for some more leniency, a false positive rate of 0.1\% is still acceptable. For each value of $k$, a different threshold will be required to maintain the selected false positive rate. Larger values have the benefit of larger thresholds causing the defense to be more resilient, since attackers' images need to be more diverse. But $k$ is also the number of queries needed before an attack can be flagged. Therefore too large values for $k$ are disadvantageous. Smaller values also reduce computational cost. Chen, Carlini and Wagner set the value of $k$ to 50 for the CIFAR-10  dataset \cite{cifar}, since the thresholds increased sharply up to this value. Other datasets might require different values for $k$.
+
+\begin{figure}
+\centering
+\tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt        
+\begin{tikzpicture}[x=0.75pt,y=0.75pt,yscale=-1,xscale=1]
+%uncomment if require: \path (0,300); %set diagram left start at 0, and has height of 300
+
+%Shape: Circle [id:dp2895627981083204] 
+\draw   (347.17,120.17) .. controls (347.17,119.06) and (348.06,118.17) .. (349.17,118.17) .. controls (350.27,118.17) and (351.17,119.06) .. (351.17,120.17) .. controls (351.17,121.27) and (350.27,122.17) .. (349.17,122.17) .. controls (348.06,122.17) and (347.17,121.27) .. (347.17,120.17) -- cycle ;
+%Shape: Circle [id:dp5366693052676745] 
+\draw   (346.33,140.33) .. controls (346.33,139.23) and (347.23,138.33) .. (348.33,138.33) .. controls (349.44,138.33) and (350.33,139.23) .. (350.33,140.33) .. controls (350.33,141.44) and (349.44,142.33) .. (348.33,142.33) .. controls (347.23,142.33) and (346.33,141.44) .. (346.33,140.33) -- cycle ;
+%Shape: Circle [id:dp8187645761519127] 
+\draw   (357.17,123.17) .. controls (357.17,122.06) and (358.06,121.17) .. (359.17,121.17) .. controls (360.27,121.17) and (361.17,122.06) .. (361.17,123.17) .. controls (361.17,124.27) and (360.27,125.17) .. (359.17,125.17) .. controls (358.06,125.17) and (357.17,124.27) .. (357.17,123.17) -- cycle ;
+%Shape: Circle [id:dp7753273986787799] 
+\draw   (348.5,128.17) .. controls (348.5,127.06) and (349.4,126.17) .. (350.5,126.17) .. controls (351.6,126.17) and (352.5,127.06) .. (352.5,128.17) .. controls (352.5,129.27) and (351.6,130.17) .. (350.5,130.17) .. controls (349.4,130.17) and (348.5,129.27) .. (348.5,128.17) -- cycle ;
+%Shape: Circle [id:dp3009078925989741] 
+\draw   (353.5,144.17) .. controls (353.5,143.06) and (354.4,142.17) .. (355.5,142.17) .. controls (356.6,142.17) and (357.5,143.06) .. (357.5,144.17) .. controls (357.5,145.27) and (356.6,146.17) .. (355.5,146.17) .. controls (354.4,146.17) and (353.5,145.27) .. (353.5,144.17) -- cycle ;
+%Shape: Circle [id:dp929482507754549] 
+\draw   (361.17,131.17) .. controls (361.17,130.06) and (362.06,129.17) .. (363.17,129.17) .. controls (364.27,129.17) and (365.17,130.06) .. (365.17,131.17) .. controls (365.17,132.27) and (364.27,133.17) .. (363.17,133.17) .. controls (362.06,133.17) and (361.17,132.27) .. (361.17,131.17) -- cycle ;
+%Shape: Circle [id:dp18569571499265525] 
+\draw   (366.17,123.17) .. controls (366.17,122.06) and (367.06,121.17) .. (368.17,121.17) .. controls (369.27,121.17) and (370.17,122.06) .. (370.17,123.17) .. controls (370.17,124.27) and (369.27,125.17) .. (368.17,125.17) .. controls (367.06,125.17) and (366.17,124.27) .. (366.17,123.17) -- cycle ;
+%Shape: Circle [id:dp9575232525149782] 
+\draw   (360.17,140.17) .. controls (360.17,139.06) and (361.06,138.17) .. (362.17,138.17) .. controls (363.27,138.17) and (364.17,139.06) .. (364.17,140.17) .. controls (364.17,141.27) and (363.27,142.17) .. (362.17,142.17) .. controls (361.06,142.17) and (360.17,141.27) .. (360.17,140.17) -- cycle ;
+%Shape: Circle [id:dp8712282207002464] 
+\draw   (326.5,110.17) .. controls (326.5,109.06) and (327.4,108.17) .. (328.5,108.17) .. controls (329.6,108.17) and (330.5,109.06) .. (330.5,110.17) .. controls (330.5,111.27) and (329.6,112.17) .. (328.5,112.17) .. controls (327.4,112.17) and (326.5,111.27) .. (326.5,110.17) -- cycle ;
+%Shape: Circle [id:dp046954888002396666] 
+\draw   (325.67,130.33) .. controls (325.67,129.23) and (326.56,128.33) .. (327.67,128.33) .. controls (328.77,128.33) and (329.67,129.23) .. (329.67,130.33) .. controls (329.67,131.44) and (328.77,132.33) .. (327.67,132.33) .. controls (326.56,132.33) and (325.67,131.44) .. (325.67,130.33) -- cycle ;
+%Shape: Circle [id:dp13159322121204386] 
+\draw   (336.5,113.17) .. controls (336.5,112.06) and (337.4,111.17) .. (338.5,111.17) .. controls (339.6,111.17) and (340.5,112.06) .. (340.5,113.17) .. controls (340.5,114.27) and (339.6,115.17) .. (338.5,115.17) .. controls (337.4,115.17) and (336.5,114.27) .. (336.5,113.17) -- cycle ;
+%Shape: Circle [id:dp010031960504940152] 
+\draw   (327.83,118.17) .. controls (327.83,117.06) and (328.73,116.17) .. (329.83,116.17) .. controls (330.94,116.17) and (331.83,117.06) .. (331.83,118.17) .. controls (331.83,119.27) and (330.94,120.17) .. (329.83,120.17) .. controls (328.73,120.17) and (327.83,119.27) .. (327.83,118.17) -- cycle ;
+%Shape: Circle [id:dp5920532591148859] 
+\draw   (333.83,126.17) .. controls (333.83,125.06) and (334.73,124.17) .. (335.83,124.17) .. controls (336.94,124.17) and (337.83,125.06) .. (337.83,126.17) .. controls (337.83,127.27) and (336.94,128.17) .. (335.83,128.17) .. controls (334.73,128.17) and (333.83,127.27) .. (333.83,126.17) -- cycle ;
+%Shape: Circle [id:dp9986224671088966] 
+\draw   (341.5,130.17) .. controls (341.5,129.06) and (342.4,128.17) .. (343.5,128.17) .. controls (344.6,128.17) and (345.5,129.06) .. (345.5,130.17) .. controls (345.5,131.27) and (344.6,132.17) .. (343.5,132.17) .. controls (342.4,132.17) and (341.5,131.27) .. (341.5,130.17) -- cycle ;
+%Shape: Circle [id:dp027345947552740668] 
+\draw   (345.5,113.17) .. controls (345.5,112.06) and (346.4,111.17) .. (347.5,111.17) .. controls (348.6,111.17) and (349.5,112.06) .. (349.5,113.17) .. controls (349.5,114.27) and (348.6,115.17) .. (347.5,115.17) .. controls (346.4,115.17) and (345.5,114.27) .. (345.5,113.17) -- cycle ;
+%Shape: Circle [id:dp6064203249329452] 
+\draw   (339.5,122.17) .. controls (339.5,121.06) and (340.4,120.17) .. (341.5,120.17) .. controls (342.6,120.17) and (343.5,121.06) .. (343.5,122.17) .. controls (343.5,123.27) and (342.6,124.17) .. (341.5,124.17) .. controls (340.4,124.17) and (339.5,123.27) .. (339.5,122.17) -- cycle ;
+%Shape: Triangle [id:dp7391612683561162] 
+\draw   (322.33,120.5) -- (324.5,125.17) -- (320.17,125.17) -- cycle ;
+%Shape: Triangle [id:dp4718491280454562] 
+\draw   (320.33,112.5) -- (322.5,117.17) -- (318.17,117.17) -- cycle ;
+%Shape: Triangle [id:dp7529574656855833] 
+\draw   (320.33,129.17) -- (322.5,133.83) -- (318.17,133.83) -- cycle ;
+%Shape: Triangle [id:dp03925236408922128] 
+\draw   (335.83,131.17) -- (338,135.83) -- (333.67,135.83) -- cycle ;
+%Shape: Triangle [id:dp38627870761944894] 
+\draw   (341.33,139.5) -- (343.5,144.17) -- (339.17,144.17) -- cycle ;
+%Shape: Triangle [id:dp898263281727802] 
+\draw   (325.33,137.5) -- (327.5,142.17) -- (323.17,142.17) -- cycle ;
+%Shape: Triangle [id:dp22756609196627053] 
+\draw   (333.33,141.5) -- (335.5,146.17) -- (331.17,146.17) -- cycle ;
+%Shape: Triangle [id:dp12998449753574648] 
+\draw   (341.33,147.5) -- (343.5,152.17) -- (339.17,152.17) -- cycle ;
+%Shape: Triangle [id:dp9466760053150753] 
+\draw   (327.33,148.5) -- (329.5,153.17) -- (325.17,153.17) -- cycle ;
+%Shape: Triangle [id:dp42039081105236353] 
+\draw   (314.33,119.5) -- (316.5,124.17) -- (312.17,124.17) -- cycle ;
+%Shape: Triangle [id:dp2965845848291051] 
+\draw   (316.33,153.5) -- (318.5,158.17) -- (314.17,158.17) -- cycle ;
+%Shape: Circle [id:dp48700754198735474] 
+\draw   (360.5,92.83) .. controls (360.5,91.73) and (361.4,90.83) .. (362.5,90.83) .. controls (363.6,90.83) and (364.5,91.73) .. (364.5,92.83) .. controls (364.5,93.94) and (363.6,94.83) .. (362.5,94.83) .. controls (361.4,94.83) and (360.5,93.94) .. (360.5,92.83) -- cycle ;
+%Shape: Circle [id:dp5624668266350015] 
+\draw   (359.67,113) .. controls (359.67,111.9) and (360.56,111) .. (361.67,111) .. controls (362.77,111) and (363.67,111.9) .. (363.67,113) .. controls (363.67,114.1) and (362.77,115) .. (361.67,115) .. controls (360.56,115) and (359.67,114.1) .. (359.67,113) -- cycle ;
+%Shape: Circle [id:dp35244973442429073] 
+\draw   (370.5,95.83) .. controls (370.5,94.73) and (371.4,93.83) .. (372.5,93.83) .. controls (373.6,93.83) and (374.5,94.73) .. (374.5,95.83) .. controls (374.5,96.94) and (373.6,97.83) .. (372.5,97.83) .. controls (371.4,97.83) and (370.5,96.94) .. (370.5,95.83) -- cycle ;
+%Shape: Circle [id:dp34118062377093716] 
+\draw   (361.83,100.83) .. controls (361.83,99.73) and (362.73,98.83) .. (363.83,98.83) .. controls (364.94,98.83) and (365.83,99.73) .. (365.83,100.83) .. controls (365.83,101.94) and (364.94,102.83) .. (363.83,102.83) .. controls (362.73,102.83) and (361.83,101.94) .. (361.83,100.83) -- cycle ;
+%Shape: Circle [id:dp34976915498514205] 
+\draw   (367.83,108.83) .. controls (367.83,107.73) and (368.73,106.83) .. (369.83,106.83) .. controls (370.94,106.83) and (371.83,107.73) .. (371.83,108.83) .. controls (371.83,109.94) and (370.94,110.83) .. (369.83,110.83) .. controls (368.73,110.83) and (367.83,109.94) .. (367.83,108.83) -- cycle ;
+%Shape: Circle [id:dp0028458647472662246] 
+\draw   (374.5,103.83) .. controls (374.5,102.73) and (375.4,101.83) .. (376.5,101.83) .. controls (377.6,101.83) and (378.5,102.73) .. (378.5,103.83) .. controls (378.5,104.94) and (377.6,105.83) .. (376.5,105.83) .. controls (375.4,105.83) and (374.5,104.94) .. (374.5,103.83) -- cycle ;
+%Shape: Circle [id:dp08440845582722023] 
+\draw   (311.5,130.83) .. controls (311.5,129.73) and (312.4,128.83) .. (313.5,128.83) .. controls (314.6,128.83) and (315.5,129.73) .. (315.5,130.83) .. controls (315.5,131.94) and (314.6,132.83) .. (313.5,132.83) .. controls (312.4,132.83) and (311.5,131.94) .. (311.5,130.83) -- cycle ;
+%Shape: Circle [id:dp5205957369844532] 
+\draw   (373.5,112.83) .. controls (373.5,111.73) and (374.4,110.83) .. (375.5,110.83) .. controls (376.6,110.83) and (377.5,111.73) .. (377.5,112.83) .. controls (377.5,113.94) and (376.6,114.83) .. (375.5,114.83) .. controls (374.4,114.83) and (373.5,113.94) .. (373.5,112.83) -- cycle ;
+%Shape: Circle [id:dp23213263400847128] 
+\draw   (349.83,85.83) .. controls (349.83,84.73) and (350.73,83.83) .. (351.83,83.83) .. controls (352.94,83.83) and (353.83,84.73) .. (353.83,85.83) .. controls (353.83,86.94) and (352.94,87.83) .. (351.83,87.83) .. controls (350.73,87.83) and (349.83,86.94) .. (349.83,85.83) -- cycle ;
+%Shape: Circle [id:dp01671060660682211] 
+\draw   (354.83,102.83) .. controls (354.83,101.73) and (355.73,100.83) .. (356.83,100.83) .. controls (357.94,100.83) and (358.83,101.73) .. (358.83,102.83) .. controls (358.83,103.94) and (357.94,104.83) .. (356.83,104.83) .. controls (355.73,104.83) and (354.83,103.94) .. (354.83,102.83) -- cycle ;
+%Shape: Circle [id:dp15271760160011283] 
+\draw   (358.83,85.83) .. controls (358.83,84.73) and (359.73,83.83) .. (360.83,83.83) .. controls (361.94,83.83) and (362.83,84.73) .. (362.83,85.83) .. controls (362.83,86.94) and (361.94,87.83) .. (360.83,87.83) .. controls (359.73,87.83) and (358.83,86.94) .. (358.83,85.83) -- cycle ;
+%Shape: Circle [id:dp7924022569885323] 
+\draw   (352.83,94.83) .. controls (352.83,93.73) and (353.73,92.83) .. (354.83,92.83) .. controls (355.94,92.83) and (356.83,93.73) .. (356.83,94.83) .. controls (356.83,95.94) and (355.94,96.83) .. (354.83,96.83) .. controls (353.73,96.83) and (352.83,95.94) .. (352.83,94.83) -- cycle ;
+%Shape: Triangle [id:dp7894842810229468] 
+\draw   (354.67,112.17) -- (356.83,116.83) -- (352.5,116.83) -- cycle ;
+%Shape: Circle [id:dp3292595541772796] 
+\draw   (327.83,88.83) .. controls (327.83,87.73) and (328.73,86.83) .. (329.83,86.83) .. controls (330.94,86.83) and (331.83,87.73) .. (331.83,88.83) .. controls (331.83,89.94) and (330.94,90.83) .. (329.83,90.83) .. controls (328.73,90.83) and (327.83,89.94) .. (327.83,88.83) -- cycle ;
+%Shape: Circle [id:dp7222614468620461] 
+\draw   (337.83,91.83) .. controls (337.83,90.73) and (338.73,89.83) .. (339.83,89.83) .. controls (340.94,89.83) and (341.83,90.73) .. (341.83,91.83) .. controls (341.83,92.94) and (340.94,93.83) .. (339.83,93.83) .. controls (338.73,93.83) and (337.83,92.94) .. (337.83,91.83) -- cycle ;
+%Shape: Circle [id:dp33702274920338415] 
+\draw   (329.17,96.83) .. controls (329.17,95.73) and (330.06,94.83) .. (331.17,94.83) .. controls (332.27,94.83) and (333.17,95.73) .. (333.17,96.83) .. controls (333.17,97.94) and (332.27,98.83) .. (331.17,98.83) .. controls (330.06,98.83) and (329.17,97.94) .. (329.17,96.83) -- cycle ;
+%Shape: Circle [id:dp6618303394879983] 
+\draw   (335.17,104.83) .. controls (335.17,103.73) and (336.06,102.83) .. (337.17,102.83) .. controls (338.27,102.83) and (339.17,103.73) .. (339.17,104.83) .. controls (339.17,105.94) and (338.27,106.83) .. (337.17,106.83) .. controls (336.06,106.83) and (335.17,105.94) .. (335.17,104.83) -- cycle ;
+%Shape: Circle [id:dp5912607202590903] 
+\draw   (341.83,99.83) .. controls (341.83,98.73) and (342.73,97.83) .. (343.83,97.83) .. controls (344.94,97.83) and (345.83,98.73) .. (345.83,99.83) .. controls (345.83,100.94) and (344.94,101.83) .. (343.83,101.83) .. controls (342.73,101.83) and (341.83,100.94) .. (341.83,99.83) -- cycle ;
+%Shape: Circle [id:dp1991730988019602] 
+\draw   (346.83,91.83) .. controls (346.83,90.73) and (347.73,89.83) .. (348.83,89.83) .. controls (349.94,89.83) and (350.83,90.73) .. (350.83,91.83) .. controls (350.83,92.94) and (349.94,93.83) .. (348.83,93.83) .. controls (347.73,93.83) and (346.83,92.94) .. (346.83,91.83) -- cycle ;
+%Shape: Circle [id:dp8437703240794641] 
+\draw   (347.17,104.83) .. controls (347.17,103.73) and (348.06,102.83) .. (349.17,102.83) .. controls (350.27,102.83) and (351.17,103.73) .. (351.17,104.83) .. controls (351.17,105.94) and (350.27,106.83) .. (349.17,106.83) .. controls (348.06,106.83) and (347.17,105.94) .. (347.17,104.83) -- cycle ;
+%Shape: Circle [id:dp8899200005361061] 
+\draw   (322.17,98.83) .. controls (322.17,97.73) and (323.06,96.83) .. (324.17,96.83) .. controls (325.27,96.83) and (326.17,97.73) .. (326.17,98.83) .. controls (326.17,99.94) and (325.27,100.83) .. (324.17,100.83) .. controls (323.06,100.83) and (322.17,99.94) .. (322.17,98.83) -- cycle ;
+%Shape: Circle [id:dp9721187069303647] 
+\draw   (326.17,81.83) .. controls (326.17,80.73) and (327.06,79.83) .. (328.17,79.83) .. controls (329.27,79.83) and (330.17,80.73) .. (330.17,81.83) .. controls (330.17,82.94) and (329.27,83.83) .. (328.17,83.83) .. controls (327.06,83.83) and (326.17,82.94) .. (326.17,81.83) -- cycle ;
+%Shape: Circle [id:dp2823977858174411] 
+\draw   (320.17,90.83) .. controls (320.17,89.73) and (321.06,88.83) .. (322.17,88.83) .. controls (323.27,88.83) and (324.17,89.73) .. (324.17,90.83) .. controls (324.17,91.94) and (323.27,92.83) .. (322.17,92.83) .. controls (321.06,92.83) and (320.17,91.94) .. (320.17,90.83) -- cycle ;
+%Shape: Triangle [id:dp7114772827858746] 
+\draw   (316,96.83) -- (318.17,101.5) -- (313.83,101.5) -- cycle ;
+%Shape: Triangle [id:dp5917376769143159] 
+\draw   (300,94.83) -- (302.17,99.5) -- (297.83,99.5) -- cycle ;
+%Shape: Triangle [id:dp2886698733658086] 
+\draw   (308,98.83) -- (310.17,103.5) -- (305.83,103.5) -- cycle ;
+%Shape: Triangle [id:dp2839999898243124] 
+\draw   (316,104.83) -- (318.17,109.5) -- (313.83,109.5) -- cycle ;
+%Shape: Triangle [id:dp5514228998080195] 
+\draw   (302,105.83) -- (304.17,110.5) -- (299.83,110.5) -- cycle ;
+%Shape: Triangle [id:dp4629076361294133] 
+\draw   (294,102.83) -- (296.17,107.5) -- (291.83,107.5) -- cycle ;
+%Shape: Triangle [id:dp8658271013077152] 
+\draw   (307.33,115.5) -- (309.5,120.17) -- (305.17,120.17) -- cycle ;
+%Shape: Triangle [id:dp6025022496942747] 
+\draw   (291.33,113.5) -- (293.5,118.17) -- (289.17,118.17) -- cycle ;
+%Shape: Triangle [id:dp9173372598851344] 
+\draw   (299.33,117.5) -- (301.5,122.17) -- (297.17,122.17) -- cycle ;
+%Shape: Triangle [id:dp8413664882700134] 
+\draw   (307.33,123.5) -- (309.5,128.17) -- (305.17,128.17) -- cycle ;
+%Shape: Triangle [id:dp9741711341013075] 
+\draw   (293.33,124.5) -- (295.5,129.17) -- (291.17,129.17) -- cycle ;
+%Shape: Triangle [id:dp10232892082900635] 
+\draw   (285.33,121.5) -- (287.5,126.17) -- (283.17,126.17) -- cycle ;
+%Shape: Triangle [id:dp9199785035211387] 
+\draw   (311.33,135.5) -- (313.5,140.17) -- (309.17,140.17) -- cycle ;
+%Shape: Triangle [id:dp25490947856505364] 
+\draw   (295.33,133.5) -- (297.5,138.17) -- (293.17,138.17) -- cycle ;
+%Shape: Triangle [id:dp660619379887109] 
+\draw   (303.33,137.5) -- (305.5,142.17) -- (301.17,142.17) -- cycle ;
+%Shape: Triangle [id:dp48981566225687545] 
+\draw   (311.33,143.5) -- (313.5,148.17) -- (309.17,148.17) -- cycle ;
+%Shape: Triangle [id:dp4989350641854624] 
+\draw   (297.33,144.5) -- (299.5,149.17) -- (295.17,149.17) -- cycle ;
+%Shape: Triangle [id:dp44319027087898566] 
+\draw   (289.33,141.5) -- (291.5,146.17) -- (287.17,146.17) -- cycle ;
+%Shape: Square [id:dp3787906683113822] 
+\draw   (346.17,147.17) -- (350.17,147.17) -- (350.17,151.17) -- (346.17,151.17) -- cycle ;
+%Shape: Square [id:dp9695262805295299] 
+\draw   (353.17,134.17) -- (357.17,134.17) -- (357.17,138.17) -- (353.17,138.17) -- cycle ;
+%Shape: Square [id:dp8253834599284726] 
+\draw   (354.17,151.17) -- (358.17,151.17) -- (358.17,155.17) -- (354.17,155.17) -- cycle ;
+%Shape: Square [id:dp5112551048496499] 
+\draw   (345.17,157.17) -- (349.17,157.17) -- (349.17,161.17) -- (345.17,161.17) -- cycle ;
+%Shape: Square [id:dp4884065597540783] 
+\draw   (364.17,145.17) -- (368.17,145.17) -- (368.17,149.17) -- (364.17,149.17) -- cycle ;
+%Shape: Square [id:dp6673735776879133] 
+\draw   (368.17,137.17) -- (372.17,137.17) -- (372.17,141.17) -- (368.17,141.17) -- cycle ;
+%Shape: Square [id:dp04732976658384658] 
+\draw   (370.17,129.17) -- (374.17,129.17) -- (374.17,133.17) -- (370.17,133.17) -- cycle ;
+%Shape: Square [id:dp6741639423769528] 
+\draw   (337.17,156.17) -- (341.17,156.17) -- (341.17,160.17) -- (337.17,160.17) -- cycle ;
+%Shape: Square [id:dp6669292497399499] 
+\draw   (361.17,153.17) -- (365.17,153.17) -- (365.17,157.17) -- (361.17,157.17) -- cycle ;
+%Shape: Circle [id:dp8223199642642283] 
+\draw   (375.83,125.83) .. controls (375.83,124.73) and (376.73,123.83) .. (377.83,123.83) .. controls (378.94,123.83) and (379.83,124.73) .. (379.83,125.83) .. controls (379.83,126.94) and (378.94,127.83) .. (377.83,127.83) .. controls (376.73,127.83) and (375.83,126.94) .. (375.83,125.83) -- cycle ;
+%Shape: Circle [id:dp3474019918776734] 
+\draw   (380.83,117.83) .. controls (380.83,116.73) and (381.73,115.83) .. (382.83,115.83) .. controls (383.94,115.83) and (384.83,116.73) .. (384.83,117.83) .. controls (384.83,118.94) and (383.94,119.83) .. (382.83,119.83) .. controls (381.73,119.83) and (380.83,118.94) .. (380.83,117.83) -- cycle ;
+%Shape: Circle [id:dp22740074263574894] 
+\draw   (368.83,116.83) .. controls (368.83,115.73) and (369.73,114.83) .. (370.83,114.83) .. controls (371.94,114.83) and (372.83,115.73) .. (372.83,116.83) .. controls (372.83,117.94) and (371.94,118.83) .. (370.83,118.83) .. controls (369.73,118.83) and (368.83,117.94) .. (368.83,116.83) -- cycle ;
+%Shape: Square [id:dp8789359945085042] 
+\draw   (376.83,136.83) -- (380.83,136.83) -- (380.83,140.83) -- (376.83,140.83) -- cycle ;
+%Shape: Square [id:dp8781122248556676] 
+\draw   (382.83,131.83) -- (386.83,131.83) -- (386.83,135.83) -- (382.83,135.83) -- cycle ;
+%Shape: Square [id:dp393557357154644] 
+\draw   (384.83,123.83) -- (388.83,123.83) -- (388.83,127.83) -- (384.83,127.83) -- cycle ;
+%Shape: Square [id:dp3133332525558432] 
+\draw   (371.83,145.83) -- (375.83,145.83) -- (375.83,149.83) -- (371.83,149.83) -- cycle ;
+%Shape: Square [id:dp5987295721151491] 
+\draw   (373.5,153.17) -- (377.5,153.17) -- (377.5,157.17) -- (373.5,157.17) -- cycle ;
+%Shape: Square [id:dp5238685977763633] 
+\draw   (364.5,159.17) -- (368.5,159.17) -- (368.5,163.17) -- (364.5,163.17) -- cycle ;
+%Shape: Square [id:dp2754755438646226] 
+\draw   (356.5,160.17) -- (360.5,160.17) -- (360.5,164.17) -- (356.5,164.17) -- cycle ;
+%Shape: Square [id:dp9569701200276632] 
+\draw   (380.5,155.17) -- (384.5,155.17) -- (384.5,159.17) -- (380.5,159.17) -- cycle ;
+%Shape: Square [id:dp8853373904045119] 
+\draw   (342.17,163.83) -- (346.17,163.83) -- (346.17,167.83) -- (342.17,167.83) -- cycle ;
+%Shape: Square [id:dp06501508084029561] 
+\draw   (329.17,154.83) -- (333.17,154.83) -- (333.17,158.83) -- (329.17,158.83) -- cycle ;
+%Shape: Square [id:dp13829729771286758] 
+\draw   (334.17,163.83) -- (338.17,163.83) -- (338.17,167.83) -- (334.17,167.83) -- cycle ;
+%Shape: Square [id:dp005893611468310134] 
+\draw   (349.17,165.83) -- (353.17,165.83) -- (353.17,169.83) -- (349.17,169.83) -- cycle ;
+%Shape: Square [id:dp10361197236315967] 
+\draw   (307.17,153.17) -- (311.17,153.17) -- (311.17,157.17) -- (307.17,157.17) -- cycle ;
+%Shape: Square [id:dp7410775007213235] 
+\draw   (299.17,154.17) -- (303.17,154.17) -- (303.17,158.17) -- (299.17,158.17) -- cycle ;
+%Shape: Square [id:dp7175697165146506] 
+\draw   (318.17,148.5) -- (322.17,148.5) -- (322.17,152.5) -- (318.17,152.5) -- cycle ;
+%Shape: Square [id:dp11436654220371456] 
+\draw   (326.5,162.5) -- (330.5,162.5) -- (330.5,166.5) -- (326.5,166.5) -- cycle ;
+%Shape: Square [id:dp5998527257525703] 
+\draw   (319.17,161.83) -- (323.17,161.83) -- (323.17,165.83) -- (319.17,165.83) -- cycle ;
+%Shape: Square [id:dp7228794195048007] 
+\draw   (304.17,159.83) -- (308.17,159.83) -- (308.17,163.83) -- (304.17,163.83) -- cycle ;
+%Shape: Square [id:dp7631128895338806] 
+\draw   (291.17,152.83) -- (295.17,152.83) -- (295.17,156.83) -- (291.17,156.83) -- cycle ;
+%Shape: Square [id:dp3239015530543172] 
+\draw   (295.17,160.83) -- (299.17,160.83) -- (299.17,164.83) -- (295.17,164.83) -- cycle ;
+%Shape: Square [id:dp8470341308986475] 
+\draw   (311.17,161.83) -- (315.17,161.83) -- (315.17,165.83) -- (311.17,165.83) -- cycle ;
+
+%Image [id:dp5811223401599148] 
+\draw (207,90) node  {\includegraphics[width=30pt,height=30pt]{Images/mnist_4_0.png}};
+%Image [id:dp4587872869220533] 
+\draw (207,175) node  {\includegraphics[width=30pt,height=30pt]{Images/mnist_2_0.png}};
+%Shape: Square [id:dp3638851328589241] 
+\draw   (235.5,162.83) -- (261.5,162.83) -- (261.5,188.83) -- (235.5,188.83) -- cycle ;
+%Shape: Triangle [id:dp7565727131335362] 
+\draw   (248.5,73.5) -- (261.5,101.5) -- (235.5,101.5) -- cycle ;
+%Curve Lines [id:da8502420508886268] 
+\draw [color={rgb, 255:red, 74; green, 144; blue, 226 }  ,draw opacity=1 ][line width=1.5]    (259,85.75) .. controls (298,56.5) and (263.8,134.12) .. (299.14,110.21) ;
+\draw [shift={(302,108.17)}, rotate = 143.13] [fill={rgb, 255:red, 74; green, 144; blue, 226 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (11.61,-5.58) -- (0,0) -- (11.61,5.58) -- cycle    ;
+%Curve Lines [id:da5798459707130834] 
+\draw [color={rgb, 255:red, 74; green, 144; blue, 226 }  ,draw opacity=1 ][line width=1.5]    (305.07,105.77) .. controls (337.52,82.6) and (374.55,121.44) .. (412.34,96.43) ;
+\draw [shift={(415.25,94.38)}, rotate = 143.13] [fill={rgb, 255:red, 74; green, 144; blue, 226 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (11.61,-5.58) -- (0,0) -- (11.61,5.58) -- cycle    ;
+\draw [shift={(302,108.17)}, rotate = 319.74] [color={rgb, 255:red, 74; green, 144; blue, 226 }  ,draw opacity=1 ][line width=1.5]      (0, 0) circle [x radius= 4.36, y radius= 4.36]   ;
+%Curve Lines [id:da05644694141454809] 
+\draw [color={rgb, 255:red, 208; green, 2; blue, 27 }  ,draw opacity=1 ][line width=1.5]    (266,181.25) .. controls (305,152) and (304.23,193.65) .. (341.24,167.95) ;
+\draw [shift={(344.17,165.83)}, rotate = 143.13] [fill={rgb, 255:red, 208; green, 2; blue, 27 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (11.61,-5.58) -- (0,0) -- (11.61,5.58) -- cycle    ;
+%Curve Lines [id:da31515691181599714] 
+\draw [color={rgb, 255:red, 208; green, 2; blue, 27 }  ,draw opacity=1 ][line width=1.5]    (347.13,163.36) .. controls (377.09,138.62) and (376.31,150.06) .. (412.76,152.43) ;
+\draw [shift={(416.25,152.63)}, rotate = 182.6] [fill={rgb, 255:red, 208; green, 2; blue, 27 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (11.61,-5.58) -- (0,0) -- (11.61,5.58) -- cycle    ;
+\draw [shift={(344.17,165.83)}, rotate = 319.74] [color={rgb, 255:red, 208; green, 2; blue, 27 }  ,draw opacity=1 ][line width=1.5]      (0, 0) circle [x radius= 4.36, y radius= 4.36]   ;
+%Image [id:dp917147005019352] 
+\draw (440,60.0) node  {\includegraphics[width=30pt,height=30pt]{Images/mnist_4_1.png}};
+%Image [id:dp6739435302515051] 
+\draw (440,105.0) node  {\includegraphics[width=30pt,height=30pt]{Images/mnist_4_2.png}};
+%Image [id:dp04932943495314279] 
+\draw (440,195.0) node  {\includegraphics[width=30pt,height=30pt]{Images/mnist_2_1.png}};
+%Image [id:dp7844439041624189] 
+\draw (440,150) node  {\includegraphics[width=30pt,height=30pt]{Images/mnist_2_2.png}};
+\end{tikzpicture}
+\caption[Deep similarity encoder]{Visual representation of a deep similarity encoder. Input images (on the left) are mapped to an embedded space (of lower dimension). Images representing the same concept (squares, circles and triangles) are mapped close to each other in clusters. A nearest neighbor search around the embedding of an image will therefore yield similar images. The example images are taken from the MNIST dataset \cite{mnist}. Image inspired by \cite{deep_similarity_encoder}.}
+\label{fig:deep_similarity_encoder}
+\end{figure}
 
 \section{PSO and distributed attacks}\label{sec:pso_and_distributed_attacks}
 There have been several attempts to craft adversarial examples using an \gls{ea}. Previous attempts tried to reduce the number of queries needed to create a successful adversarial example by utilizing \glspl{ea} \cite{genattack,dong2019efficient,mosli2019they,audio_pso,distributed_pso_attack,suryanto2020}. \\
