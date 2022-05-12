@@ -16,13 +16,13 @@ from MNIST.setup_mnist import MNIST
 
 if __name__ == '__main__':
     # Settings
-    dataset = 'mnist'  # mnist or cifar
+    dataset = 'cifar'  # mnist or cifar
     n_particles = [5]
-    n_nodes = [5, 10]
+    n_nodes = [10]
     experiment_ids = list(range(20))
     max_queries = 25000
     distribution_schemes = ['rdbe']  # rr or mrr or dbl2 or dbe or rdbe
-    history_len = 20
+    history_len = 50
     source_step_multiplier_up = 1.05
     source_step_multiplier_down = 0.99
     spherical_step = 0.05
