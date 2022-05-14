@@ -143,3 +143,24 @@ class InsertResettingEmbeddedNodeManager(ResettingEmbeddedNodeManager):
         else:
             self.history[node_idx][self.idx % self.history_len] = embedded_query
         self.idx += 1
+
+
+class InsertEmbeddedNodeManager(InsertResettingEmbeddedNodeManager):
+    def add_to_detector(self, query: np.ndarray) -> None:
+        embedded_query = self.encoder(np.expand_dims(query, axis=0))
+        distances = self.calculate_distances(embedded_query)
+        best_idx = np.argmax(distances)
+        best_distance = distances[best_idx]
+        if best_distance < self.threshold:
+            # Very close to detection
+            self.add_noise_to_detector(best_idx)
+        _ = self.nodes[best_idx].add_to_detector(query)
+        self.history[best_idx][self.idx % self.history_len] = embedded_query
+        self.idx += 1
+
+    def add_noise_to_detector(self, node_idx) -> None:
+        random_query = self.training_data[np.random.randint(0, self.training_data.shape[0])]
+        embedded_query = self.encoder(np.expand_dims(random_query, axis=0))
+        _ = self.nodes[node_idx].add_to_detector(random_query)
+        self.history[node_idx][self.idx % self.history_len] = embedded_query
+        self.idx += 1

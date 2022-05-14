@@ -10,7 +10,8 @@ from tqdm import tqdm
 from Attacks.DistributedBBA.distributed_bba import DistributedBiasedBoundaryAttack
 from Attacks.DistributedBBA.distribution_scheme import RoundRobinDistribution, DistanceBasedDistributionScheme, \
     EmbeddedDistanceBasedDistributionScheme, ModifiedRoundRobinDistribution, \
-    ResettingEmbeddedDistanceBasedDistributionScheme, InsertResettingEmbeddedDistanceBasedDistributionScheme
+    ResettingEmbeddedDistanceBasedDistributionScheme, InsertResettingEmbeddedDistanceBasedDistributionScheme, \
+    InsertEmbeddedDistanceBasedDistributionScheme
 from MNIST.setup_cifar import CIFAR
 from MNIST.setup_mnist import MNIST
 
@@ -21,12 +22,12 @@ if __name__ == '__main__':
     n_nodes = [10]
     experiment_ids = list(range(20))
     max_queries = 25000
-    distribution_schemes = ['irdbe']  # rr or mrr or dbl2 or dbe or rdbe or irdbe
+    distribution_schemes = ['irdbe']  # rr or mrr or dbl2 or dbe or rdbe or irdbe or idbe
     history_len = 20
     source_step_multiplier_up = 1.05
     source_step_multiplier_down = 0.99
     spherical_step = 0.05
-    threshold = 1.
+    threshold = 0.25
 
     if dataset == 'mnist':
         data = MNIST()
@@ -45,7 +46,6 @@ if __name__ == '__main__':
             for particles in n_particles:
                 for distribution_scheme in distribution_schemes:
                     np.random.seed(42)
-
                     output_file = f'results/results_{dataset}_{distribution_scheme}.csv'
                     if not os.path.isfile(output_file):
                         with open(output_file, 'w') as file:
@@ -93,6 +93,12 @@ if __name__ == '__main__':
                         scheme = InsertResettingEmbeddedDistanceBasedDistributionScheme(None, n_nodes=nodes,
                                                                                         dataset=dataset,
                                                                                         history_len=history_len)
+                    elif distribution_scheme == 'idbe':
+                        use_node_manager = True
+                        distance_based = 'insert_embedded'
+                        scheme = InsertEmbeddedDistanceBasedDistributionScheme(None, n_nodes=nodes,
+                                                                               dataset=dataset,
+                                                                               history_len=history_len)
                     else:
                         raise ValueError
 
