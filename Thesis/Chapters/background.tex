@@ -479,8 +479,14 @@ The inertia weight $w$ is dropped and the entire sum is multiplied with $\chi$. 
 	\end{cases}
 \end{align*}
 Here $C$ is the sum of the acceleration coefficients $c_p$ and $c_g$ and $\kappa$ is a user defined value to determine the rate of convergence.\\ 
+
+Another improvement on vanilla\footnote{Vanilla is used to refer to software or algorithms not altered from their original form \cite{vanilla}.} \gls{pso} is \gls{mgrr} \gls{pso} \cite{opposite_cs}. The swarm is split into two groups with opposite acceleration coefficients. The first group, with a larger $c_p$, is more attracted to the local optima, while the second group, with larger $c_g$, moves to the global optimum. The combination of the two groups, accounts for more variation during the search process. This in turn aids in the convergence to the global optimum.\\ 
+
+Even with the multi-group improvement, the particles can get trapped in local optima, as is the case in vanilla \gls{pso}. Whenever the swarm is stuck in a local optimum, half of the particles are randomly redistributed. The particles that will be redistributed will change approximately half of their values. The redistribution gives the algorithm a chance to escape the local optimum.\\
  
-TODO hybridization, multigroup
+Experimental results show that \gls{mgrr}-\gls{pso} has better performance than the vanilla variant \cite{opposite_cs}. The convergence is also faster and less dependent on the starting positions of the particles. Even the variant without the random redistribution outperforms vanilla \gls{pso}.\\  
+ 
+TODO hybridization, ring topology
 
 \begin{figure}
 \centering
