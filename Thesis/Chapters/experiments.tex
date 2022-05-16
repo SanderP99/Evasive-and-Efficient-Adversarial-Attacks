@@ -588,13 +588,13 @@ Since there is no real gain in having a complicated distribution scheme, the \gl
 \subsection{Adding more nodes to the equation}
 It is obvious that increasing the number of nodes makes the attack more evasive without an added efficiency cost. In the most extreme scenario, every query will be submitted using its own designated node. This ultimately causes no detections to occur. In fact, this scenario is a complete overkill. A detection is based on the average distance to the $k$~nearest neighbors in the detector buffer associated with the account submitting the query. This means that the defense has to build up a history of $k$ queries before any detection can occur. Only the $(k+1)$th and subsequent queries can therefore be flagged\footnote{This limitation should not have a big impact on the defense against current state of the art methods, as \gls{hsja} is only 70\% successful using \num{1000} queries \cite{hsja} and the proposed value for $k$ is 50 in \cite{chen_stateful_2019}. Here, being successful is defined as a maximum of 8/255 difference in $L_\infty$-distance between the original and the adversarial example.}. Every adversarial attack that is distributed in the same manner, therefore only requires $\lceil budget / k \rceil$ nodes in order to remain undetected, where $budget$ represents the query budget.\\
 
-The combination of \gls{pso} and \gls{bba} as described in section \ref{sec:combining_pso_bba} requires less nodes in order to be completely evasive. On the MNIST dataset, 25\% of the adversarial attacks does not trigger any detections when distributed over 25~nodes. For 50~nodes, already 60\% of the attacks are completely evasive. Figure \ref{fig:detections_nodes} shows the detection count in function of the number of nodes for both datasets. When thee attack is distributed over 500 nodes, no detections are reported due to the limitations of the stateful defense mechanism.
+The combination of \gls{pso} and \gls{bba} as described in section \ref{sec:combining_pso_bba} requires less nodes in order to be completely evasive. On the MNIST dataset, 25\% of the adversarial attacks does not trigger any detections when distributed over 25~nodes. For 50~nodes, already 60\% of the attacks are completely evasive and all attacks are completely evasive when using 100 nodes. The CIFAR-10 dataset requires more nodes to be completely evasive. When using 100 nodes, 60\% of the attacks do not trigger any detections. If the node count is increased to 250 then no detections occur. Figure \ref{fig:detections_nodes} shows the detection count in function of the number of nodes for both datasets. When the attack is distributed over 500 nodes, no detections are reported due to the limitations of the stateful defense mechanism.
 
 \begin{figure}
 \centering
 \begin{tikzpicture}
 \begin{axis}[width=6cm, height=5cm, xmin=0,xmax=500, xlabel=Nodes, ylabel=Detections, tick label style={/pgf/number format/fixed}, scaled ticks=false, enlarge x limits=0.01, xtick={0,100,200,300,400,500},legend pos=north east,	legend style={draw=none}]
-\addplot table[blue,col sep=comma,x index=0,y expr=\thisrowno{1},mark=none] {Data/detections_nodes_mnist.csv};
+\addplot table[blue,col sep=comma,x index=0,y expr=\thisrowno{1}] {Data/detections_nodes_mnist.csv};
 \addlegendentry{MNIST};
 %\addplot table[color=red,col sep=comma,x index=0,y expr=\thisrowno{3},mark=none] {Data/detections_nodes_mnist.csv};
 %\addlegendentry{CIFAR};
@@ -620,7 +620,7 @@ The combination of \gls{pso} and \gls{bba} as described in section \ref{sec:comb
 \begin{axis}[width=6cm, height=5cm, xmin=0,xmax=500, xlabel=Nodes, ylabel=Detections, tick label style={/pgf/number format/fixed}, scaled ticks=false, enlarge x limits=0.01, xtick={0,100,200,300,400,500},legend pos=north east,	legend style={draw=none}]
 %\addplot table[blue,col sep=comma,x index=0,y expr=\thisrowno{1},mark=none] {Data/detections_nodes_mnist.csv};
 %\addlegendentry{MNIST};
-\addplot table[color=red,col sep=comma,x index=0,y expr=\thisrowno{3},mark=none] {Data/detections_nodes_mnist.csv};
+\addplot table[color=red,col sep=comma,x index=0,y expr=\thisrowno{3}] {Data/detections_nodes_mnist.csv};
 \addlegendentry{CIFAR};
 
 %\addplot [name path=lower_bba, fill=none, draw=none] table [
@@ -646,7 +646,7 @@ An improvement on the \gls{db} and \gls{edb} schemes can be made based on the as
 
 The \gls{fedb} scheme is more evasive than its non-flushing counterpart, both for five and ten nodes. However the gain is marginal. It is also based on the assumption that the attacker is notified of its account being banned. This might not always be the case. Users might be shadow banned \cite{shadow_banning} momentarily or even permanently, which violates the assumption\footnote{The entire attack might fail in case of a permanent shadow ban.}.\\
 
-The distance based distribution schemes can be greatly impacted by the length of the history they take into account. Longer buffers require more computational overhead, but the best node can be chosen with higher accuracy. Table \ref{tbl:history_len} shows the results for different buffer lengths for distribution over ten nodes. Increasing the buffer, lowers the number of detections. However, the extra computations almost triple the run-time of the attack using a buffer size of 50 compared to a buffer of length 20. A buffer size of 20 is therefore the ideal middle ground between evasiveness and computational cost.\\
+The distance based distribution schemes can be greatly impacted by the length of the history they take into account. Longer buffers require more computational overhead, but the best node can be chosen with higher accuracy. Table \ref{tbl:history_len} shows the results for different buffer lengths for distribution over ten nodes. Increasing the buffer, lowers the number of detections. However, the extra computations almost triple the run-time of the attack using a buffer size of 50 compared to a buffer of length 20. A buffer size of 20 is therefore an ideal middle ground between evasiveness and computational cost.\\
 
 \begin{table}
 \centering
