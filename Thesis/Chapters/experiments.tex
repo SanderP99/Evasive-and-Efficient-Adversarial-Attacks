@@ -88,18 +88,18 @@ The proposed \gls{pso}-\gls{bba} algorithm works as follows. Particles will perf
 
 The inertia weight of the \gls{pso} equations is determined by the linearly decaying scheme of equation \ref{eq:weight}, with the weight decaying from 1 to 0. The acceleration coefficients $c$ are set based on an idea of multi-group \gls{pso}. Two groups with opposite acceleration coefficients are created. This approach helps escape local optima \cite{opposite_cs}. The equations for both $c_p$ and $c_g$ are:
 
-\begin{align*}
+\begin{align}
 c_p &= 
 \begin{cases}
 	\max(A1, A2), &\text{if } i\bmod 2 = 0\\
 	\min(A1, A2), &\text{else}
-\end{cases}\\
+\end{cases} \label{eq:cp_mg}\\
 c_g &=
 \begin{cases}
 	\min(A1, A2), &\text{if } i\bmod 2 = 0\\
 	\max(A1, A2), &\text{else}
-\end{cases}\\
-\end{align*} 
+\end{cases} \label{eq:cg_mg}
+\end{align} 
 
 Here $i$ is the index of the particle in its swarm. The values of $A1$ and $A2$ are 1 and 2 respectively. These values are suggested by the authors of \cite{suryanto2020}.\\
 
@@ -323,7 +323,7 @@ original image
 	\end{tabular}
 \end{table}
 
-\section{Towards distribution of the attack}
+\section{Towards distribution of the attack}\label{sec:distribution}
 The stateful defense mechanism \cite{chen_stateful_2019} makes the assumption that there is no collaboration between adversaries. Based on this assumption, each account or user will have its own detector buffer. This subsection aims to exploit this assumption by distributing the query submission over multiple accounts.\\
 
 By distributing the query submissions over multiple accounts, the number of total detection should be reduced compared to \gls{bba} due to two reasons. The first reason is obvious. If a budget of \num{25000} queries is distributed over $N$ accounts, then every account will submit \num{25000} / $N$ queries. The less queries there are submitted, the less potential attacks will be detected. The second reason is due to \gls{pso}. As stated before, the different particles reside in different parts of the search space. This means that a detector buffer of a specific account will contain queries from all over the search space, causing the inter query distances to be larger. The latter reason was also present in the algorithm described in section \ref{sec:combining_pso_bba}.\\
@@ -585,7 +585,7 @@ Since there is no real gain in having a complicated distribution scheme, the \gl
 
 
 
-\subsection{Adding more nodes to the equation}
+\subsection{Adding more nodes to the equation}\label{sec:more_nodes}
 It is obvious that increasing the number of nodes makes the attack more evasive without an added efficiency cost. In the most extreme scenario, every query will be submitted using its own designated node. This ultimately causes no detections to occur. In fact, this scenario is a complete overkill. A detection is based on the average distance to the $k$~nearest neighbors in the detector buffer associated with the account submitting the query. This means that the defense has to build up a history of $k$ queries before any detection can occur. Only the $(k+1)$th and subsequent queries can therefore be flagged\footnote{This limitation should not have a big impact on the defense against current state of the art methods, as \gls{hsja} is only 70\% successful using \num{1000} queries \cite{hsja} and the proposed value for $k$ is 50 in \cite{chen_stateful_2019}. Here, being successful is defined as a maximum of 8/255 difference in $L_\infty$-distance between the original and the adversarial example.}. Every adversarial attack that is distributed in the same manner, therefore only requires $\lceil budget / k \rceil$ nodes in order to remain undetected, where $budget$ represents the query budget.\\
 
 The combination of \gls{pso} and \gls{bba} as described in section \ref{sec:combining_pso_bba} requires less nodes in order to be completely evasive. On the MNIST dataset, 25\% of the adversarial attacks does not trigger any detections when distributed over 25~nodes. For 50~nodes, already 60\% of the attacks are completely evasive and all attacks are completely evasive when using 100 nodes. The CIFAR-10 dataset requires more nodes to be completely evasive. When using 100 nodes, 60\% of the attacks do not trigger any detections. If the node count is increased to 250 then no detections occur. Figure \ref{fig:detections_nodes} shows the detection count in function of the number of nodes for both datasets. When the attack is distributed over 500 nodes, no detections are reported due to the limitations of the stateful defense mechanism.
@@ -641,7 +641,7 @@ The combination of \gls{pso} and \gls{bba} as described in section \ref{sec:comb
 \label{fig:detections_nodes}
 \end{figure}
 
-\subsection{Modifications to the distance based schemes}
+\subsection{Modifications to the distance based schemes}\label{sec:distance_based_modifications}
 An improvement on the \gls{db} and \gls{edb} schemes can be made based on the assumption that the attacking user has knowledge about the status of its account. If the user receives a notification whenever its account is banned, then this knowledge can be incorporated in the distribution scheme. The standard \gls{db} and \gls{edb} schemes distribute queries based on the distance to the most recently submitted queries from this node. If an attack is flagged based on a submitted query, then this means that the corresponding account is banned and a new account has to be set up on the node. The new account will have a fresh detector buffer, therefore the previous queries submitted from this node are no longer relevant. By flushing the list of previously submitted queries whenever an account is banned, the distribution can happen more effectively. This distribution scheme will be called the \gls{fedb} distribution scheme. The results compared to the \gls{edb} scheme are shown in Table \ref{tbl:resetting_db}.\\
 
 The \gls{fedb} scheme is more evasive than its non-flushing counterpart, both for five and ten nodes. However the gain is marginal. It is also based on the assumption that the attacker is notified of its account being banned. This might not always be the case. Users might be shadow banned \cite{shadow_banning} momentarily or even permanently, which violates the assumption\footnote{The entire attack might fail in case of a permanent shadow ban.}.\\

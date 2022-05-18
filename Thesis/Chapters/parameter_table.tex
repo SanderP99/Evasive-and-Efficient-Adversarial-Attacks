@@ -1,0 +1,22 @@
+\chapter{Parameter table}
+\centering
+\renewcommand*{\arraystretch}{1.7}
+\begin{longtable}{p{3cm}p{2.5cm}p{7cm}}
+\caption{Parameter table}
+\label{tbl:parameter_table}\\
+\toprule
+Parameter &Default value &Usage \\ \midrule \endhead
+\bottomrule\endfoot
+Number of  particles	&5 &Controls the number of particles in the \gls{pso} swarm. Increasing the number of particles decreases the evasiveness of the algorithm but decreases the efficiency as seen in section \ref{sec:combining_pso_bba}. Decreasing the value decreases both the evasiveness and efficiency.\\
+Number of nodes &10 &Controls the number of nodes over which the query submission can be distributed. Increasing the number of nodes helps the algorithm to be more evasive as seen in section \ref{sec:more_nodes}. Every added node comes with a certain cost.\\
+Query budget &25000 &The maximum number of queries that can be submitted by the attack. Increasing the number can make the attack more efficient, but the later queries tend to trigger more detections, causing the evasiveness to drop.\\
+Distribution scheme &\gls{rr} distribution &Controls how the queries are distributed over the different nodes. As discussed in section \ref{sec:distribution}, the distribution scheme does not heavily influence the number of detections. Other options for this parameter are the \gls{mrr}, \gls{db} and \gls{edb} distribution schemes.\\
+History length	&20	&Controls the size of the query submission history that is taken into account in the \gls{db} and \gls{edb} distribution schemes. As seen in section \ref{sec:distance_based_modifications}, increasing this value helps the algorithm remain more evasive at an added computational cost. The chosen value is a middle ground between this computational cost and the evasiveness.\\
+Source step $\epsilon$ &0.25 (MNIST) 0.20 (CIFAR) & Controls the step towards the original image in the \gls{bba}. This parameter is also shown in Figure \ref{fig:boundary_attack_intuition} as $\epsilon$. Increasing the value causes the queries to be more spread out over the search space, ultimately lowering detections. However, increasing the value too much will result in slow convergence of the attack.\\
+Spherical step $\eta$	&0.05 & Controls the size of the random direction of the \gls{bba} algorithm. This parameter is also shown in Figure \ref{fig:boundary_attack_intuition} as $\eta$. The value of this parameter is chosen based on the results of \cite{brunner_guessing_2019}. Increasing the value, adds more randomness into the algorithm, but can hamper convergence.\\
+Source step multiplier up &1.05	&Controls the speed at which the source step increases when the new position remains adversarial. Setting this value to 1 (together with source step multiplier down) fixes the value of the source step for the entire duration of the attack. The increasing value of the source step helps the attack to be more evasive due to the submitted queries being more spread out.\\
+Source step multiplier down &0.99 &Controls the speed at which the source step decreases when the new position remains non-adversarial. Setting this value to 1 (together with source step multiplier up) fixes the value of the source step for the entire duration of the attack. The decreasing value of the source step helps the attack to be more efficient, since the smaller steps aid convergence.\\
+Recalculate mask every &50	&Controls after how many iterations the mask used in the \gls{bba} should be recalculated. This parameter has no big effect on the efficiency of the attack, only on the run time. After a sufficient amount of iterations the masks tends to change only slightly.\\
+Particle acceleration coefficient $c_p$ &2\footnote{\label{ftn:cp} Due to the multi-group approach, these values are actually set based on equations \ref{eq:cp_mg} and \ref{eq:cg_mg} with $A1$ and $A2$ being 1 and 2 respectively.} &Controls the rate of attraction towards the personal best position of a particle. The different steps of the particle are weighted according to equation \ref{eq:position_update}. Increasing this value creates a stronger attraction to the personal best position of the particle.\\
+Global acceleration coefficient $c_g$ &1\textsuperscript{\ref{ftn:cp}} &Controls the rate of attraction towards the best position of the swarm. The different steps of the particle are weighted according to equation \ref{eq:position_update}. Increasing this value creates a stronger attraction to the best position of the swarm.\\
+\end{longtable}
