@@ -258,141 +258,141 @@ original image
 \end{figure}
 
 
-\section{SurFree attack}
-SurFree attack \cite{surfree} is a decision-based attack, similar to \gls{hsja}. The authors of the paper observed that \gls{hsja} uses a significant part of the query budget to estimate the gradients of the decision boundary. These queries will not improve the distance of the best adversarial example to the original image and will therefore cause the progress to stall. In order for the attack to require less queries to be successful, SurFree works without any surrogate gradient estimation, hence the name. Instead directions are sampled randomly and a geometrical mechanism determines the biggest distortion in this direction.\\
-
-\subsection{Geometrical mechanism}\label{subsec:geometrical}
-The geometrical mechanism starts from a point on the decision boundary: $x_b \in \partial\mathcal{A}$. This boundary point is located at distance $d := \| x_b - x_o\|_2 $ from the original image $x_o$. A unit vector $\mathbf{u}$ is constructed starting in $x_o$, pointing towards $x_b$. The search space for a better adversarial point will be restricted to a two-dimensional random plane $\mathcal{P}$. The plane $\mathcal{P}$ is spanned by vectors $\mathbf{u}$ and $\mathbf{v}$, where $\mathbf{v}$ is a random unit vector orthogonal to $\mathbf{u}$. The vector $\mathbf{v}$ will be sampled from a distribution $\mathcal{T}$ as explained in section \ref{sec:surfree_direction_sampling} and orthogonalized using the Gram-Schmidt process \cite{gram_schmidt}. Both $x_o$ and $x_b$ are part of $\mathcal{P}$.\\
-
-New adversarial candidates are points at a distance $d(1 - \alpha)$ from $x_o$ in $\mathcal{P}$. In polar coordinates, this results in the following equation:
-\begin{align}
- \mathbf{z}(\alpha, \theta) = d(1-\alpha) (\cos(\theta)\mathbf{u} + \sin(\theta)\mathbf{v}) + x_o \label{eq:surfree_polar}
-\end{align}
-with $\alpha \in [0,1]$, $\theta \in [-\pi, \pi]$ and with $\theta$ being the angle with $\mathbf{u}$. If the new adversarial candidate yields to be adversarial, then the distance to the original image is decreased by $100\cdot\alpha \%$.\\
-
-Equation \ref{eq:surfree_polar} has two parameters that can be chosen independently. However, $\alpha$ can be set based on $\theta$ in order to increase the probability of $\mathbf{z}(\alpha, \theta)$ being adversarial. Lets assume that the intersection of the decision boundary and the random two-dimensional plane $\partial\mathcal{A}\cap\mathcal{P}$ is a line through $x_b$. This line has a normal unit vector $\mathbf{n}$ in $\mathcal{P}$. This vector makes an angle~$\psi$ with $\mathbf{u}$. The polar form of $\mathbf{n}$ is the following:
-\begin{align}
-\mathbf{n} = \cos(\psi)\mathbf{u} + \sin(\psi)\mathbf{v}. \label{eq:surfree_n}
-\end{align}
-The optimal adversarial point, minimizing the distance to $x_o$, would be the orthogonal projection of $x_o$ on $\partial\mathcal{A}\cap\mathcal{P}$. This projection is achieved when $\theta = \psi$ and $\alpha = 1 - \cos(\psi)$. However, it is not possible to create this projection in practice, since the attacker has no knowledge about the angle~$\psi$.\\
-
-The calculation in appendix \ref{app:surfree_calculations} shows that $z(\alpha, \theta)$ is adversarial if the following equation holds:
-\begin{align}
-\left| \frac{1 - (1-\alpha)\cos(\theta)}{(1-\alpha)\sin(\theta)}\right| \leq \tan(\psi)\sgn(\theta) \label{eq:surfree_adversarial}
-\end{align}
-Since the left hand side of this equation is always positive due to the absolute value operator, the inequality can only hold if the right hand side is positive as well. This is the case when $\theta$ and $\psi$ share the same sign.\\
-
-By minimizing the left hand side of the equation, the probability of the inequality holding, increases. The $\theta$ parameter can be discarded from the equation by inserting the previously attained coupling $\alpha = 1 - \cos(\theta)$. This causes the left hand side of the equation to be equal to $|\tan(\theta^*(\alpha))|$, where $\theta^*(\alpha)$ denotes that the coupling between $\alpha$ and $\theta$ is used. $z^*(\theta)$ is therefore also equal to $z(1-\cos(\theta), \theta)$. The derivation of this result is also shown in appendix \ref{app:surfree_calculations}. The result is an increasing function in terms of $\alpha$. Minimizing the left hand side of equation \ref{eq:surfree_adversarial} is therefore the same as finding the minimal value of $\alpha$ for which the inequality holds. Minimal values of $\alpha$ are attained for higher values of $\theta$ when using the coupling. The geometrical mechanism is visualized in Figure \ref{fig:surfree}.\\
-
-The attack proposes the following technique in order to determine the best value for $\theta$. A maximal angle $\theta_{max}$ is set at the beginning of the attack. This maximal angle is then multiplied with a fraction from the following list:
-\begin{align*}
-1, -1, (T - 1)/T, -(T-1)/T, \ldots, 1/T, -1/T
-\end{align*}
-The biggest fractions are at the beginning of the list in order to test these first. As soon as an adversarial position is found, the search is stopped. If no fraction results in an adversarial position, then the value of $\theta_{max}$ is decreased and the search is restarted using another direction $\mathbf{v}$.
-
-\subsection{Sampling random directions}\label{sec:surfree_direction_sampling}
-As explained in section \ref{subsec:geometrical}, the SurFree attack \cite{surfree} algorithm requires random directions $\mathbf{v}$ in order to restrict the search to a random plane $\mathcal{P}$. The random sampling is done from a distribution $\mathcal{T}$ using a custom sampling algorithm. The advantage of this sampling algorithm over uniform sampling is twofold. The first advantage is dimensionality reduction. This is done using a \gls{dct} \cite{dct}. The original image is transformed using a \gls{dct}. Some components are set to zero, while other components are shaped like the visual content of $x_o$. This adaptivity to the contents of $x_o$ is the second advantage of the sampling algorithm. It makes the final perturbation less perceptible and is based on the masking used in watermarking techniques \cite{watermarking}. The final result is then transformed using the inverse \gls{dct}.
-
-
-\begin{figure}
-\centering
-\begin{tikzpicture}[xscale=0.75, yscale=0.75]
-\definecolor{clr2}{RGB}{31,182,83}
-\tikzset{
-dot/.style = {circle, fill, minimum size=#1,
-              inner sep=0pt, outer sep=0pt},
-dot/.default = 6pt % size of the circle diameter 
-}
-\draw [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=0.5, draw=none] (0,7.5) -- (10,2.5) -- (10,10) -|cycle; % Fill above line
-
-\path[name path=DB,draw, line width=0.5mm] (0,7.5) -- (10, 2.5); % Decision boundary
-
-\begin{scope}[every node/.style={dot,thick,draw,anchor=base,fill=black}] % Circles
-	\node[] (xo) at (3,3){}; %xo
-	\node[] (xb) at (9,3){}; %xb
-\end{scope}
-
-\begin{scope}[red,line width=0.5mm]
-\draw[] (xb) arc [
-	start angle = 0,
-	end angle = 180,
-	radius = 3
-];
-\draw[] (xb) arc [
-	start angle = 0,
-	delta angle = -20,
-	radius = 3
-];
-\draw[] (xo) arc [
-	start angle = 180,
-	delta angle = 20,
-	radius = 3
-];
-\end{scope}
-
-\begin{scope}[every node/.style={dot,thick,draw,anchor=base,fill=black}] % Circles
-	\node[label=225:$x_o$] (xo) at (3,3){}; %xo
-	\node[label=45:$x_b$] (xb) at (9,3){}; %xb
-\end{scope}
-
-\node[label=270:$\mathbf{u}$] (xu) at (4.5,3){};
-\node[label=180:$\mathbf{v}$] (xv) at (3,4.5){};
-\node[] (dl) at (3,1.5){};
-\node[] (dr) at (9,1.5){};
-\node[] (dal) at (3,0.5){};
-\node[] (dar) at (7,0.5){};
-\node[] (rpx) at (7,3){};
-\path [-,line width=0.1mm, name path=guideline] (xo.east) edge (xb.west); % Guideline xo xb
-\path [-latex, line width=0.5mm] (xo.east) edge (xu.west); % U arrow
-\path [-latex, line width=0.5mm] (xo.north) edge (xv.south); % V arrow
-\draw [spath/save=black, name path=blackarc, dashed] (rpx.center) arc (0:60:4);
-\draw[dashed] (rpx) arc [start angle = 0, delta angle = -10, radius=4];
-\path[spath/save=red, name path=redcircle] (xb) arc [
-	start angle = 0,
-	end angle = 180,
-	radius = 3
-];
-\tikzset{
-	spath/split at intersections={red}{black},
-	spath/get components of ={black}\blackCpt,
-}
-
-\path[name intersections={of=DB and redcircle,by={Z, Z1}}];
-\path [name intersections={of=blackarc and redcircle, by=intersect}];
-\node[label=45:$z^*(\theta)$,dot,draw=red,anchor=base,fill=red] (i) at (intersect){};
-\node[label=$z^*(\theta^*)$,dot,thick,draw=red,anchor=base,fill=red] (i2) at (Z1){};
-
-\draw[spath/use={\getComponentOf\blackCpt{1}}, -latex, line width=0.5mm] node[right, pos=0.5] {$\theta$};
-\path [dashed] (xo.center) edge (i.center);
-
-
-
-\begin{scope}[color={rgb, 255:red, 31; green, 182; blue, 83}]
-	\path [dashed] (dal.center) edge (xo.center);
-	\path [dashed] (dr.center) edge (xb.center);
-	\path [dashed] (dar.center) edge (rpx.center);
-	\path [latex-latex, line width=0.5mm] (dl.center) edge node[fill=white] {$d$} (dr.center);
-	\path [latex-latex, line width=0.5mm] (dal.center) edge node[fill=white] {$d(1-\alpha)$} (dar.center);
-\end{scope}
-
-\node[] (p) at (2,9){};
-\draw [-latex, line width=0.5mm, blue, spath/save=normal] ($(xb)!(p)!(0,7.5)$) -- (p) node[]{$\mathbf{n}$};
-\draw [dashed, blue, line width=0.5mm] ($(xb)!(p)!(0,7.5)$) -- ($(xb)!(p)!(0,7.5) + (2,0)$);
-\path[spath/save=dash] ($(xb)!(p)!(0,7.5) + (1.5,0)$) arc [start angle = 0, end angle = 90, radius = 1.5];
-\tikzset{
-	spath/split at intersections={normal}{dash},
-	spath/get components of ={dash}\blueCpt,
-}
-\draw[spath/use={\getComponentOf\blueCpt{1}}, -latex, line width=0.5mm, blue] node[right, pos=0.5] {$\psi$};
-
-\node[] at (8,9.5) {$\mathcal{A} \cap \mathcal{P}$};
-\node[] (text) at (1,5.5) {$\partial\mathcal{A} \cap \mathcal{P}$};
-\node[] (line) at (0.5,7.25) {};
-\draw (text) to[out=0,in=-70] (line);
-\end{tikzpicture}
-\caption[Geometric configuration of SurFree]{The geometrical mechanism of the SurFree attack. A random position is projected onto the decision boundary $\partial\mathcal{A}\cap\mathcal{P}$ using a binary search algorithm. This position is called $x_b$ and is located at a distance $d$ from the original image $x_o$. The goal of the attack is to find a new position $z(\alpha,\theta)$ in the adversarial region $\mathcal{A}$ that lays at distance $d(1-\alpha)$ from $x_o$. In this process a unit vector $\mathbf{u}$ pointing from $x_o$ to $x_b$ is constructed as well as another random unit vector $\mathbf{v}$ orthogonal to $\mathbf{u}$. The search for new adversarial positions is restricted to a plane $\mathcal{P}$ spanned by $\mathbf{u}$ and $\mathbf{v}$ containing $x_o$. In this case, the plane $\mathcal{P}$ is the piece of paper or the monitor you are reading this text from. There exists a coupling between $\alpha$ and $\theta$ ($\alpha = 1 - \cos(\theta)$). Points adhering to this coupling are located on the red circle and are referred to using $z^*(\theta)$. The optimal adversarial point $z^*(\theta^*)$, is the point on this circle laying in $\mathcal{A}$ with the minimal distance to $x_o$, i.e. maximal $\alpha$. SurFree determines this point by repeatedly testing decreasing angle amplitudes until an adversarial position is found. The image is inspired by \cite{surfree}.}
-\label{fig:surfree}
-\end{figure}
+%\section{SurFree attack}
+%SurFree attack \cite{surfree} is a decision-based attack, similar to \gls{hsja}. The authors of the paper observed that \gls{hsja} uses a significant part of the query budget to estimate the gradients of the decision boundary. These queries will not improve the distance of the best adversarial example to the original image and will therefore cause the progress to stall. In order for the attack to require less queries to be successful, SurFree works without any surrogate gradient estimation, hence the name. Instead directions are sampled randomly and a geometrical mechanism determines the biggest distortion in this direction.\\
+%
+%\subsection{Geometrical mechanism}\label{subsec:geometrical}
+%The geometrical mechanism starts from a point on the decision boundary: $x_b \in \partial\mathcal{A}$. This boundary point is located at distance $d := \| x_b - x_o\|_2 $ from the original image $x_o$. A unit vector $\mathbf{u}$ is constructed starting in $x_o$, pointing towards $x_b$. The search space for a better adversarial point will be restricted to a two-dimensional random plane $\mathcal{P}$. The plane $\mathcal{P}$ is spanned by vectors $\mathbf{u}$ and $\mathbf{v}$, where $\mathbf{v}$ is a random unit vector orthogonal to $\mathbf{u}$. The vector $\mathbf{v}$ will be sampled from a distribution $\mathcal{T}$ as explained in section \ref{sec:surfree_direction_sampling} and orthogonalized using the Gram-Schmidt process \cite{gram_schmidt}. Both $x_o$ and $x_b$ are part of $\mathcal{P}$.\\
+%
+%New adversarial candidates are points at a distance $d(1 - \alpha)$ from $x_o$ in $\mathcal{P}$. In polar coordinates, this results in the following equation:
+%\begin{align}
+% \mathbf{z}(\alpha, \theta) = d(1-\alpha) (\cos(\theta)\mathbf{u} + \sin(\theta)\mathbf{v}) + x_o \label{eq:surfree_polar}
+%\end{align}
+%with $\alpha \in [0,1]$, $\theta \in [-\pi, \pi]$ and with $\theta$ being the angle with $\mathbf{u}$. If the new adversarial candidate yields to be adversarial, then the distance to the original image is decreased by $100\cdot\alpha \%$.\\
+%
+%Equation \ref{eq:surfree_polar} has two parameters that can be chosen independently. However, $\alpha$ can be set based on $\theta$ in order to increase the probability of $\mathbf{z}(\alpha, \theta)$ being adversarial. Lets assume that the intersection of the decision boundary and the random two-dimensional plane $\partial\mathcal{A}\cap\mathcal{P}$ is a line through $x_b$. This line has a normal unit vector $\mathbf{n}$ in $\mathcal{P}$. This vector makes an angle~$\psi$ with $\mathbf{u}$. The polar form of $\mathbf{n}$ is the following:
+%\begin{align}
+%\mathbf{n} = \cos(\psi)\mathbf{u} + \sin(\psi)\mathbf{v}. \label{eq:surfree_n}
+%\end{align}
+%The optimal adversarial point, minimizing the distance to $x_o$, would be the orthogonal projection of $x_o$ on $\partial\mathcal{A}\cap\mathcal{P}$. This projection is achieved when $\theta = \psi$ and $\alpha = 1 - \cos(\psi)$. However, it is not possible to create this projection in practice, since the attacker has no knowledge about the angle~$\psi$.\\
+%
+%The calculation in appendix \ref{app:surfree_calculations} shows that $z(\alpha, \theta)$ is adversarial if the following equation holds:
+%\begin{align}
+%\left| \frac{1 - (1-\alpha)\cos(\theta)}{(1-\alpha)\sin(\theta)}\right| \leq \tan(\psi)\sgn(\theta) \label{eq:surfree_adversarial}
+%\end{align}
+%Since the left hand side of this equation is always positive due to the absolute value operator, the inequality can only hold if the right hand side is positive as well. This is the case when $\theta$ and $\psi$ share the same sign.\\
+%
+%By minimizing the left hand side of the equation, the probability of the inequality holding, increases. The $\theta$ parameter can be discarded from the equation by inserting the previously attained coupling $\alpha = 1 - \cos(\theta)$. This causes the left hand side of the equation to be equal to $|\tan(\theta^*(\alpha))|$, where $\theta^*(\alpha)$ denotes that the coupling between $\alpha$ and $\theta$ is used. $z^*(\theta)$ is therefore also equal to $z(1-\cos(\theta), \theta)$. The derivation of this result is also shown in appendix \ref{app:surfree_calculations}. The result is an increasing function in terms of $\alpha$. Minimizing the left hand side of equation \ref{eq:surfree_adversarial} is therefore the same as finding the minimal value of $\alpha$ for which the inequality holds. Minimal values of $\alpha$ are attained for higher values of $\theta$ when using the coupling. The geometrical mechanism is visualized in Figure \ref{fig:surfree}.\\
+%
+%The attack proposes the following technique in order to determine the best value for $\theta$. A maximal angle $\theta_{max}$ is set at the beginning of the attack. This maximal angle is then multiplied with a fraction from the following list:
+%\begin{align*}
+%1, -1, (T - 1)/T, -(T-1)/T, \ldots, 1/T, -1/T
+%\end{align*}
+%The biggest fractions are at the beginning of the list in order to test these first. As soon as an adversarial position is found, the search is stopped. If no fraction results in an adversarial position, then the value of $\theta_{max}$ is decreased and the search is restarted using another direction $\mathbf{v}$.
+%
+%\subsection{Sampling random directions}\label{sec:surfree_direction_sampling}
+%As explained in section \ref{subsec:geometrical}, the SurFree attack \cite{surfree} algorithm requires random directions $\mathbf{v}$ in order to restrict the search to a random plane $\mathcal{P}$. The random sampling is done from a distribution $\mathcal{T}$ using a custom sampling algorithm. The advantage of this sampling algorithm over uniform sampling is twofold. The first advantage is dimensionality reduction. This is done using a \gls{dct} \cite{dct}. The original image is transformed using a \gls{dct}. Some components are set to zero, while other components are shaped like the visual content of $x_o$. This adaptivity to the contents of $x_o$ is the second advantage of the sampling algorithm. It makes the final perturbation less perceptible and is based on the masking used in watermarking techniques \cite{watermarking}. The final result is then transformed using the inverse \gls{dct}.
+%
+%
+%\begin{figure}
+%\centering
+%\begin{tikzpicture}[xscale=0.75, yscale=0.75]
+%\definecolor{clr2}{RGB}{31,182,83}
+%\tikzset{
+%dot/.style = {circle, fill, minimum size=#1,
+%              inner sep=0pt, outer sep=0pt},
+%dot/.default = 6pt % size of the circle diameter 
+%}
+%\draw [fill={rgb, 255:red, 155; green, 155; blue, 155 }  ,fill opacity=0.5, draw=none] (0,7.5) -- (10,2.5) -- (10,10) -|cycle; % Fill above line
+%
+%\path[name path=DB,draw, line width=0.5mm] (0,7.5) -- (10, 2.5); % Decision boundary
+%
+%\begin{scope}[every node/.style={dot,thick,draw,anchor=base,fill=black}] % Circles
+%	\node[] (xo) at (3,3){}; %xo
+%	\node[] (xb) at (9,3){}; %xb
+%\end{scope}
+%
+%\begin{scope}[red,line width=0.5mm]
+%\draw[] (xb) arc [
+%	start angle = 0,
+%	end angle = 180,
+%	radius = 3
+%];
+%\draw[] (xb) arc [
+%	start angle = 0,
+%	delta angle = -20,
+%	radius = 3
+%];
+%\draw[] (xo) arc [
+%	start angle = 180,
+%	delta angle = 20,
+%	radius = 3
+%];
+%\end{scope}
+%
+%\begin{scope}[every node/.style={dot,thick,draw,anchor=base,fill=black}] % Circles
+%	\node[label=225:$x_o$] (xo) at (3,3){}; %xo
+%	\node[label=45:$x_b$] (xb) at (9,3){}; %xb
+%\end{scope}
+%
+%\node[label=270:$\mathbf{u}$] (xu) at (4.5,3){};
+%\node[label=180:$\mathbf{v}$] (xv) at (3,4.5){};
+%\node[] (dl) at (3,1.5){};
+%\node[] (dr) at (9,1.5){};
+%\node[] (dal) at (3,0.5){};
+%\node[] (dar) at (7,0.5){};
+%\node[] (rpx) at (7,3){};
+%\path [-,line width=0.1mm, name path=guideline] (xo.east) edge (xb.west); % Guideline xo xb
+%\path [-latex, line width=0.5mm] (xo.east) edge (xu.west); % U arrow
+%\path [-latex, line width=0.5mm] (xo.north) edge (xv.south); % V arrow
+%\draw [spath/save=black, name path=blackarc, dashed] (rpx.center) arc (0:60:4);
+%\draw[dashed] (rpx) arc [start angle = 0, delta angle = -10, radius=4];
+%\path[spath/save=red, name path=redcircle] (xb) arc [
+%	start angle = 0,
+%	end angle = 180,
+%	radius = 3
+%];
+%\tikzset{
+%	spath/split at intersections={red}{black},
+%	spath/get components of ={black}\blackCpt,
+%}
+%
+%\path[name intersections={of=DB and redcircle,by={Z, Z1}}];
+%\path [name intersections={of=blackarc and redcircle, by=intersect}];
+%\node[label=45:$z^*(\theta)$,dot,draw=red,anchor=base,fill=red] (i) at (intersect){};
+%\node[label=$z^*(\theta^*)$,dot,thick,draw=red,anchor=base,fill=red] (i2) at (Z1){};
+%
+%\draw[spath/use={\getComponentOf\blackCpt{1}}, -latex, line width=0.5mm] node[right, pos=0.5] {$\theta$};
+%\path [dashed] (xo.center) edge (i.center);
+%
+%
+%
+%\begin{scope}[color={rgb, 255:red, 31; green, 182; blue, 83}]
+%	\path [dashed] (dal.center) edge (xo.center);
+%	\path [dashed] (dr.center) edge (xb.center);
+%	\path [dashed] (dar.center) edge (rpx.center);
+%	\path [latex-latex, line width=0.5mm] (dl.center) edge node[fill=white] {$d$} (dr.center);
+%	\path [latex-latex, line width=0.5mm] (dal.center) edge node[fill=white] {$d(1-\alpha)$} (dar.center);
+%\end{scope}
+%
+%\node[] (p) at (2,9){};
+%\draw [-latex, line width=0.5mm, blue, spath/save=normal] ($(xb)!(p)!(0,7.5)$) -- (p) node[]{$\mathbf{n}$};
+%\draw [dashed, blue, line width=0.5mm] ($(xb)!(p)!(0,7.5)$) -- ($(xb)!(p)!(0,7.5) + (2,0)$);
+%\path[spath/save=dash] ($(xb)!(p)!(0,7.5) + (1.5,0)$) arc [start angle = 0, end angle = 90, radius = 1.5];
+%\tikzset{
+%	spath/split at intersections={normal}{dash},
+%	spath/get components of ={dash}\blueCpt,
+%}
+%\draw[spath/use={\getComponentOf\blueCpt{1}}, -latex, line width=0.5mm, blue] node[right, pos=0.5] {$\psi$};
+%
+%\node[] at (8,9.5) {$\mathcal{A} \cap \mathcal{P}$};
+%\node[] (text) at (1,5.5) {$\partial\mathcal{A} \cap \mathcal{P}$};
+%\node[] (line) at (0.5,7.25) {};
+%\draw (text) to[out=0,in=-70] (line);
+%\end{tikzpicture}
+%\caption[Geometric configuration of SurFree]{The geometrical mechanism of the SurFree attack. A random position is projected onto the decision boundary $\partial\mathcal{A}\cap\mathcal{P}$ using a binary search algorithm. This position is called $x_b$ and is located at a distance $d$ from the original image $x_o$. The goal of the attack is to find a new position $z(\alpha,\theta)$ in the adversarial region $\mathcal{A}$ that lays at distance $d(1-\alpha)$ from $x_o$. In this process a unit vector $\mathbf{u}$ pointing from $x_o$ to $x_b$ is constructed as well as another random unit vector $\mathbf{v}$ orthogonal to $\mathbf{u}$. The search for new adversarial positions is restricted to a plane $\mathcal{P}$ spanned by $\mathbf{u}$ and $\mathbf{v}$ containing $x_o$. In this case, the plane $\mathcal{P}$ is the piece of paper or the monitor you are reading this text from. There exists a coupling between $\alpha$ and $\theta$ ($\alpha = 1 - \cos(\theta)$). Points adhering to this coupling are located on the red circle and are referred to using $z^*(\theta)$. The optimal adversarial point $z^*(\theta^*)$, is the point on this circle laying in $\mathcal{A}$ with the minimal distance to $x_o$, i.e. maximal $\alpha$. SurFree determines this point by repeatedly testing decreasing angle amplitudes until an adversarial position is found. The image is inspired by \cite{surfree}.}
+%\label{fig:surfree}
+%\end{figure}
 
 
 \section{Stateful defense}\label{sec:stateful_detection}
