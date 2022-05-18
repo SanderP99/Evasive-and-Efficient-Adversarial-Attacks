@@ -38,11 +38,11 @@ def compare(path):
                 df_rest.original_index.isin(indices)) & (
                     df_rest.distribution_scheme.apply(str.strip) == 'round_robin')]
         assert len(indices) == len(df_filtered)
-        d[str(indices)] = [row.n_detections, df_filtered['n_detections'].sum(), sum(distances),
-                           df_filtered['distance'].sum(), len(indices)]
+        d[str(indices)] = [dataset, row.n_detections / len(indices), df_filtered['n_detections'].mean(),
+                           np.mean(distances), df_filtered['distance'].mean(), len(indices)]
 
     df = pd.DataFrame.from_dict(d, orient='index',
-                                columns=['n_detections_combined', 'n_detection_split', 'distance_combined',
+                                columns=['dataset', 'n_detections_combined', 'n_detections_split', 'distance_combined',
                                          'distance_split', 'n_experiments'])
     df.to_csv('combination_comparison.csv')
 
