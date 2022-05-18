@@ -147,3 +147,12 @@ class InsertResettingEmbeddedDistanceBasedDistributionScheme(ResettingEmbeddedDi
 class InsertEmbeddedDistanceBasedDistributionScheme(ResettingEmbeddedDistanceBasedDistributionScheme):
     def __str__(self):
         return f'insert_embedded_distance_based_{self.history_len}'
+
+
+class CombinationDistributionScheme(RoundRobinDistribution):
+    def __init__(self, mapping, n_nodes=1, n_particles=1, n_experiments=1):
+        super(CombinationDistributionScheme, self).__init__(mapping, n_nodes, n_particles)
+        self.n_experiments = n_experiments
+
+    def __str__(self):
+        return f'combination_distribution_{self.n_experiments}'

@@ -164,3 +164,15 @@ class InsertEmbeddedNodeManager(InsertResettingEmbeddedNodeManager):
         _ = self.nodes[node_idx].add_to_detector(random_query)
         self.history[node_idx][self.idx % self.history_len] = embedded_query
         self.idx += 1
+
+
+class CombinationNodeManager(NodeManager):
+    def __init__(self, nodes: List[Node], dataset: str):
+        super().__init__(nodes, dataset)
+        self.queries = []
+
+    def add_to_detector(self, query: np.ndarray) -> None:
+        self.queries.append(query)
+
+    def clear(self):
+        self.queries = []

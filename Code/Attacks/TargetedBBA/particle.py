@@ -7,7 +7,7 @@ from keras.models import Model
 from Attacks.DistributedBBA.distribution_scheme import RoundRobinDistribution, DistanceBasedDistributionScheme
 from Attacks.DistributedBBA.node import Node
 from Attacks.DistributedBBA.node_manager import NodeManager, L2NodeManager, EmbeddedNodeManager, \
-    ResettingEmbeddedNodeManager, InsertResettingEmbeddedNodeManager, InsertEmbeddedNodeManager
+    ResettingEmbeddedNodeManager, InsertResettingEmbeddedNodeManager, InsertEmbeddedNodeManager, CombinationNodeManager
 from Attacks.TargetedBBA.utils import line_search_to_boundary
 
 
@@ -54,6 +54,8 @@ class Particle:
                 self.node_manager = InsertEmbeddedNodeManager(dataset=dataset, nodes=swarm.nodes,
                                                               threshold=threshold,
                                                               history_len=history_len)
+            elif distance_based == 'combination':
+                self.node_manager = CombinationNodeManager(dataset=dataset, nodes=swarm.nodes)
             else:
                 raise ValueError
 
