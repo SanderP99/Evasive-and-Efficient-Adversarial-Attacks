@@ -1,19 +1,11 @@
-import ast
-import csv
-import os
 from collections import deque
 from typing import Optional, List
 
-import numpy as np
-import pandas as pd
 from keras.models import Model, load_model
-from tqdm import tqdm
 
 from Attacks.DistributedBBA.distributed_bba import DistributedBiasedBoundaryAttack
-from Attacks.DistributedBBA.distribution_scheme import CombinationDistributionScheme
 from Attacks.DistributedBBA.experiment import Experiment
 from Attacks.DistributedBBA.node import Node
-from MNIST.setup_mnist import MNIST
 
 
 class CombinedDistributedBiasedBoundaryAttack:
@@ -64,48 +56,3 @@ class CombinedDistributedBiasedBoundaryAttack:
                     self.nodes[self.node_idx].add_to_detector(q)
                     self.node_idx += 1
                     self.node_idx %= self.n_nodes
-
-
-if __name__ == '__main__':
-    experiments = pd.read_csv('../../Experiments/experiments_sorted.csv', index_col='index')
-    data = MNIST()
-    model = load_model('../../MNIST/models/mnist', compile=False)
-    max_queries = 25000
-    exps = []
-    for j in range(2):
-        e = experiments.iloc[j]
-        exps.append(Experiment(e.name, data.test_data[e.name], ast.literal_eval(e.targets), e.y_target, 'mnist'))
-    attack = CombinedDistributedBiasedBoundaryAttack(exps, 5, model,
-                                                CombinationDistributionScheme(None, n_experiments=len(exps)),
-                                                None, 10, 'mnist')
-
-    output_file = f'results/results_{dataset}_{distribution_scheme}.csv'
-    if not os.path.isfile(output_file):
-        with open(output_file, 'w') as file:
-            writer = csv.writer(file)
-            writer.writerow([
-                'original_index', 'y_orig', 'y_target', 'n_particles', 'n_nodes', 'distance',
-                'n_detections', 'calls', 'detections_per_node', 'distribution_scheme',
-                'source_step', 'spherical_step', 'dataset', 'source_step_multiplier_up',
-                'source_step_multiplier_down', 'detections_all', 'threshold'
-            ])
-
-    previous_queries = 0
-    new_queries = 0
-    with tqdm(total=len(exps) * max_queries) as pbar:
-        while attack.total_queries < max_queries:
-            attack.attack()
-            new_queries, previous_queries = attack.total_queries, new_queries
-            pbar.update(new_queries - previous_queries)
-
-    detections_all = [node.detector.get_detections() for node in attack.nodes]
-    total_detections = np.sum([len(x) for x in detections_all])
-
-    with open(output_file, 'a') as file:
-        writer = csv.writer(file)
-        writer.writerow([
-            experiment.name, experiment.y_orig, experiment.y_target, particles, nodes,
-            attack.swarm.best_fitness, total_detections, attack.swarm.total_queries,
-            [len(x) for x in detections_all], str(scheme), source_step, spherical_step, dataset,
-            source_step_multiplier_up, source_step_multiplier_down, detections_all, threshold
-        ])
