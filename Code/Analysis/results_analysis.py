@@ -7,9 +7,10 @@ import pandas as pd
 def analyse_results(path: str) -> None:
     dfs = []
     for file in listdir(path):
-        x = pd.read_csv(path + file)
-        x.columns = [name.strip() for name in x.columns]
-        dfs.append(x)
+        if not str.__contains__(file, 'comb') and not str.__contains__(file, 'hsja'):
+            x = pd.read_csv(path + file)
+            x.columns = [name.strip() for name in x.columns]
+            dfs.append(x)
     df = pd.concat(dfs, axis=0)
 
     pd.set_option('display.max_rows', None)
@@ -17,7 +18,7 @@ def analyse_results(path: str) -> None:
     pd.set_option('display.width', None)
     pd.set_option('display.max_colwidth', None)
 
-    print(df.groupby(['dataset', 'distribution_scheme', 'n_particles', 'n_nodes']).agg({'distance':
+    print(df.groupby(['dataset', 'distribution_scheme', 'n_particles', 'n_nodes', 'threshold']).agg({'distance':
                                                                                             [np.mean, np.std],
                                                                                         'n_detections':
                                                                                             [np.mean, np.std]

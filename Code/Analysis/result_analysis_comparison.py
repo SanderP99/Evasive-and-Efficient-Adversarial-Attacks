@@ -1,4 +1,5 @@
 import ast
+import struct
 from collections import defaultdict
 from os import listdir
 
@@ -14,7 +15,7 @@ def compare(path):
             x = pd.read_csv(path + file)
             x.columns = [name.strip() for name in x.columns]
             dfs_comb.append(x)
-        else:
+        elif not str.__contains__(file, 'hsja'):
             x = pd.read_csv(path + file)
             x.columns = [name.strip() for name in x.columns]
             dfs_rest.append(x)

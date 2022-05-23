@@ -27,7 +27,7 @@ if __name__ == '__main__':
     source_step_multiplier_up = 1.05
     source_step_multiplier_down = 0.99
     spherical_step = 0.05
-    threshold = 0.25
+    threshold = 0.1
 
     if dataset == 'mnist':
         data = MNIST()

@@ -13,7 +13,7 @@ from MNIST.setup_mnist import MNIST
 
 if __name__ == '__main__':
     datasets = ['mnist', 'cifar']
-    experiment_ids = list(range(20))
+    experiment_ids = list(range(5))
     max_queries = 25000
     n_nodes = [10]
 
@@ -57,12 +57,15 @@ if __name__ == '__main__':
 
                 detections_all = [node.detector.get_detections() for node in qdw.nodes]
 
-                with open(output_file, 'a') as file:
-                    writer = csv.writer(file)
-                    writer.writerow([
-                        experiment.name, experiment.y_orig, experiment.y_target, nodes,
-                        np.linalg.norm(example - x_orig), qdw.get_n_detections(), max_queries,
-                        [len(x) for x in detections_all], str(scheme), dataset,
-                        detections_all
-                    ])
+                # with open(output_file, 'a') as file:
+                #     writer = csv.writer(file)
+                #     writer.writerow([
+                #         experiment.name, experiment.y_orig, experiment.y_target, nodes,
+                #         np.linalg.norm(example - x_orig), qdw.get_n_detections(), max_queries,
+                #         [len(x) for x in detections_all], str(scheme), dataset,
+                #         detections_all
+                #     ])
+
+                with open(f'result_images/hsja_{dataset}_{experiment_id}.npy', 'wb') as f:
+                    np.save(f, example)
 
