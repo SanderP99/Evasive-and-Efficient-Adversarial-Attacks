@@ -20,6 +20,8 @@ def hsja(model,
          flush_buffer_after_detection=True,
          step_size_decrease=2.0,
          n_nodes=1,
+         max_queries=25000,
+         dataset=None
          ):
     """
     Main algorithm for HopSkipJumpAttack.
@@ -48,7 +50,7 @@ def hsja(model,
     """
     # Set parameters
     original_label = np.argmax(model.predict(sample))
-    qdw = QueryDistributionWrapper(n_nodes, flush_buffer_after_detection=flush_buffer_after_detection)
+    qdw = QueryDistributionWrapper(n_nodes, flush_buffer_after_detection=flush_buffer_after_detection, dataset=dataset)
     params = {'clip_max': clip_max, 'clip_min': clip_min,
               'shape': sample.shape,
               'original_label': original_label,
@@ -64,6 +66,7 @@ def hsja(model,
               'verbose': verbose,
               'distributed': distributed,
               'qdw': qdw,
+              'total_evaluations': 0,
               }
 
     # Set binary search threshold.
@@ -81,8 +84,9 @@ def hsja(model,
                                                       model,
                                                       params)
     dist = compute_distance(perturbed, sample, constraint)
-
-    for j in np.arange(params['num_iterations']):
+    j = 0
+    while params['total_evaluations'] < max_queries:
+        print('Total: ', params['total_evaluations'])
         params['cur_iter'] = j + 1
 
         # Choose delta.
@@ -91,6 +95,7 @@ def hsja(model,
         # Choose number of evaluations.
         num_evals = int(params['init_num_evals'] * np.sqrt(j + 1))
         num_evals = int(min([num_evals, params['max_num_evals']]))
+        num_evals = int(min([num_evals, max_queries - params['total_evaluations']]))
 
         # approximate gradient.
         gradf = approximate_gradient(model, perturbed, num_evals,
@@ -130,6 +135,7 @@ def hsja(model,
 
         # compute new distance.
         dist = compute_distance(perturbed, sample, constraint)
+        j += 1
         if verbose:
             print('iteration: {:d}, {:s} distance {:.4E}'.format(j + 1, constraint, dist))
     if distributed:
@@ -145,9 +151,11 @@ def decision_function(model, images, params):
     images = clip_image(images, params['clip_min'], params['clip_max'])
     if not params['distributed']:
         prob = model.predict(images.reshape((images.shape[0],) + (28, 28, 1)))
+        params['total_evaluations'] += len(images)
     else:
         qdw = params['qdw']
         prob = qdw.predict(model, images)
+        params['total_evaluations'] += len(images)
     if params['target_label'] is None:
         return np.argmax(prob, axis=1) != params['original_label']
     else:
