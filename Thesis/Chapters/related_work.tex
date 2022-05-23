@@ -163,7 +163,7 @@ original image
 \label{fig:boundary_attack_intuition}
 \end{figure}
 
-\section{HopSkipJumpAttack}
+\section{HopSkipJumpAttack}\label{sec:hsja}
 \gls{hsja} \cite{hsja}, like \gls{ba}, is a decision-based adversarial attack that starts from an adversarial input. The initial input is obtained in an identical manner as in \gls{ba}. \gls{hsja} is an iterative algorithm that consists of three steps.\\
 
 The first step is a projection onto the decision boundary of the model under attack. This projection is carried out using a binary search. The second step is to estimate the direction of the gradient at the boundary. Different directions are sampled from a uniform distribution over a $d$-dimensional sphere, where $d$ is the input dimension. This random direction is added to the boundary point, generating a new query for the model. The results of these queries are combined to a gradient estimation~$\widetilde{\nabla S}$ using the Monte Carlo estimate of equation \ref{eq:monte_carlo_estimate}. In this equation $u_b$ are the random directions and $x_t$ is the boundary position. $B$ is the number of random directions that needs to be sampled. This number increases based on the current iteration of the attack to reduce the variance of the estimate. The function~$\phi_{x^*}$ returns 1 if the new position is adversarial and -1 if it is not adversarial. $\delta$ is a positive parameter determining the size of the $d$-dimensional sphere.

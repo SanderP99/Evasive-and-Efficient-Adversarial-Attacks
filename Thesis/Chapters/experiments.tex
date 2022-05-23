@@ -767,3 +767,37 @@ There are numerous parameters that influence both the efficiency and evasiveness
 This section will focus on optimization of a small parameter set. Due to the complexity of this task, the goal is not to find the optimal value for all  parameters in this set. But rather to find any obviously incompatible combinations of parameters if there are any. For the sake of completeness a list of all possible parameters and their respective default values is given in Table \ref{tbl:parameter_table} of appendix \ref{app:parameter_tables}. Table \ref{tbl:parameter_table_defense} of the same appendix shows the list of all parameters of the defensive scheme. The attacker has no knowledge of these values but the optimal values of the attacking parameters will depend on them.\\
 
 \section{Comparing to state of the art}
+As stated in section \ref{sec:hsja}, \gls{hsja} \cite{hsja} eclipsed \gls{ba} and \gls{bba} in terms of efficiency. This section aims to compare \gls{hsja} to the attack proposed in this work both in terms of efficiency as evasiveness. The idea of query submission distribution is applicable to all adversarial attacks. In order to make the comparison more fair, this idea has been applied to \gls{hsja} as well.\\
+
+Table \ref{tbl:hsja} shows the results of the comparison. The original images and target labels are identical between both attacks and the results are averaged over all experiments. As expected, \gls{hsja} is more efficient than vanilla \gls{bba} and the spin-off \gls{pso}-\gls{bba} attack. For the CIFAR dataset, \gls{pso}-\gls{bba} performs more than four times worse when only taking the distance into account. \gls{pso}-\gls{bba} shows its potential when comparing the evasiveness of the attacks. This attack triggers less detections than \gls{hsja} both in the undistributed and distributed version. The increased evasiveness is partly due to the inherent distributed nature of the attack, but can also be attributed to the lower efficiency. The larger distance to the original image requires the attack to be less precise in order to remain adversarial. This in turn causes less detections. The larger distance to the original image does not have to pose a problem as the human eye is not very perceptible to such a small difference in $L_2$-distance. This can be concluded from the visual comparison in Figures \ref{fig:mnist_comparison} and \ref{fig:cifar_comparison}. The difference is notable for some examples, such as the airplane in Figure \ref{fig:cifar_comparison}, but for others it is not visible, i.e. the frog in the same figure.\\ 
+
+\begin{table}
+\centering
+\caption[Comparison with state of the art]{Results for the \gls{pso}-\gls{bba} algorithm proposed in this work and the \gls{hsja} from \cite{hsja}. \gls{hsja} is the more efficient attack, but triggers much more detections than \gls{pso}-\gls{bba}. Increasing the number of nodes causes a drop in the number of detection for both attacks.}
+\label{tbl:hsja}
+\begin{tabular}{lrrrrr}\toprule
+			&& \multicolumn{2}{c}{MNIST} &\multicolumn{2}{c}{CIFAR} \\ \cmidrule(r){3-4} \cmidrule(r){5-6}
+	Attack				&Nodes &Distance	&Detections	&Distance	&Detections \\ \midrule
+	Baseline \gls{bba}			  &1			&2.807		&413		&1.306			&474 \\
+	\gls{pso}-\gls{bba} 		  &1			&2.712		&138		&1.239	&257 \\ 
+	\gls{hsja} &1 &2.056&481&0.307&487\\ \addlinespace[\linespace]
+	\gls{rr}-\gls{pso}-\gls{bba} &10		&2.712		&\textbf{104}			&1.239			&\textbf{202} \\
+	\gls{hsja} &10 &\textbf{2.056}&417&\textbf{0.307}&456\\
+	\bottomrule
+	\end{tabular}
+\end{table}
+
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{Images/mnist_comparison.pdf}
+\caption[Visual comparison of the adversarial MNIST examples of different attacks]{The examples of Figure \ref{fig:mnist} are repeated with the corresponding adversarial examples. The first row are the original images with their respective labels above them. The second row is the result of the \gls{pso}-\gls{bba} attack wit the target label specified above the resulting adversarial example. The $L_2$-distance is shown after the target label in brackets. The setup of the third row is similar to the second row, but the adversarial examples originate from \gls{hsja}. }
+\label{fig:mnist_comparison}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{Images/cifar_comparison.pdf}
+\caption[Visual comparison of the adversarial CIFAR examples of different attacks]{The examples of Figure \ref{fig:cifar} are repeated with the corresponding adversarial examples. The first row are the original images with their respective labels above them. The second row is the result of the \gls{pso}-\gls{bba} attack wit the target label specified above the resulting adversarial example. The $L_2$-distance is shown after the target label in brackets. The setup of the third row is similar to the second row, but the adversarial examples originate from \gls{hsja}. }
+\label{fig:cifar_comparison}
+\end{figure}
