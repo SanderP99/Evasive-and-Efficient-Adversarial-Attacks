@@ -1,4 +1,4 @@
-\chapter{Parameter table}
+\chapter{Parameter table}\label{app:parameter_tables}
 This appendix serves as an overview of the different parameters present in the attack (and defense). 
 \centering
 \renewcommand*{\arraystretch}{1.7}
@@ -11,8 +11,9 @@ Parameter &Default value &Usage \\ \midrule \endfirsthead
 Parameter &Default value &Usage \\ \midrule \endhead
 \bottomrule\endfoot
 Number of  particles	&5 &Controls the number of particles in the \gls{pso} swarm. Increasing the number of particles decreases the evasiveness of the algorithm but decreases the efficiency as seen in section \ref{sec:combining_pso_bba}. Decreasing the value decreases both the evasiveness and efficiency.\\
-Number of nodes &10 &Controls the number of nodes over which the query submission can be distributed. Increasing the number of nodes helps the algorithm to be more evasive as seen in section \ref{sec:more_nodes}. Every added node comes with a certain cost.\\
+Number of nodes $N$&10 &Controls the number of nodes over which the query submission can be distributed. Increasing the number of nodes helps the algorithm to be more evasive as seen in section \ref{sec:more_nodes}. Every added node comes with a certain cost.\\
 Query budget &25000 &Controls the maximum number of queries that can be submitted by the attack. Increasing the number can make the attack more efficient, but the later queries tend to trigger more detections, causing the evasiveness to drop.\\
+Group size $s$ &1 &Controls the number of experiments that are grouped together and are executed concurrently. The queries of the attacks in the same group are submitted in an interleaved fashion. Increasing this value aids towards the evasiveness of the attack without sacrificing efficiency. Experiments have been performed with this parameter in section \ref{sec:noise_insertion}.\\
 Distribution scheme &\gls{rr} distribution &Controls how the queries are distributed over the different nodes. As discussed in section \ref{sec:distribution}, the distribution scheme does not heavily influence the number of detections. Other options for this parameter are the \gls{mrr}, \gls{db} and \gls{edb} distribution schemes.\\
 History length	&20	&Controls the size of the query submission history that is taken into account in the \gls{db} and \gls{edb} distribution schemes. As seen in section \ref{sec:distance_based_modifications}, increasing this value helps the algorithm remain more evasive at an added computational cost. The chosen value is a middle ground between this computational cost and the evasiveness.\\
 Source step $\epsilon$ &0.25 (MNIST) 0.20 (CIFAR) & Controls the step towards the original image in the \gls{bba}. This parameter is also shown in Figure \ref{fig:boundary_attack_intuition} as $\epsilon$. Increasing the value causes the queries to be more spread out over the search space, ultimately lowering detections. However, increasing the value too much will result in slow convergence of the attack.\\
@@ -25,7 +26,7 @@ Global acceleration coefficient $c_g$ &1\textsuperscript{\ref{ftn:cp}} &Controls
 Maximum velocity $v_{max}$ &0.5 &Controls the maximum velocity of a particle. The velocity values of equation \ref{eq:velocity_update} are clipped by this value in order to avoid the problem of exploding velocities. Decreasing this value causes the algorithm to take smaller steps in every iteration, which in turn reduces the evasiveness.\\
 $w_{start}$ &1 &Controls the value of the inertia weight of equation \ref{eq:weight}. Decreasing the value will cause the particle to change its direction more easily in the beginning of the attack, allowing for more exploitation of the search space.\\
 $w_{end}$ &0 &Controls the value of the inertia weight of equation \ref{eq:weight}. Increasing the value will cause the particle to change its direction more easily at the end of the attack, allowing for more exploitation of the search space.\\
-Insert type &Train data &Controls the type of noise queries that are inserted in order to flush the buffer of the detector. The other options are uniforms noise, Perlin noise with a fixed frequency, Perlin noise with a variable frequency and a mix of all other approaches. Other approaches have a smaller inter query distance as shown in Table \ref{tbl:noise_distances}. Therefore train data noise is the best option in terms of evasiveness.\\
+Insert type &Test data &Controls the type of noise queries that are inserted in order to flush the buffer of the detector. The other options are uniforms noise, Perlin noise with a fixed frequency, Perlin noise with a variable frequency and a mix of all other approaches. Other approaches have a smaller inter query distance as shown in Table \ref{tbl:noise_distances}. Therefore train data noise is the best option in terms of evasiveness.\\
 Insert time &Distance based &Controls when noise queries should be inserted to flush the buffer of the detector. Other options are fixed interval and geometric decay.\\
 Insert count &1 &Controls the number of noise queries that are inserted every time the 'Insert time' decides that noise should be inserted. Inserting more noise queries can improve evasiveness, but the efficiency is lowered since less queries are used to progress the attack.\\
 Insert threshold &TODO &Controls the threshold used in the distance based insertion scheme. Whenever the distance between an impending query and the previously submitted queries falls below this value, noise queries will be inserted. Increasing this value will result in more noise being inserted, causing the evasiveness to increase while the efficiency drops. Increasing the value too high will result in more detections due to the noise queries being flagged as an attack.\\
@@ -33,8 +34,8 @@ Insert decay rate &/ &Controls the decay rate of the geometric decay insertion s
 \end{longtable}
 
 \begin{longtable}{p{3cm}p{2.5cm}p{7cm}}
-\caption{Parameter table of the defense\protect\footnotemark}
-\label{tbl:parameter_table}\\
+\caption[Parameter table of the defense]{Parameter table of the defense\protect\footnotemark}
+\label{tbl:parameter_table_defense}\\
 \toprule
 Parameter &Default value &Usage \\ \midrule \endfirsthead
 \toprule

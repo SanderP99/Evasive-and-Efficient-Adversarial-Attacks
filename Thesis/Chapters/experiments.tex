@@ -2,9 +2,9 @@
 This chapter will discuss the experiments performed, as well as the ideas and intuitions behind them. The adversarial algorithm will be refined throughout the different subsections and the results of the refinement will be discussed at the end of each subsection.
 
 \section{Evaluation protocol}
-This subsection described the evaluation protocol that will be followed for all experiments performed. Experiments will be performed with the MNIST \cite{mnist} and CIFAR \cite{cifar} datasets. Some examples of these datasets are visualised in Figures \ref{fig:mnist} and \ref{fig:cifar} respectively. A black box model is trained using the training data of the respective dataset. The architectures of the models are identical to the ones used in \cite{cw_attack, defensive_distillation}. A summary of the two architectures can be found in Table \ref{tbl:architectures}. The training parameters are also identical to the ones used in \cite{cw_attack, defensive_distillation}. These models remain unchanged for all experiments.\\
+This subsection describes the evaluation protocol that will be followed for all experiments performed. Experiments will be performed with the MNIST \cite{mnist} and CIFAR \cite{cifar} datasets. Some examples of these datasets are visualised in Figures \ref{fig:mnist} and \ref{fig:cifar} respectively. A black box model is trained using the training data of the respective dataset. The architectures of the models are identical to the ones used in \cite{cw_attack, defensive_distillation}. A summary of the two architectures can be found in Table \ref{tbl:architectures}. The training parameters are also identical to the ones used in \cite{cw_attack, defensive_distillation}. These models remain unchanged for all experiments.\\
 
-The trained models are then used to classify all instances in the test set of their respective dataset. The incorrectly classified examples are filtered out of this set as they are essentially already adversarial. The remaining examples can be used for experiments. A list of experiments is generated based on the remaining examples. An experiment consists of an original image, a target label and starting position(s). All future refinements will therefore perform the same set of experiments in order to make the comparison more fair. All random effects present in the algorithm are seeded for the same purpose.\\
+The trained models are then used to classify all instances in the test set of their respective dataset. The incorrectly classified examples are filtered out of this set as they are essentially already adversarial. A list of experiments is generated based on the remaining examples. An experiment consist s of an original image, a target label and starting position(s). All future refinements will therefore perform the same set of experiments in order to make the comparison more fair. All random effects present in the algorithm are seeded for the same purpose.\\
 
 \begin{figure}
 \centering
@@ -78,7 +78,7 @@ Table \ref{tbl:baseline} reports the average $L_2$-distance and the average numb
 \end{table}
 
 \section{Applying PSO to BBA} \label{sec:combining_pso_bba}
-As mentioned in section \ref{sec:optimization_approach}, previous attempts to craft adversarial example using \gls{pso} used \gls{pso} to guide adversarial examples through the search space closer to the original image. This work aims to combine the benefits of \gls{pso} and an existing decision-based attack such as \gls{bba}.\\
+As mentioned in section \ref{sec:optimization_approach}, previous attempts to craft adversarial examples using \gls{pso} used \gls{pso} as a standalone algorithm to guide adversarial examples through the search space closer to the original image. This work aims to combine the benefits of \gls{pso} and an existing decision-based attack such as \gls{bba}.\\
 
 Vanilla \gls{bba} has the disadvantage that, depending on the starting position, it might get trapped in a local optimum. By using \gls{pso} in combination with \gls{bba}, multiple starting positions can be explored and the probability of getting trapped is lowered. The intuition behind this idea is shown in Figure \ref{fig:applying_pso_to_bba}. The more starting positions there are, the higher the probability of finding the global optimum. There is however a clear trade-off in terms of efficiency. By having $n$ different starting positions, the query budget is essentially reduced by a factor~$n$ for each starting position.\\
 
@@ -107,7 +107,7 @@ The source step~$\epsilon$ will be changed after every iteration of the attack. 
 
 By using \gls{pso} in combination with \gls{bba}, the advantage of multiple starting points, as explained in Figure \ref{fig:applying_pso_to_bba}, can be exploited, without having a less efficient attack as a whole. Whenever particles end up in non-adversarial regions, they will move closer to the best known position in the swarm due to the \gls{pso} equations. At then end of the attack, most particles will be in the same area of the search space, allowing for more exploitation in this specific area.\\
 
-The \gls{pso} framework requires a fitness function the quantify the fitness of a position for the problem at hand. The authors of AdversarialPSO \cite{mosli2019they} suggested the following fitness function~$f$:
+The \gls{pso} framework requires a fitness function to quantify the fitness of a position for the problem at hand. The authors of AdversarialPSO \cite{mosli2019they} suggested the following fitness function~$f$:
 
 \begin{align}
 	f(x) = |p_{x} - p_{x^{\prime}}| - \frac{c}{n}\|x-x^\prime\|_2   \label{eq:old_fitness}
@@ -124,9 +124,9 @@ Where $x$ is the position of the particle, $x^\prime$ is the original image, $p_
 
 The infinite value for the fitness function inside non-adversarial decision regions acts as a penalty, causing the particles to quickly diverge from these regions.\\
 
-The same set of experiments as in section \ref{sec:baseline} has been performed. The experiments have been done using attacks with both five and ten particles. The initial step sizes have been set to 0.25 and 0.20 for MNIST and CIFAR respectively. The values for the increasing and decreasing multiplier have been set to 1.05 and 0.99 for both datasets. The results of the experiments can be found in Table \ref{tbl:pso_bba}.\\
+The same set of experiments as in section \ref{sec:baseline} has been performed. The experiments have been done using attacks with both five and ten particles. The initial step sizes have been set to 0.25 and 0.20 for MNIST and CIFAR respectively. The values for the increasing and decreasing multiplier have been set to 1.05 and 0.99 for both datasets. These values have been selected at random and were tested on a small subset of the experiments in order to confirm their effectiveness. Other values will be tested in section \ref{sec:optimize}. The results of the experiments can be found in Table \ref{tbl:pso_bba}. \\
 
-The five particle \gls{pso}-\gls{bba} algorithm outperforms the baseline in terms of distance to the original image on both datasets. This is not the case for the ten particle version. The high number of particles requires sufficient queries in the beginning of the attack in order to discover promising regions in the high dimensional search space of CIFAR. This exploration requires more queries than the query budget allows. The number of detections is lower for all variants of \gls{pso}-\gls{bba}. The different starting points have the added advantage that initial queries are more spread out over the search space. These queries are therefore less similar and the detector will not flag as much attacks. This effect can be seen in Figure \ref{fig:detections_bba_vs_pso_bba} for the MNIST experiments.\\
+The five particle \gls{pso}-\gls{bba} algorithm outperforms the baseline in terms of distance to the original image on both datasets. This is not the case for the ten particle version. The high number of particles requires sufficient queries in the beginning of the attack in order to discover promising regions in the high dimensional search space of CIFAR. This exploration requires more queries than the query budget allows. The number of detections is lower for all variants of \gls{pso}-\gls{bba} compared to the baseline. The different starting points have the added advantage that initial queries are more spread out over the search space. These queries are therefore less similar and the detector will not flag as much attacks. This effect can be seen in Figure \ref{fig:detections_bba_vs_pso_bba} for the MNIST experiments.\\
 
 The number of detections drops as the number of particles increases. This was to be expected from the intuition behind \gls{pso}-\gls{bba}. However, the average $L_2$-distance to the original image is higher for ten particles compared to five. To reduce the number of different parameters in future refinements, only swarms with five particles will be considered from here on.\\ 
 
@@ -291,14 +291,14 @@ original image
     x index=1, y expr=\thisrowno{0} - \thisrow{ci},col sep=comma]{Data/detections_bba_mnist.csv};
 \addplot [name path=upper_bba, fill=none, draw=none] table [
     x index=1, y expr=\thisrowno{0} + \thisrow{ci},col sep=comma]{Data/detections_bba_mnist.csv};
-\addplot[blue!60, fill opacity=0.2] fill between[of=lower_bba and upper_bba];
+\addplot[blue!60, fill opacity=0.4] fill between[of=lower_bba and upper_bba];
 
 
 \addplot [name path=lower_pso, fill=none, draw=none] table [
     x index=1, y expr=\thisrowno{0} - \thisrow{ci},col sep=comma]{Data/detections_bba_pso_mnist.csv};
 \addplot [name path=upper_pso, fill=none, draw=none] table [
     x index=1, y expr=\thisrowno{0} + \thisrow{ci},col sep=comma]{Data/detections_bba_pso_mnist.csv};
-\addplot[red!60, fill opacity=0.2] fill between[of=lower_pso and upper_pso];
+\addplot[red!60, fill opacity=0.4] fill between[of=lower_pso and upper_pso];
 
 
 \end{axis}
@@ -315,8 +315,8 @@ original image
 			& \multicolumn{2}{c}{MNIST} &\multicolumn{2}{c}{CIFAR} \\ \cmidrule(r){2-3} \cmidrule(r){4-5}
 	Attack				&Distance	&Detections	&Distance	&Detections \\ \midrule
 	Baseline \gls{bba}	&2.807		&413		&1.306			&474 \\
-	\gls{pso}-\gls{bba} (5 particles)	&2.712			&138			&1.239				&257 \\ 
-	\gls{pso}-\gls{bba} (10 particles)	&3.157			&44			&2.290				&184 \\
+	\gls{pso}-\gls{bba} (5 particles)	&\textbf{2.712}			&138			&\textbf{1.239}				&257 \\ 
+	\gls{pso}-\gls{bba} (10 particles)	&3.157			&\textbf{44}			&2.290				&\textbf{184} \\
 	
 	\bottomrule
 	
@@ -338,13 +338,13 @@ The \gls{rr} distribution scheme is fairly straightforward. The outgoing queries
 
 The \gls{mrr} distribution scheme maps a particle to a node for the entire duration of an attack iteration. The queries submitted by a single particle during one attack iteration are relatively close together, but this approach ensures that all particles will submit queries to all nodes. This might ultimately cause less detections. The \gls{mrr} distribution scheme maps a number of particles on a number of nodes. If the amount of particles is equal to the number of nodes then the mapping is straightforward. If the number of nodes is less than the number of particles then dummy nodes are introduced in the mapping. The dummy nodes forward their received queries to a random existing node. The random node changes every rotation. If the number of particles is less than the number of nodes then dummy particles that do not submit queries, are introduced. After every attack iteration, the mapping rotates. The mapping process is shown in Figure \ref{fig:round_robin}.\\ 
 
-The ultimate goal of the attack is to evade the stateful detection mechanism that defends the model under attack. Potential attacks are flagged based on the inter query distance in a detector buffer. The distance-based distribution scheme tries to exploit the defense. Instead of distributing queries over nodes in a \gls{rr}-fashion, queries are submitted to nodes based on the distance to the previously submitted queries to this node. The node with the highest average distance to the previously submitted queries is selected. For this purpose, every node will hold an internal buffer of queries. The size of this buffer can be chosen by the attacker, as can the distance metric. Standard $L_2$-distance can be chosen, but this has the same pitfalls as discussed in section \ref{sec:stateful_detection}. It is also possible to train another similarity encoder and use the $L_2$-distance in the embedded space in order to resemble the defense more closely. The distribution schemes will be called \gls{db} and \gls{edb} distribution schemes respectively.\\
+The ultimate goal of the attack is to evade the stateful detection mechanism that defends the model under attack. Potential attacks are flagged based on the inter query distance in a detector buffer. The distance-based distribution scheme tries to exploit the defense. Instead of distributing queries over nodes in a \gls{rr}-fashion, queries are submitted to nodes based on the distance to the previously submitted queries to this node. The node with the highest average distance to the previously submitted queries is selected. For this purpose, every node will hold an internal buffer of queries. The size of this buffer can be chosen by the attacker, as well as the distance metric. Standard $L_2$-distance can be chosen, but this has the same pitfalls as discussed in section \ref{sec:stateful_detection}. It is also possible to train another similarity encoder and use the $L_2$-distance in the embedded space in order to resemble the defense more closely. The distribution schemes will be called \gls{db} and \gls{edb} distribution schemes respectively.\\
 
-The experiments performed in this section will use a buffer size at each node of 20 for both the \gls{db} and \gls{edb} distribution schemes. The similarity encoder in the case of the \gls{edb} scheme will be trained on the test data of the respective dataset and has an output dimension of 128. The results of the experiments can be found in Table \ref{tbl:d_pso_bba}.\\
+The experiments performed in this section will use a buffer size at each node of 20 for both the \gls{db} and \gls{edb} distribution schemes. The similarity encoder in the case of the \gls{edb} scheme will be trained on the test data of the respective dataset and has an output dimension of 128.\\
 
-The results shown in Table \ref{tbl:d_pso_bba} reveal that the different distribution schemes have similar performance in terms of the number of detections. The distance is identical for all distribution schemes since the underlying algorithm is the same. They only differ in the way that the queries are distributed over the nodes. The ten node distribution is always better than the five node version. An attacker has to make a trade-off between the number of nodes and the number of detections (and consequently accounts). More nodes require less accounts, depending on the cost of nodes and accounts, the optimal amounts might differ.\\
+The results shown in Table \ref{tbl:d_pso_bba} reveal that the different distribution schemes have similar performance in terms of the number of detections. The distance is identical for all distribution schemes since the underlying algorithm is the same. They only differ in the way that the queries are distributed over the nodes. The ten node distribution is always better than the five node version. An attacker has to make a trade-off between the number of nodes and the number of detections (and consequently accounts). More nodes require trigger less detection and therefore require less accounts. Depending on the cost of nodes and accounts, the optimal amounts might differ.\\
 
-Since there is no real gain in having a complicated distribution scheme, the \gls{rr} distribution scheme will be used for the remaining experiments since the distance based schemes have more computational overhead. These experiments will also be performed using ten nodes, unless mentioned otherwise.\\
+As can be concluded from Table \ref{tbl:d_pso_bba}, there is no real gain in having a complicated distribution scheme. The \gls{rr} distribution scheme will consequently be used for the remaining experiments since the distance based schemes have more computational overhead. These experiments will also be performed using ten nodes, unless mentioned otherwise.\\
 
 \begin{figure}
 \centering
@@ -383,7 +383,7 @@ Since there is no real gain in having a complicated distribution scheme, the \gl
 
 \begin{table}
 	\centering
-	\caption[Distributed PSO-BBA results]{Results for the distributed \gls{pso}-\gls{bba} approaches on MNIST and CIFAR-10 dataset. There is no real advantage of one distribution scheme over the others. Increasing the number of nodes however, does have a clear advantage. The distribution over ten nodes is flagged less than the five node distribution for all schemes. The \gls{rr} scheme performs best for the MNIST dataset, while the \gls{db} scheme is the best performer for the CIFAR dataset. Their respectie values are shown in bold in the table.}
+	\caption[Distributed PSO-BBA results]{Results for the distributed \gls{pso}-\gls{bba} approaches on MNIST and CIFAR-10 dataset. There is no real advantage of one distribution scheme over the others. Increasing the number of nodes however, does have a clear advantage. The distribution over ten nodes is flagged less than the five node distribution for all schemes. The \gls{db} scheme performs best for the MNIST dataset, while the \gls{rr} scheme is the best performer for the CIFAR dataset. Their respectie values are shown in bold in the table.}
 	\label{tbl:d_pso_bba}
 	\begin{tabular}{lrrrrr}\toprule
 			&& \multicolumn{2}{c}{MNIST} &\multicolumn{2}{c}{CIFAR} \\ \cmidrule(r){3-4} \cmidrule(r){5-6}
@@ -579,14 +579,14 @@ Since there is no real gain in having a complicated distribution scheme, the \gl
 \draw [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]  [dash pattern={on 0.84pt off 2.51pt}]  (80.18,158.09) -- (63.26,187.41) ;
 \draw [shift={(62.26,189.14)}, rotate = 300] [color={rgb, 255:red, 155; green, 155; blue, 155 }  ,draw opacity=1 ][line width=0.75]    (10.93,-3.29) .. controls (6.95,-1.4) and (3.31,-0.3) .. (0,0) .. controls (3.31,0.3) and (6.95,1.4) .. (10.93,3.29)   ;
 \end{tikzpicture}
-\caption[Overview of the round-robin based distribution scheme]{Overview of the round-robin based distribution scheme. The particles are represented by the small circles and the squares represent the different nodes. If the number of particles is equal to the number of nodes (left), then particles submit their queries to the corresponding node. If the number of nodes is less than the number of particles (middle), then the particles without nodes will submit their queries to a random node. This random node will change every attack iteration. If the number of particles is less than the number of nodes (right), then a dummy particles are introduced. These dummy particles will not submit any queries, therefore some nodes will not receive queries. After every attack iteration the particle mapping will rotate.}
+\caption[Overview of the modified round-robin based distribution scheme]{Overview of the modified round-robin based distribution scheme. The particles are represented by the small circles and the squares represent the different nodes. If the number of particles is equal to the number of nodes (left), then particles submit their queries to the corresponding node. If the number of nodes is less than the number of particles (middle), then the particles without nodes will submit their queries to a random node. This random node will change every attack iteration. If the number of particles is less than the number of nodes (right), then dummy particles are introduced. These dummy particles will not submit any queries, therefore some nodes will not receive queries. After every attack iteration the particle mapping will rotate.}
 \label{fig:round_robin}
 \end{figure}
 
 
 
 \subsection{Adding more nodes to the equation}\label{sec:more_nodes}
-It is obvious that increasing the number of nodes makes the attack more evasive without an added efficiency cost. In the most extreme scenario, every query will be submitted using its own designated node. This ultimately causes no detections to occur. In fact, this scenario is a complete overkill. A detection is based on the average distance to the $k$~nearest neighbors in the detector buffer associated with the account submitting the query. This means that the defense has to build up a history of $k$ queries before any detection can occur. Only the $(k+1)$th and subsequent queries can therefore be flagged\footnote{This limitation should not have a big impact on the defense against current state of the art methods, as \gls{hsja} is only 70\% successful using \num{1000} queries \cite{hsja} and the proposed value for $k$ is 50 in \cite{chen_stateful_2019}. Here, being successful is defined as a maximum of 8/255 difference in $L_\infty$-distance between the original and the adversarial example.}. Every adversarial attack that is distributed in the same manner, therefore only requires $\lceil budget / k \rceil$ nodes in order to remain undetected, where $budget$ represents the query budget.\\
+It is obvious that increasing the number of nodes makes the attack more evasive without an added efficiency cost. In the most extreme scenario, every query will be submitted using its own designated node. This ultimately causes no detections to occur. In fact, this scenario is a complete overkill. A detection is based on the average distance to the $k$~nearest neighbors in the detector buffer associated with the account submitting the query. This means that the defense has to build up a history of $k$ queries before any detection can occur. Only the $(k+1)$th and subsequent queries can therefore be flagged\footnote{This limitation should not have a big impact on the defense against current state of the art methods, as \gls{hsja} is only 70\% successful using \num{1000} queries \cite{hsja} and the proposed value for $k$ is 50 in \cite{chen_stateful_2019}. In \cite{chen_stateful_2019}, being successful is defined as a maximum of 8/255 difference in $L_\infty$-distance between the original and the adversarial example.}. Every adversarial attack that is distributed in the same manner, therefore only requires $\lceil budget / k \rceil$ nodes in order to remain undetected, where $budget$ represents the query budget.\\
 
 The combination of \gls{pso} and \gls{bba} as described in section \ref{sec:combining_pso_bba} requires less nodes in order to be completely evasive. On the MNIST dataset, 25\% of the adversarial attacks does not trigger any detections when distributed over 25~nodes. For 50~nodes, already 60\% of the attacks are completely evasive and all attacks are completely evasive when using 100 nodes. The CIFAR-10 dataset requires more nodes to be completely evasive. When using 100 nodes, 60\% of the attacks do not trigger any detections. If the node count is increased to 250 then no detections occur. Figure \ref{fig:detections_nodes} shows the detection count in function of the number of nodes for both datasets. When the attack is distributed over 500 nodes, no detections are reported due to the limitations of the stateful defense mechanism.
 
@@ -603,7 +603,7 @@ The combination of \gls{pso} and \gls{bba} as described in section \ref{sec:comb
     x index=0, y expr=\thisrowno{1} - \thisrowno{2},col sep=comma]{Data/detections_nodes_mnist.csv};
 \addplot [name path=upper_bba, fill=none, draw=none] table [
     x index=0, y expr=\thisrowno{1} + \thisrowno{2},col sep=comma]{Data/detections_nodes_mnist.csv};
-\addplot[blue!60, fill opacity=0.2] fill between[of=lower_bba and upper_bba];
+\addplot[blue!60, fill opacity=0.4] fill between[of=lower_bba and upper_bba];
 
 
 %\addplot [name path=lower_pso, fill=none, draw=none] table [
@@ -634,10 +634,10 @@ The combination of \gls{pso} and \gls{bba} as described in section \ref{sec:comb
     x index=0, y expr=\thisrowno{3} - \thisrowno{4},col sep=comma]{Data/detections_nodes_mnist.csv};
 \addplot [name path=upper_pso, fill=none, draw=none] table [
     x index=0, y expr=\thisrowno{3} + \thisrowno{4},col sep=comma]{Data/detections_nodes_mnist.csv};
-\addplot[blue!60, fill opacity=0.2] fill between[of=lower_pso and upper_pso];
+\addplot[blue!60, fill opacity=0.4] fill between[of=lower_pso and upper_pso];
 \end{axis}
 \end{tikzpicture}
-\caption[Detections for more nodes]{The number of detections for both datasets, when distributed over a given number of nodes. The number of detections decreases with increasing number of nodes. At 500 nodes, no detections can be flagged due to the limitation of the stateful defensive mechanism. The 95\% confidence regions are shown around the curves. Note that the y axes do not line up.}
+\caption[Detections for more nodes]{The number of detections for both datasets, when distributed over a given number of nodes. The number of detections decreases with increasing number of nodes. No attacks are flagged at 100 and 250 nodes for the MNIST and CIFAR dataset respectively. At 500 nodes, no detections can be flagged due to the theoretical limitation of the stateful defensive mechanism. The 95\% confidence regions are shown around the curves. Note that the y axes do not line up.}
 \label{fig:detections_nodes}
 \end{figure}
 
@@ -682,18 +682,18 @@ The distance based distribution schemes can be greatly impacted by the length of
 \end{table}
 
 
-\section{Throwing the defense off the scent}
+\section{Throwing the defense off the scent}\label{sec:noise_insertion}
 As previously mentioned, the two goals of the proposed attack are conflicting. In order for the attack to be efficient, subsequent queries will be clumped together in search space, causing the evasiveness of the attack to drop. This is an important trade-off that has to be made depending on the type of attack, cost of detection, efficiency thresholds and many other criteria. In this subsection changes will be made to the algorithm to be more evasive at the cost of efficiency.\\
 
 Remember that the model under attack holds a query-bounded detector buffer per account. The buffer contains a history of the last submitted queries by a specific account. Every time a new query is inserted in the buffer, the distances to their nearest neighbors is determined and averaged. In the case of an attempted attack, the nearest neighbors will be relatively close together, causing the average distance to fall below a set threshold. Appropriate actions, such as banning the account, can now be taken.\\
 
 The key idea behind the approach to increase the evasiveness is the following. Benign queries can be submitted by the attacker in order to flood the buffer with noise. The insertion of the benign queries will cause the average inter query distance to be raised, which in turn will lower the number of detections.\\
 
-The approach raises two questions that will need to be answered: what sort of noise should be inserted and when should it be inserted. The former question will be answered first. Five types of noise are considered. The first one being uniform noise, as has been depicted in Figure \ref{fig:uniform_noise}. The second and third options are Perlin noise with a fixed frequency value and a random frequency value respectively. Perlin noise has been shown in Figure \ref{fig:perlin_noise}, while Figure \ref{fig:perlin_noise_frequencies} shows the influence of the frequency on the Perlin patterns. The fourth option will be random samples from the test data of the dataset on which the attack is being performed. The fifth and final option is a combination of the previous four strategies. Every time a benign query has to be inserted, one of the for options is chosen at random.\\
+The approach raises two questions that will need to be answered: what sort of noise should be inserted and when should it be inserted. The former question will be answered first. Five types of noise are considered. The first one being uniform noise, as has been depicted in Figure \ref{fig:uniform_noise}. The second and third options are Perlin noise with a fixed frequency value and a random frequency value respectively. Perlin noise has been shown in Figure \ref{fig:perlin_noise}, while Figure \ref{fig:perlin_noise_frequencies} shows the influence of the frequency on the Perlin patterns. The fourth option will be random samples from the test data of the dataset on which the attack is being performed. The fifth and final option is a combination of the previous four strategies. Every time a benign query has to be inserted, one of the four options is chosen at random.\\
 
 A similarity encoder will encode the submitted queries in an embedded space. The detector buffer will calculate the distances in this embedded space. Therefore it makes sense to determine the strategy with the highest inter query distance in the embedded space. The following experiment has been set up in order to establish the best strategy. The similarity encoder used in the \gls{edb} distribution scheme is reused to encode the benign queries. A fixed amount of queries (\num{20000}) is encoded and added to a detector buffer of size \num{1000}. Every time a query is added, the nearest neighbors are determined and the average distance to these neighbors is calculated. These distances are finally averaged over all submitted queries. The results of this experiment can be found in Table \ref{tbl:noise_distances}.\\
 
-The most promising noise strategy is the test data strategy. This makes sense as the similarity encoder is trained to maximize the distance between images representing different concepts. The uniform and perlin noise patterns are probably very similar to the encoder, although they might be further apart in terms of $L_2$-distance. This causes these patterns to reside in the same regions of the embedded space. The mixed strategy is another promising candidate. It even outperforms the test data strategy on the MNIST dataset. However this is likely due to a large distance between the patterns and test data clusters in the embedded space as the mixed strategy triggers more detections (3056) compared to the test data strategy (0). \\
+The most promising noise strategy is the test data strategy. This makes sense as the similarity encoder is trained to maximize the distance between images representing different concepts. The uniform and perlin noise patterns are probably very similar to the encoder, although they might be further apart in terms of $L_2$-distance. This causes these patterns to reside in the same regions of the embedded space. The mixed strategy is another promising candidate. It even outperforms the test data strategy on the MNIST dataset. However this is likely due to a large distance between the patterns and test data clusters in the embedded space as the mixed strategy triggers more detections (3056) compared to the test data strategy (0). For this reason, test data will be chosen as the source for the noise queries.\\
 
 \begin{table}
 \centering
@@ -711,8 +711,59 @@ Mixed noise&\textbf{0.238}&0.198\\ \bottomrule
 
 Now all that remains is answering the second question: when should the noise be inserted? Three strategies were considered. The first strategy is insertion of noise queries every $n$th query. The second strategy is inspired by the conclusion drawn from Figure \ref{fig:detections_bba_vs_pso_bba}. Detections are more common near the end of the attack, when the different particles have converged to the same region in search space. Therefore the second approach makes use of a geometric progression scheme \cite{geometric_progression} in order to submit more noise queries later in the attack progress. The third and final strategy does not have a fixed interval between the submission of noise queries. The submission is based on the distance to the previous queries. Using the \gls{edb} distribution scheme, a node is selected based on the average distance to the queries previously submitted from this node. If this average distance falls below a certain threshold then it is likely that an attack will be flagged by this query. Therefore noise queries are inserted before submitting the query used to progress the attack.\\
 
-The first strategy does not seem a very good fit on paper. There is no good value for the submission interval~$n$ that works for the entire duration of the attack. Smaller values will result in noise being inserted too often, especially in the beginning of the attack when detections occur less frequently. Larger values will not help towards the evasiveness of the attack as the noise queries are inserted too infrequently. For these reasons, this approach is dropped from the evaluation.\\
+The first strategy does not seem a very good fit on paper. There is no good value for the submission interval~$n$ that works for the entire duration of the attack. Smaller values will result in noise being inserted too often, especially in the beginning of the attack when detections occur less frequently. Larger values will not help towards the evasiveness of the attack as the noise queries are inserted too infrequently. The second strategy relies on two hyperparameters, the starting value of the noise submission interval $n$ and the decay rate. The optimal values of these parameters are very problem specific. For these reasons, the first two approaches are dropped from the evaluation.\\
 
+Experiments will be performed using the third strategy. Noise queries will be inserted based on the mean distance of an incoming query to the previously submitted queries. Whenever this mean distance drops below a set threshold, a noise query will be inserted. The results of the experiments can be found in Table \ref{tbl:thresholds} for different threshold values. The experiments are performed using a \gls{edb} distribution scheme over ten nodes with a buffer size of 20. Lower values for the threshold cause less noise queries to be inserted, while higher value have the opposite effect. When only taking the number of detections into account, there seems to be an optimal dataset-dependent value. However, the noise insertion hampers the efficiency of the attack. Only one datapoint is more efficient than the algorithm without noise insertion due to random effects. All other datapoints are less efficient. For the CIFAR dataset, the attack with insertion performs worse than the vanilla \gls{bba} for all threshold values. The small gain in evasiveness is not worth the loss in efficiency, therefore no further experiments have been performed.\\
 
+\begin{table}
+\centering
+\caption[Results for different buffer sizes]{Results for the \gls{edb} distribution scheme with noise insertion for threshold values on the MNIST and CIFAR-10 dataset. All experiments are performed using ten nodes and a buffer size of 20.}
+\label{tbl:thresholds}
+\begin{tabular}{lrrrrr}\toprule
+			&& \multicolumn{2}{c}{MNIST} &\multicolumn{2}{c}{CIFAR} \\ \cmidrule(r){3-4} \cmidrule(r){5-6}
+	Attack				&Threshold &Distance	&Detections	&Distance	&Detections \\ \midrule
+	Baseline \gls{bba}			  &/			&2.807		&413		&1.306			&474 \\
+	\gls{pso}-\gls{bba} 		  &/			&2.712		&138		&\textbf{1.239}	&257 \\ 
+	\gls{edb}-\gls{pso}-\gls{bba} &/			&2.712		&88			&\textbf{1.239}	&205 \\ \addlinespace[\linespace]
+	\gls{edb}-\gls{pso}-\gls{bba} &0.10		&\textbf{2.710}		&87			&1.537			&208 \\
+	\gls{edb}-\gls{pso}-\gls{bba} &0.25		&2.719		&87			&1.622			&\textbf{202} \\
+	\gls{edb}-\gls{pso}-\gls{bba} &1.00		&2.720		&\textbf{83}&1.595			&221 \\
+	\gls{edb}-\gls{pso}-\gls{bba} &2.00		&2.775		&89			&1.592			&241 \\
+	\bottomrule
+	\end{tabular}
+\end{table}
 
-\section{Optimizing the attack}
+The queries inserted in the experiments performed in the previous paragraph are merely noise queries. They have no purpose in progressing the attack, only to evade the detection algorithm. What if the queries that are inserted to evade detection could also serve towards progressing the attack? The attacker would not have to worry about the query budget since all submitted queries would be useful. The idea behind this is based on the assumption that an adversary often interested in multiple adversarial examples instead of just the one. If this is the case, multiple attacks can be performed concurrently and their respective queries can be submitted in an interleaved manner.\\
+
+The same experiments are performed again. This time experiments are grouped together. Experiments in the same group are executed concurrently and their queries that have be be submitted are interleaved. The query budget per experiment is respected, meaning that a group of size $s$ will submit $s$ times the query budget. The interleaved queries are distributed over different nodes as if they came from a single attack.\\
+
+Figure \ref{fig:detections_combinations} shows the average number of detections per experiment. This means that the total number of detections of a group of size $s$ is divided by $s$, which allows for an easier comparison to the baseline. Increasing the group size $s$ yields a lower number of detections per experiment. The only exception to this conclusion is a group size of two for the CIFAR dataset. This effect is likely due to some unlucky combinations in the experiment pairings. Experiments with the same original label or same target label can cause more detections due to the attacks exploring the same regions in the search space. This effect is still present in the higher group sizes, but less prominent since the probability of all attacks exploring the same regions is reduced. The average $L_2$-distance of the resulting adversarial examples is again equal to the results obtained by the \gls{pso}-\gls{bba} attack, since the only difference is the order in which the queries are submitted. All experiments performed to produce this plot used the \gls{rr} distribution scheme over ten nodes.\\
+
+In a real scenario, the attacker would benefit from interleaving the query submission of all planned adversarial attacks. There is an added benefit when the group size $s$ is high enough. Since the detector buffer of the defensive scheme can only hold a certain number of queries, it should be possible that every individual attack only has a few of its queries at a time in this buffer. If this number is below the number of considered neighbors $k$, then no attack should be flagged even using a single node or account. This might not be possible with the MNIST or CIFAR datasets due the limited number of target classes, causing the individual attacks to help detect each other. This effect can be seen on the CIFAR dataset with group size two in Figure \ref{fig:detections_combinations}. But when performing attacks on datasets such as ImageNet \cite{imagenet}, where the number of classes is much higher, this scenario is not completely unthinkable.\\
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+\begin{axis}[width=6cm, height=5cm, xmin=0,xmax=20, ymin=0,xlabel=Experiments combined, ylabel=Detections, tick label style={/pgf/number format/fixed}, scaled ticks=false, enlarge x limits=0.01, xtick={1,5,10,20},legend pos=north east,	legend style={draw=none}]
+\addplot table[blue,col sep=comma,x index=0,y expr=\thisrowno{1}] {Data/detections_combinations.csv};
+\addlegendentry{MNIST};
+\end{axis}
+\end{tikzpicture}
+%
+\begin{tikzpicture}
+\begin{axis}[width=6cm, height=5cm, xmin=0,xmax=20, ymin=0,xlabel=Experiments combined, ylabel=Detections, tick label style={/pgf/number format/fixed}, scaled ticks=false, enlarge x limits=0.01, xtick={1,5,10,20},legend pos=north east,	legend style={draw=none}]
+\addplot table[color=red,col sep=comma,x index=0,y expr=\thisrowno{2}] {Data/detections_combinations.csv};
+\addlegendentry{CIFAR};
+
+\end{axis}
+\end{tikzpicture}
+\caption[Detections for combinations of experiments]{The average number of detections for both datasets, when experiments are combined and distributed over ten nodes. Experiments are run individually but their queries have to be submitted are interleaved. Increasing the number of experiments that are combined, decreases the average number of detections per experiment. The only data point inconsistent with this conclusion is two combined experiments for the CIFAR dataset. This is probably due to some unlucky combinations of experiments (same original label or same target label). Note that the y axes do not line up.}
+\label{fig:detections_combinations}
+\end{figure}
+
+\section{Optimizing the attack}\label{sec:optimize}
+There are numerous parameters that influence both the efficiency and evasiveness of the attack. Some parameters are assigned values based on suggestions by the original authors of the work, some receive values based on experiments performed in this work and others get their respective value based on an educated guess. All parameters influence each other, making tuning of a single parameter pointless.\\
+
+This section will focus on optimization of a small parameter set. Due to the complexity of this task, the goal is not to find the optimal value for all  parameters in this set. But rather to find any obviously incompatible combinations of parameters if there are any. For the sake of completeness a list of all possible parameters and their respective default values is given in Table \ref{tbl:parameter_table} of appendix \ref{app:parameter_tables}. Table \ref{tbl:parameter_table_defense} of the same appendix shows the list of all parameters of the defensive scheme. The attacker has no knowledge of these values but the optimal values of the attacking parameters will depend on them.\\
+
+\section{Comparing to state of the art}
