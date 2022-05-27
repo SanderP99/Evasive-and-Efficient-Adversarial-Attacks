@@ -18,7 +18,8 @@ class Particle:
                  model: Model = None, swarm=None, is_targeted: bool = True, source_step: float = 1e-2,
                  spherical_step: float = 5e-2, steps_per_iteration: int = 50, source_step_multiplier_up: float = 1.05,
                  source_step_multiplier_down: float = 0.6, use_node_manager: bool = False, dataset=None,
-                 distance_based: Optional[str] = None, history_len=10, threshold: float = 0.02):
+                 distance_based: Optional[str] = None, history_len=10, threshold: float = 0.02, c1: float = 2.,
+                 c2: float = 1., w_start: float = 1., w_end: float = 0.):
         self.id: int = i
         self.position: np.ndarray = init
         self.velocity: np.ndarray = np.random.randn(*self.position.shape) - 0.5
@@ -26,6 +27,10 @@ class Particle:
         self.current_label: int = -1
         self.is_adversarial: bool = True
         self.is_targeted: bool = is_targeted
+        self.c3 = c2
+        self.c4 = c1
+        self.w_start = w_start
+        self.w_end = w_end
 
         self.target_image: np.ndarray = target_img
         self.target_label: int = target_label
@@ -149,7 +154,7 @@ class Particle:
             self.source_step = 0.002
 
     def update_velocity(self, c1: float = 2., c2: float = 2.) -> None:
-        w = self.calculate_w(1., 0., 1000)
+        w = self.calculate_w(self.w_start, self.w_end, 1000)
         particle_best_delta = c2 * (self.best_position - self.position) * np.random.uniform(0., 1.,
                                                                                             self.target_image.shape)
         swarm_best_delta = c1 * (self.swarm.best_position - self.position) * np.random.uniform(0., 1.,
@@ -167,7 +172,7 @@ class Particle:
             return w_end + ((w_start - w_end) * (1 - (self.swarm.iteration / max_queries)))
 
     def select_cs(self) -> (float, float):
-        a1, a2 = 1., 2.
+        a1, a2 = self.c3, self.c4
         if self.id % 2 == 0:
             c1, c2 = max(a1, a2), min(a1, a2)
         else:
