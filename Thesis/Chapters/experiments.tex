@@ -764,7 +764,115 @@ In a real scenario, the attacker would benefit from interleaving the query submi
 \section{Optimizing the attack}\label{sec:optimize}
 There are numerous parameters that influence both the efficiency and evasiveness of the attack. Some parameters are assigned values based on suggestions by the original authors of the work, some receive values based on experiments performed in this work and others get their respective value based on an educated guess. All parameters influence each other, making tuning of a single parameter pointless.\\
 
-This section will focus on optimization of a small parameter set. Due to the complexity of this task, the goal is not to find the optimal value for all  parameters in this set. But rather to find any obviously incompatible combinations of parameters if there are any. For the sake of completeness a list of all possible parameters and their respective default values is given in Table \ref{tbl:parameter_table} of appendix \ref{app:parameter_tables}. Table \ref{tbl:parameter_table_defense} of the same appendix shows the list of all parameters of the defensive scheme. The attacker has no knowledge of these values but the optimal values of the attacking parameters will depend on them.\\
+This section will focus on optimization of a small parameter set. Due to the complexity of this task, the goal is not to find the optimal value for all  parameters in this set. But rather to find any obviously incompatible combinations of parameters if these are present. For the sake of completeness a list of all possible parameters and their respective default values is given in Table \ref{tbl:parameter_table} of appendix \ref{app:parameter_tables}. Table \ref{tbl:parameter_table_defense} of the same appendix shows the list of all parameters of the defensive scheme. The attacker has no knowledge of these values but the optimal values of the attacking parameters will depend on them.\\
+
+The following parameters are chosen to perform the incompatibility search on: the number of particles, the source step~$\epsilon$, the acceleration coefficients $c_p$ and $c_g$ and the starting inertia weight~$w_{start}$. The number of nodes and maximal number of queries are not changed as these are more of a physical limitations instead of attack parameters. Other parameters are deemed less important or influential and are therefore also kept constant.\\
+
+Different combinations for the parameter values are tested on a subset of the experiments performed throughout this section. The considered ranges per parameter are shown in Table \ref{tbl:incopatibility_search}. Values are drawn from these ranges and the subset of experiments is performed using these values. The whole process is done using the Optuna framework \cite{optuna}.\\
+
+Figure \ref{fig:optimization_experiments} shows contour plots for the 200 trials performed in the incompatibility study. Every plot shows contours for two parameters used in the study, where the contours are drawn based on the average $L_2$-distance to the original image. Blue regions correspond to a lower distance and indicate a synergy between the parameter values. Red regions indicate the opposite. Some insights that can be drawn from this Figure are the following: The number of particles seems to synergize with all other considered parameters for a value of five. The starting inertia weight $w_{start}$ should be relatively low , meaning that the particles can move more freely from the beginning of the search. There is no real optimal combination for the acceleration coefficients $c_p$ and $c_g$. This is to be expected due to the multi-group approach.\\
+
+However, the same trade-off that had to be made for the duration of this work, should also be considered here. The synergies between parameters might cause a lower final distance to the original but this also triggers more detections. This can clearly be seen in Figure \ref{fig:detections_vs_distance}. All trials were performed on the CIFAR dataset.\\
+
+\begin{table}
+\centering
+\caption[Considered ranges for all parameters part of the incompatibility search]{Considered ranges for all parameters part of the incompatibility search.}
+\label{tbl:incopatibility_search}
+\begin{tabular}{ll}\toprule
+Parameter	&Considered range \\ \midrule
+Number of particles & [1, 20] \\
+Source step $\epsilon$ & [\num{e-6}, \num{e0}] \\
+Acceleration coefficient $c_p$	&[0.5, 3.0]\\
+Acceleration coefficient $c_g$	&[0.5, 3.0]\\
+Starting inertia weight $w_{start}$ &[0.5, 2.0] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}
+\begin{groupplot}[
+	group style={
+        group size=5 by 5
+    }
+    ]
+    \nextgroupplot[view={0}{90}, ylabel={$c_p$},label style={font=\huge}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/0.csv};
+    \nextgroupplot[view={0}{90}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/5.csv};
+    \nextgroupplot[view={0}{90}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/10.csv};
+    \nextgroupplot[view={0}{90}, xmode=log]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/15.csv};
+    \nextgroupplot[view={0}{90}, colorbar sampled, colormap access=piecewise const, 
+    colorbar style={samples=11, title={Distance},title style={font=\huge}},
+    every colorbar/.append style={height=
+        5*\pgfkeysvalueof{/pgfplots/parent axis height}
+        +4*\pgfkeysvalueof{/pgfplots/group/vertical sep}
+}
+        ]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/20.csv};
+    \nextgroupplot[view={0}{90}, ylabel={$c_g$},label style={font=\huge}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/1.csv};
+    \nextgroupplot[view={0}{90}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/6.csv};
+    \nextgroupplot[view={0}{90}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/11.csv};
+    \nextgroupplot[view={0}{90}, xmode=log]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/16.csv};
+    \nextgroupplot[view={0}{90}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/21.csv};
+    \nextgroupplot[view={0}{90}, ylabel={Nb. particles},label style={font=\huge}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/2.csv};
+    \nextgroupplot[view={0}{90}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/7.csv};
+    \nextgroupplot[view={0}{90}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/12.csv};
+    \nextgroupplot[view={0}{90}, xmode=log]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/17.csv};
+    \nextgroupplot[view={0}{90}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/22.csv};
+    \nextgroupplot[view={0}{90}, ymode=log, ylabel={Source step $\epsilon$},label style={font=\huge}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/3.csv};
+    \nextgroupplot[view={0}{90}, ymode=log]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/8.csv};
+    \nextgroupplot[view={0}{90}, ymode=log]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/13.csv};
+    \nextgroupplot[view={0}{90}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/18.csv};
+    \nextgroupplot[view={0}{90}, ymode=log]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/23.csv};
+    \nextgroupplot[view={0}{90}, ylabel={$w_{start}$}, xlabel={$c_p$},label style={font=\huge}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/4.csv};
+    \nextgroupplot[view={0}{90}, xlabel={$c_g$},label style={font=\huge}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/9.csv};
+    \nextgroupplot[view={0}{90}, xlabel={Nb. particles},label style={font=\huge}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/14.csv};
+    \nextgroupplot[view={0}{90}, xmode=log, xlabel={Source step $\epsilon$},label style={font=\huge}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/19.csv};
+    \nextgroupplot[view={0}{90}, xlabel={$w_{start}$},label style={font=\huge}]
+    \addplot3 [contour filled={number=10}] table[x index=0, y index=1, col sep=comma, z index=2] {../Code/Analysis/contour_files/24.csv};
+\end{groupplot}
+\end{tikzpicture}
+}
+\caption[Contour plots for the optimization experiments]{Contour plots for combinations of parameters used in the incompatibility study. The colorbar indicates the average $L_2$-distance to the original image for a combination of parameters. Blue regions (corresponding to low distance) indicate a synergy between the respective parameter values, while red regions indicate the opposite. The study has been performed on the CIFAR dataset.}
+\label{fig:optimization_experiments}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+\begin{axis}[width=12cm, height=5cm, ymin=0,xlabel=Distance, ylabel=Detections, tick label style={/pgf/number format/fixed}, scaled ticks=false, enlarge x limits=0.01]
+\addplot[only marks, mark options={fill=blue, draw=blue}] table[col sep=comma,x index=1,y expr=\thisrowno{0}] {../Code/Analysis/distance_v_detections.csv};
+\end{axis}
+\end{tikzpicture}
+\caption[Distance versus detections]{The plot shows the distance to the original image and the number of detections triggered for all trials in the incompatibility study. In general a larger distance yields less detections.}
+\label{fig:detections_vs_distance}
+\end{figure}
+
+
 
 \section{Comparing to state of the art}
 As stated in section \ref{sec:hsja}, \gls{hsja} \cite{hsja} eclipsed \gls{ba} and \gls{bba} in terms of efficiency. This section aims to compare \gls{hsja} to the attack proposed in this work both in terms of efficiency as evasiveness. The idea of query submission distribution is applicable to all adversarial attacks. In order to make the comparison more fair, this idea has been applied to \gls{hsja} as well.\\
