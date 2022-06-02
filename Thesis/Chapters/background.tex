@@ -1,10 +1,10 @@
-\chapter{Background}
+\chapter{Background}\label{chap:background}
 \section{Neural networks}
-Ever since the invention of computer systems, it has always been a goal of scientists and engineers to create \gls{ai}. Current state of the art approaches are mimicking the human brain, more specifically the neurons inside the brain. Already in the fifties, Rosenblatt introduced his perceptron \cite{rosenblatt_perceptron_1958}. The perceptron is a single neuron able to learn linearly separable patterns. It does so by finding a hyperplane that separates the two classes. This hyperplane is called the decision surface or decision boundary and the perceptron itself is called a classifier. Geometric regions separated by a decision boundary are called decision regions. The concept of linear separability is explained in Figure~\ref{fig:linear_separability} in two dimensions. In Figure~\ref{fig:decision_boundaries_decision_regions}, the decision boundaries and decision regions are explained visually. \\
+Ever since the invention of computer systems, it has always been a goal of scientists and engineers to create \gls{ai}. Current state-of-the-art approaches are mimicking the human brain, more specifically the neurons inside the brain. Already in the fifties, Rosenblatt introduced his perceptron \cite{rosenblatt_perceptron_1958}. The perceptron is a single neuron able to learn binary linearly separable patterns. It does so by finding a hyperplane that separates the two classes. This hyperplane is called the decision surface or decision boundary and the perceptron itself is called a classifier. Geometric regions separated by a decision boundary are called decision regions. The concept of linear separability is explained in Figure~\ref{fig:linear_separability} in two dimensions. In Figure~\ref{fig:decision_boundaries_decision_regions}, the decision boundaries and decision regions are explained visually. \\
 
 Unfortunately not all patterns are linearly separable. To overcome this problem, the neurons can be layered, creating an \gls{ann} in the process. Layering neurons sequentially is essentially a linear combination of neurons. This in itself does not create non-linear decision surfaces. Non-linear activation functions are added for the \gls{ann} to be able to learn more complex decision boundaries. Some commonly used activation functions are \gls{relu} \cite{relu}, Heaviside step function \cite{heaviside} and softmax \cite{softmax} (or sigmoid when used on scalars). In Figure~\ref{fig:activation_functions} the plots of some activation functions can be found.\\ 
 
-The neurons can be combined in different ways to create different \gls{ann} architectures. Each architecture has its own strengths and weaknesses. \glspl{cnn} excel in classifying visual data \cite{cnn_1, cnn_2}, whilst \glspl{rnn} are widely used when there exist dependencies inside the data, such as in speech recognition \cite{speech_1, speech_2} or time series prediction \cite{time_series_1}. More recent research focuses on \glspl{dnn}, due to the ever increasing computational power available. \gls{dnn} approaches are able to compare to and even surpass human performance on very specific tasks \cite{alpha_go_google, imagenet_dnn}.\\ 
+The neurons can be combined in different ways to create different \gls{ann} architectures. Each architecture has its own strengths and weaknesses. \glspl{cnn} excel in classifying visual data \cite{face_recognition_survey, cnn_1, cnn_2}, whilst \glspl{rnn} are widely used when there exist dependencies inside the data, such as in speech recognition \cite{speech_1, speech_2} or time series prediction \cite{time_series_1}. More recent research focuses on \glspl{dnn}, due to the ever increasing computational power available. \gls{dnn} approaches are able to compare to and even surpass human performance on very specific tasks \cite{alpha_go_google, imagenet_dnn}.\\ 
 
 Most \glspl{ann} are not built from individual neurons, but rather from layers of neurons. An \gls{ann} architecture describes the different layers of which the network consists. The most basic type of layer is the fully connected or dense layer. This layer, as the name suggests, consists of neurons that are connected to all neurons of the previous layer. Every neuron in this layer outputs a value based on the perceptron rule:
 \begin{align*}
@@ -14,9 +14,9 @@ Here $y$ is the output of the neuron, $b$ is the bias, $W$ is the weight matrix 
 
 Activation layers apply activation functions to their inputs. They can be standalone layers, but more frequently they are integrated in other layers.\\ 
 
-Convolution layers \cite{mnist} are the main building blocks of \glspl{cnn}. Convolution layers map inputs to so called feature maps. A filter~$W$ slides over the input~$X$ from left to right top to bottom. At every position, the dot product $W\cdot X$ of the frame and the underlying values of the input are computed. This value is placed at the corresponding position of the feature map. Higher values of the dot product (for a fixed value of $\|W\|_2$) mean that $W$ and the underlying values of $X$ are more similar. The feature map therefore indicates where in the input~$X$ a certain pattern~$W$ can be found. This process is translation-invariant, meaning that a certain pattern can be detected at any location of $X$. Scale and rotation invariance can be achieved by repeating the process for scaled and rotated filters. This is the main reason why \glspl{cnn} are widely used for visual data. An example of a convolution layer is shown in Figure \ref{fig:convolution}.\\
+Convolution layers \cite{mnist} are the main building blocks of \glspl{cnn}. Convolution layers map inputs to so called feature maps. A filter~$W$ slides over the input~$X$ from left to right top to bottom. At every position, the dot product $W\cdot X$ of the frame and the underlying values of the input are computed. This value is placed at the corresponding position of the feature map. Higher values of the dot product (for a fixed value of $\|W\|$) mean that $W$ and $X$ are more similar at this position of $X$. The feature map therefore indicates where in the input~$X$ a certain pattern~$W$ can be found. This process is translation-invariant, meaning that a certain pattern can be detected at any location of $X$. Scale and rotation invariance can be achieved by repeating the process for scaled and rotated filters. This invariance is the main reason why \glspl{cnn} are widely used for visual data. An example of a convolution layer is shown in Figure \ref{fig:convolution}.\\
 
-The use of convolution layers tends to cause an explosion in the dimensionality of the data. One filter will produce a feature map that is smaller than the original input. But a convolution layer typically consists of many filters, causing the explosion in the number of connections and weights. Pooling or subsampling layers \cite{mnist} alleviate this problem by aggregating nearby points. The aggregation happens using a sliding window similar to a convolution layer. This approach of reducing the dimensionality has the added benefit that the output of the model is less sensitive to the exact location of a pattern. Some commonly used pooling layers are the MaxPooling and AveragePooling layers. They aggregate nearby points using the maximum and average value respectively. Convolution and pooling layers are often used in combination with each other and are repeated multiple times. This allows the \gls{cnn} to detect patterns at different scales.\\
+The use of convolution layers tends to cause an explosion in the dimensionality of the data. One filter will produce a feature map that is smaller than the original input. But a convolution layer typically consists of many filters, causing the explosion in the number of connections and weights. Pooling or subsampling layers \cite{mnist} alleviate this problem by aggregating nearby points. The aggregation happens using a sliding window similar to a convolution layer. This approach of reducing the dimensionality has the added benefit that the output of the model is less sensitive to the exact location of a pattern. Some frequently used pooling layers are the MaxPooling and AveragePooling layers. They aggregate nearby points using the maximum and average value respectively. Convolution and pooling layers are often used in combination with each other and are repeated multiple times. This allows the \gls{cnn} to detect patterns at different scales.\\
  
 \begin{figure}
 \tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt        
@@ -330,26 +330,26 @@ Feature maps
 
 \end{minipage}};
 \end{tikzpicture}
-\caption[Example of a convolution layer]{Example of a convolution layer. The filter slides over the input from left to right top to bottom. At every position, the dot product of the filter and input image is computed. This value is added to the corresponding position of the feature map. This process is repeated for $m$ different filters leading to $m$ feature maps.}
+\caption[Example of a convolution layer]{Example of a convolution layer. The filter slides over the input from left to right top to bottom. At every position, the dot product of the filter and input image is computed. This value is added to the corresponding position of the feature map. This process is repeated for $m$ different filters leading to $m$ feature maps. Inspired by \cite{convolution_source}.}
 \label{fig:convolution}
 \end{figure}
 
 \section{Adversarial attacks}
-The expressiveness of \glspl{ann} is a double-edged sword. It is the cause for the near-human performance on some tasks, but also for counter-intuitive properties. As studied by Szegedy et al \cite{szegedy2014intriguing}, one of these properties is the presence of discontinuous decision boundaries. This might cause seemingly identically images to be classified differently. They were the first to define adversarial examples as \textit{imperceptibly small perturbations to a correctly classified input image, so that it is no longer classified correctly} \cite{szegedy2014intriguing}. This property of \glspl{ann} might not seem important at first glance, but it can be quite worrisome from a security point-of-view. Malicious users could craft images to bypass face recognition software \cite{face_recognition} or attack the camera of a self-driving car to misclassify traffic signs \cite{traffic_signs}. Other fields where adversarial examples are of interest include malware detection \cite{malware_detection}, natural language processing \cite{adversarial_nlp} and industrial control systems \cite{adversarial_industrial_control_system}. Adversarial attacks are algorithms used to craft such adversarial examples.\\ 
+The expressiveness of \glspl{ann} is a double-edged sword. It is the cause for the near-human performance on some tasks, but also for counter-intuitive properties. As studied by Szegedy et al \cite{szegedy2014intriguing}, one of these properties is the presence of discontinuous decision boundaries. This might cause seemingly identically images to be classified differently. They were the first to define adversarial examples as \textit{"imperceptibly small perturbations to a correctly classified input image, so that it is no longer classified correctly"} \cite{szegedy2014intriguing}. This property of \glspl{ann} might not seem important at first glance, but it can be quite worrisome from a security point-of-view. Malicious users could craft images to bypass face recognition software \cite{face_recognition} or attack the camera of a self-driving car to misclassify traffic signs \cite{traffic_signs}. These images would seem identical to correctly classified images for humans. Other fields where adversarial examples are of interest include malware detection \cite{malware_detection}, natural language processing \cite{adversarial_nlp} and industrial control systems \cite{adversarial_industrial_control_system}. Adversarial attacks are algorithms used to craft such adversarial examples.\\ 
 
-All adversarial attacks are evaluated against a threat model. A threat model is \textit{a structured representation of all the information that affects the security of an application} \cite{threat_model}. This information consists of the goals, knowledge and capabilities of the attacker, the accessibility of the model under attack and the costs of (un)successful attacks.\\
+All adversarial attacks are evaluated against a threat model. A threat model is \textit{"a structured representation of all the information that affects the security of an application"} \cite{threat_model}. This information consists of the goals, knowledge and capabilities of the attacker, the accessibility of the model under attack and the costs of (un)successful attacks.\\
 
 Most research on adversarial attacks is done using images. Researchers have the most freedom in this domain, since a slightly altered image is still an image with roughly the same contents. Slightly modifying an industrial control system however, might cause complete disruption of the system. Research in other domains is mostly conducted by altering existing image algorithms to the specific use case. For this reason this work focuses on adversarial attacks on images only.\\ 
 
 
 \subsection{Adversarial attacks terminology}
-Adversarial attacks are generally divided in two categories, white box attacks and black box attacks. In a white box attack, the attacker has complete knowledge of the classifier under attack. This knowledge consists of the architecture, parameters and thus their gradients and all output of the classifier. Examples of white box attacks are the \gls{fgsm} \cite{FGSM} or the Carlini \& Wagner attack \cite{cw_attack}.\\
+Adversarial attacks are generally divided in two categories, white-box attacks and black-box attacks. In a white-box attack, the attacker has complete knowledge of the classifier under attack. This knowledge consists of the architecture, parameters and thus their gradients and all output of the classifier. Examples of white box attacks are the \gls{fgsm} \cite{FGSM} or the Carlini \& Wagner attack \cite{cw_attack}.\\
 
-In black box attacks, the only thing the attacker has access to is the output of the model. Depending on the literature, this output consists of class labels only (decision-based attack) or class labels and the corresponding confidence scores (score-based attacks). Black box attacks are more relevant in real-life scenarios, since most attacks are performed on a third-party \gls{api}. These \glspl{api} generally do not reveal the underlying model.\\
+In black-box attacks, the only piece of information the attacker has access to is the output of the model. Depending on the literature, this output consists of the final decision or class label(s) only (decision-based attack) or the class labels and the corresponding confidence scores (score-based attacks). Black-box attacks are more relevant in real scenarios, since most attacks are performed on a third-party \gls{api}. These \glspl{api} generally do not reveal the underlying model.\\
 
-Transfer attacks \cite{transfer_attack} try to overcome this hurdle by creating a surrogate model. This is an undefended model similar to the model under attack. This idea is based on the observation that adversarial perturbations often are transferable to other models \cite{FGSM}. Attacks can leverage information (such as gradients) from the surrogate model to breach the black box model. Due to the transferability of adversarial examples, it is also possible to perform so called zero-query attacks. Zero-query attacks are performed entirely on the surrogate model and the resulting adversarial example is forwarded to the black box model.\\
+Transfer attacks \cite{transfer_attack} try to overcome this hurdle by creating a surrogate model. This is an undefended model similar to the model under attack. This idea is based on the observation that adversarial perturbations often are transferable to other models than the one they were designed for \cite{FGSM}. Attacks can leverage information (such as gradients) from the surrogate model to breach the black-box model. Due to the transferability of adversarial examples, it is also possible to perform so called zero-query attacks. Zero-query attacks are performed entirely on the surrogate model and the resulting adversarial example is forwarded to the black-box model.\\
 
-Both white box and black box attacks can be divided into targeted and untargeted attacks depending on their goal. In a targeted attack, the goal of the attacker is to create an adversarial example with a specific target class. In an untargeted attack the target class can be any class. Untargeted variants of attacks generally enjoy much more freedom and are therefore able to craft adversarial examples that are closer to the original. Figure \ref{fig:target_vs_untargeted} visually explains the difference between the two types.
+Both white-box and black-box attacks can be divided into targeted and untargeted attacks depending on their goal. In a targeted attack, the goal of the attacker is to create an adversarial example with a specific target class. In an untargeted attack the target class can be any class. Untargeted variants of attacks generally enjoy much more freedom and are therefore able to craft adversarial examples that are closer to the original. Figure \ref{fig:target_vs_untargeted} visually explains the difference between the two types of attack.
 
 \begin{figure}
 \centering
@@ -382,11 +382,11 @@ Both white box and black box attacks can be divided into targeted and untargeted
 %Shape: Circle [id:dp29014472584929707] 
 \draw  [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ,fill opacity=1 ] (130,77.03) .. controls (130,73.72) and (132.69,71.03) .. (136,71.03) .. controls (139.31,71.03) and (142,73.72) .. (142,77.03) .. controls (142,80.35) and (139.31,83.03) .. (136,83.03) .. controls (132.69,83.03) and (130,80.35) .. (130,77.03) -- cycle ;
 \end{tikzpicture}
-\caption[Difference targeted and untargeted attack]{Different decision regions are shown in different colors. An adversarial example is being created starting from the source image (black star). On the left an untargeted attack is performed. The adversarial example is the image closest to the source image, that is classified differently (black circle). On the right a targeted attack is performed with the red decision region being the target class. The adversarial example is the image closest to the source image that is in the red decision region.}
+\caption[Difference targeted and untargeted attack]{Different decision regions are shown in different colors. An adversarial example is being created starting from the original image (black star). On the left an untargeted attack is performed. The adversarial example is the image closest to the original image, that is classified differently (black circle). On the right a targeted attack is performed with the red decision region being the target class. The adversarial example is the image closest to the original image that is in the red decision region.}
 \label{fig:target_vs_untargeted}
 \end{figure}
 
-What does it mean for images to be close to each other? This is easy to visualize in two dimensions as in Figure \ref{fig:target_vs_untargeted}, but in higher dimensions, this is more difficult. Images reside in $d$-dimensional space, where $d$ is the amount of pixels of the image. Two commonly used distances in higher dimensions are the $L_2$-distance and the $L_\infty$-distance. They are defined as follows:
+What does it mean for images to be close to each other? This is easy to visualize in two dimensions as in Figure \ref{fig:target_vs_untargeted}, but in higher dimensions, this is more difficult. Images reside in $d$-dimensional space, where $d$ is the amount of pixels of the image\footnote{For color images in RGB-space, there are actually three times the amount of pixels. A complete set for each color channel.}. Two commonly used distances in higher dimensions are the $L_2$-distance and the $L_\infty$-distance. They are defined as follows:
 
 \begin{align*}
 L_2(X, Y) &= \sqrt{\sum_{i=1}^d|x_i - y_i|^2} \\
@@ -394,7 +394,7 @@ L_\infty(X, Y) &= \lim_{p\rightarrow \infty}\left( \sum_{i=1}^d|x_i-y_i|^p\right
 &= \max (|x_1 - y_1|, |x_2-y_2|, \ldots, |x_d-y_d|)
 \end{align*}
 
-In both distances $X$ and $Y$ represent the images and $(x_1, x_2, \ldots, x_i, \ldots, x_d)$ and $(y_1, y_2, \ldots, y_i, \ldots, y_d)$ are the pixel values of $X$ and $Y$ respectively. The $L_2$-distance is also known as the Euclidean distance, which is a generalization of the Pythagorean theorem in more than two dimensions. It takes the pairwise distances between all pixels into account. The $L_\infty$-distance is also called the Chebyshev distance. This distance only depends on the maximal pairwise distance between the two images. By minimizing the $L_\infty$-distance, the maximal pixelwise difference is minimized \cite{wiki_distances}.  Sometimes the norm notation $\| \cdot \|$ is used instead of the distance notation. A distance is induced by a norm by $d(X,Y) = \| X -Y\|$. The other direction, a distance inducing a norm, is not as trivial. In order for a distance to induce a norm, the distance has to satisfy the following condition: $d(\alpha X,\alpha Y) = |\alpha | d(X,Y)$. This condition is satisfied in most commonly used distances, but not always. The discrete distance \cite{discrete_distance} is an example of such a distance and is defined as follows:
+In both distances $X$ and $Y$ represent the images and $(x_1, x_2, \ldots, x_i, \ldots, x_d)$ and $(y_1, y_2, \ldots, y_i, \ldots, y_d)$ are the pixel values of $X$ and $Y$ respectively. The $L_2$-distance is also known as the Euclidean distance, which is a generalization of the Pythagorean theorem in more than two dimensions. It takes the pairwise distances between all pixels into account. The $L_\infty$-distance is also called the Chebyshev distance. This distance only depends on the maximal pairwise distance between the two images. By minimizing the $L_\infty$-distance, the maximal pixelwise difference is minimized \cite{wiki_distances}.  Sometimes the norm notation $\| \cdot \|$ is used instead of the distance notation. A distance is induced by a norm by $d(X,Y) = \| X -Y\|$. The other direction, a distance inducing a norm, is not as trivial. In order for a distance to induce a norm, the distance has to satisfy the following condition: $d(\alpha X,\alpha Y) = |\alpha | d(X,Y)$. This condition is satisfied in most commonly used distances, but this is not always the case. The discrete distance \cite{discrete_distance} is an example of such a distance and is defined as follows:
 \begin{align*}
 d(X,Y) = 
 \begin{cases}
@@ -402,6 +402,7 @@ d(X,Y) =
 0, &\text{else}
 \end{cases}
 \end{align*}
+Multiplying both $X$ and $Y$ with a fixed value $\alpha$ does not change the outcome of the distance function.\\
 
 \subsection{Adversarial defenses}\label{sec:adversarial_defenses}
 The existence of adversarial attacks naturally gave rise to adversarial defenses. These defenses can be categorized based on their objective. They can be either proactive or reactive. The goal of a proactive defense consists of making the models under attack more robust, while reactive defenses aim to identify attacks before they reach the model \cite{adversarial_defense_survey}. Different defensive countermeasures can be taken in each category. The remainder of this section will discuss some commonly used techniques \cite{defenses_survey}.\\
@@ -445,9 +446,58 @@ Some defenses rely on \textbf{proximity measurements} between the input and the 
 
 
 \section{Particle swarm optimization}
-\gls{pso} \cite{pso} is an optimization framework part of the \glspl{ea} family. In \glspl{ea}, populations of candidate solutions evolve based on mechanisms inspired by the field of biology, such as ant colonies \cite{aco}, mutation and recombination \cite{genetic_algorithm}. The mechanism that inspired \gls{pso} is the behaviour of flocks of birds. The framework has been applied to numerous problems such as routing problems \cite{ev_transport, freight_transport}, diagnosing diseases from imaging \cite{leukemia_pso} and calculating heat transfer coefficients \cite{heat_transfer_pso}.\\
+\gls{pso} \cite{pso} is an optimization framework part of the \gls{ea} family. In \glspl{ea}, populations of candidate solutions evolve based on mechanisms inspired by the field of biology, such as ant colonies \cite{aco}, mutation and recombination \cite{genetic_algorithm}. The mechanism that inspired \gls{pso} is the behaviour of flocks of birds. The framework has been applied to numerous problems such as routing problems \cite{ev_transport, freight_transport}, diagnosing diseases from imaging \cite{leukemia_pso} and calculating heat transfer coefficients \cite{heat_transfer_pso}.\\
 
 In \gls{pso}, different particles~$x$ move through the search space based on a set of rules. Their new position~$x_t$ is determined by their previous position~$x_{t-1}$ and a velocity $v_t$. The velocity depends on the distance to best position of the swarm~$g$ and the best known position of the particle~$p$. The distances can be weighted by acceleration coefficients~$c$ to put more emphasis on exploration or exploitation. These values are multiplied by random parameters~$r$ uniformly distributed in~$[0,1]$. The velocity is also dependent on the previous velocity with a corresponding weight~$w$. The best position is determined using a fitness function. This function states how 'fit' or good a certain position is with respect to the goal of the optimization problem. Equations~\ref{eq:velocity_update} and \ref{eq:position_update} correspond to the update rules. Each particle $i$ has its own position~$x_{t,i}$ and velocity~$v_{t,i}$ at time step~$t$, but the $i$~index has been omitted for readability. In Figure~\ref{fig:pso}, the steps are graphically represented for a single particle.
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[x=0.75pt,y=0.75pt,yscale=-1,xscale=1]
+
+%uncomment if require: \path (0,300); %set diagram left start at 0, and has height of 300
+
+%Shape: Circle [id:dp06935534605548432] 
+\draw  [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ,fill opacity=1 ] (100,161) .. controls (100,152.16) and (107.16,145) .. (116,145) .. controls (124.84,145) and (132,152.16) .. (132,161) .. controls (132,169.84) and (124.84,177) .. (116,177) .. controls (107.16,177) and (100,169.84) .. (100,161) -- cycle ;
+%Straight Lines [id:da36297070749556615] 
+\draw [color={rgb, 255:red, 255; green, 0; blue, 0 }  ,draw opacity=1 ][line width=3]    (116,161) -- (109.44,250.02) ;
+\draw [shift={(109,256)}, rotate = 274.21] [fill={rgb, 255:red, 255; green, 0; blue, 0 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
+%Shape: Circle [id:dp2975589876543052] 
+\draw  [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ,fill opacity=1 ] (258,156) .. controls (258,147.16) and (265.16,140) .. (274,140) .. controls (282.84,140) and (290,147.16) .. (290,156) .. controls (290,164.84) and (282.84,172) .. (274,172) .. controls (265.16,172) and (258,164.84) .. (258,156) -- cycle ;
+%Straight Lines [id:da11974704599725938] 
+\draw [color={rgb, 255:red, 255; green, 0; blue, 0 }  ,draw opacity=1 ][line width=3]    (274,156) -- (267.44,245.02) ;
+\draw [shift={(267,251)}, rotate = 274.21] [fill={rgb, 255:red, 255; green, 0; blue, 0 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
+%Straight Lines [id:da34669530870861953] 
+\draw [color={rgb, 255:red, 0; green, 0; blue, 255 }  ,draw opacity=1 ][line width=3]    (267,251) -- (207.74,176.69) ;
+\draw [shift={(204,172)}, rotate = 51.43] [fill={rgb, 255:red, 0; green, 0; blue, 255 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
+%Straight Lines [id:da2944239439562262] 
+\draw [color={rgb, 255:red, 55; green, 158; blue, 54 }  ,draw opacity=1 ][line width=3]    (204,172) -- (217.97,148.18) ;
+\draw [shift={(221,143)}, rotate = 120.38] [fill={rgb, 255:red, 55; green, 158; blue, 54 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
+%Straight Lines [id:da9472051718664152] 
+\draw [color={rgb, 255:red, 243; green, 0; blue, 255 }  ,draw opacity=1 ][line width=2.25]  [dash pattern={on 2.53pt off 3.02pt}]  (274,156) -- (224.88,143.95) ;
+\draw [shift={(221,143)}, rotate = 13.78] [color={rgb, 255:red, 243; green, 0; blue, 255 }  ,draw opacity=1 ][line width=2.25]    (15.74,-7.06) .. controls (10.01,-3.31) and (4.76,-0.96) .. (0,0) .. controls (4.76,0.96) and (10.01,3.31) .. (15.74,7.06)   ;
+%Straight Lines [id:da8503925276289086] 
+\draw [color={rgb, 255:red, 0; green, 0; blue, 255 }  ,draw opacity=1 ][line width=3]    (116,161) -- (56.74,86.69) ;
+\draw [shift={(53,82)}, rotate = 51.43] [fill={rgb, 255:red, 0; green, 0; blue, 255 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
+%Straight Lines [id:da10251717157021911] 
+\draw [color={rgb, 255:red, 55; green, 158; blue, 54 }  ,draw opacity=1 ][line width=3]    (116,161) -- (129.97,137.18) ;
+\draw [shift={(133,132)}, rotate = 120.38] [fill={rgb, 255:red, 55; green, 158; blue, 54 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
+
+% Text Node
+\draw (46,156) node [anchor=north west][inner sep=0.75pt]   [align=left] {Particle};
+% Text Node
+\draw (115,244) node [anchor=north west][inner sep=0.75pt]   [align=left] {\textcolor[rgb]{1,0,0}{Inertia}};
+% Text Node
+\draw (38,65) node [anchor=north west][inner sep=0.75pt]  [color={rgb, 255:red, 0; green, 0; blue, 255 }  ,opacity=1 ] [align=left] {Swarm best};
+% Text Node
+\draw (94,110) node [anchor=north west][inner sep=0.75pt]  [color={rgb, 255:red, 55; green, 158; blue, 54 }  ,opacity=1 ] [align=left] {Individual best};
+% Text Node
+\draw (212,117) node [anchor=north west][inner sep=0.75pt]   [align=left] {\textcolor[rgb]{0.95,0,1}{New position}};
+
+
+\end{tikzpicture}
+\caption[Particle swarm optimization]{Particles move based on a step towards their best known position, the swarm's best known position and a step in the direction of the movement of the previous iteration. The different steps are combined to determine the new position of the particle.}
+\label{fig:pso}
+\end{figure}
 
 %In \gls{pso}, different particles move through the search space based on a set of rules. Each position in the search space has a given fitness value. This value determines how 'fit' or good a certain position is with respect to the goal of the optimization problem. Every iteration, all particles take a step towards their personal best position, towards the group or swarm's best position and a step in the current direction (inertia). The different step sizes can be weighted depending on the problem at hand. In Figure~\ref{fig:pso}, the steps are graphically represented for a single particle.
 
@@ -466,11 +516,11 @@ w_t = w_{end} + (w_{start} - w_{end})\left(1 - \frac{t}{t_{max}}\right) \label{e
 
 In a large search space, particles can be far apart, which can cause the velocities to explode. By limiting the value of velocities to $v_{max}$, the swarm can be stabilized and the probability of finding an optimum is increased \cite{pso}.\\
 
-Clerc and Kennedy \cite{constriction_factor} studied \gls{pso} from a dynamic systems point of view. They provided a theoretically backed solution to the problem of the exploding velocities. Instead of limiting the value of the velocity, something which has only been shown empirically that it works, they proposed the constriction factor $\chi$. The constriction factor is able to prevent the velocity explosion, whilst avoiding premature convergence to local optima. The velocity update of equation \ref{eq:velocity_update} is altered as follows:
+Clerc and Kennedy \cite{constriction_factor} studied \gls{pso} from a dynamic systems point of view. They provided a theoretically backed solution to the problem of the exploding velocities. Instead of limiting the value of the velocity, something of which only empirical evidence has been given, they proposed the use of a constriction factor $\chi$. The constriction factor is able to prevent the velocity explosion, whilst avoiding premature convergence to local optima. The velocity update of equation \ref{eq:velocity_update} is altered as follows:
 \begin{align*}
 	v_{t} &= \chi (v_{t-1} + c_pr_p(p_{t-1} - x_{t-1}) + c_gr_g(g_{t-1} - x_{t-1}))
 \end{align*}
-The inertia weight $w$ is dropped and the entire sum is multiplied with $\chi$. The value of $\chi$ is calculated as follows:
+The inertia weight $w$ is dropped and the entire sum is multiplied by $\chi$. The value of $\chi$ is calculated as follows:
 \begin{align*}
 	\chi = 
 	\begin{cases}
@@ -478,18 +528,20 @@ The inertia weight $w$ is dropped and the entire sum is multiplied with $\chi$. 
 		\sqrt{\kappa}, 							&\text{else}
 	\end{cases}
 \end{align*}
-Here $C$ is the sum of the acceleration coefficients $c_p$ and $c_g$ and $\kappa$ is a user defined value to determine the rate of convergence.\\ 
+Here $C$ is the sum of the acceleration coefficients $c_p$ and $c_g$ and $\kappa$ is a user defined value to determine the rate of convergence. Increasing $\kappa$ slows down convergence, but causes a more thorough search to take place. The value of $\kappa$ should be contained in the interval $]0, 1[$.\\ 
 
-Another improvement on vanilla\footnote{Vanilla is used to refer to software or algorithms not altered from their original form \cite{vanilla}.} \gls{pso} is \gls{mgrr} \gls{pso} \cite{opposite_cs}. The swarm is split into two groups with opposite acceleration coefficients. The first group, with a larger $c_p$, is more attracted to the local optima, while the second group, with larger $c_g$, moves to the global optimum. The combination of the two groups, accounts for more variation during the search process. This in turn aids in the convergence to the global optimum.\\ 
+Another improvement on vanilla\footnote{Vanilla is used to refer to software or algorithms not altered from their original form \cite{vanilla}.} \gls{pso} is \gls{mgrr} \gls{pso} \cite{opposite_cs}. The swarm is split into two groups with opposite acceleration coefficients. The first group, with a larger $c_p$, is more attracted to the local optima, while the second group, with larger $c_g$, moves to the global optimum. The combination of the two groups accounts for more variation during the search process. This in turn aids in the convergence to the global optimum.\\ 
 
 Even with the multi-group improvement, the particles can get trapped in local optima, as is the case in vanilla \gls{pso}. Whenever the swarm is stuck in a local optimum, half of the particles are randomly redistributed. The particles that will be redistributed will change approximately half of their values. The redistribution gives the algorithm a chance to escape the local optimum.\\
  
 Experimental results show that \gls{mgrr}-\gls{pso} has better performance than the vanilla variant \cite{opposite_cs}. The convergence is also faster and less dependent on the starting positions of the particles. Even the variant without the random redistribution outperforms vanilla \gls{pso}.\\  
 
-\gls{pso} is often combined with other algorithms in so called hybridization techniques. The goal of this combination is to create an algorithm that contains the beneficial properties of both its constituents. Some commonly used algorithms combined with \gls{pso} are genetic algorithms \cite{genetic_algorithm}, differential evolution \cite{differential_evolution} and ant colony optimization \cite{aco}. The hybridization is most commonly done in three different ways. In the first way, one algorithm is used before the other. The first algorithm performs optimization on the population used in the second algorithm. The second way divides the entire population into two groups and every group is optimized with a constituent algorithm. Some inter group communication is required for this approach to work. The idea behind this technique is similar to the \gls{mgrr} approach discussed earlier. The third way incorporates specific parts of an algorithm as a local search operator in the other. Thangaraj et al. \cite{hybridization_survey} studied 64 hybridization algorithms containing \gls{pso} as one of the constituents. They found that the combination of differential evolution and \gls{pso} edges out the other hybrid approaches in terms of average error. However, all techniques outperform vanilla \gls{pso} using the error metric.\\
+\gls{pso} is often combined with other algorithms in so-called hybridization techniques. The goal of this combination is to create an algorithm that contains the beneficial properties of both its constituents. Some commonly used algorithms combined with \gls{pso} are genetic algorithms \cite{genetic_algorithm}, differential evolution \cite{differential_evolution} and ant colony optimization \cite{aco}. The hybridization is most commonly done in three different ways. In the first way, one algorithm is used before the other. The first algorithm performs optimization on the population used in the second algorithm. The second way divides the entire population into two groups and every group is optimized with a constituent algorithm. Some inter-group communication is required for this approach to work. The idea behind this technique is similar to the \gls{mgrr} approach discussed earlier. The third way incorporates specific parts of an algorithm as a local search operator in the other. Thangaraj et al. \cite{hybridization_survey} studied 64 hybridization algorithms containing \gls{pso} as one of the constituents. They found that the combination of differential evolution and \gls{pso} edges out the other hybrid approaches in terms of average error. However, all techniques outperform vanilla \gls{pso} using the error metric.\\
 
 Another approach to prevent the particles of the swarm to converge to local optima is to restrict the communication inside the swarm. In vanilla \gls{pso} all particles have knowledge about the best position of the entire swarm. All particles will take a step towards this position in the next iteration of the algorithm. This causes the particles to converge to each other and limits the exploration of the search space. In order to restrict this knowledge, different communication topologies can be used. Some topologies are depicted in Figure \ref{fig:pso_topologies}. Here the nodes represent the different particles and the edges show the possibility of communication between these particles. The fully connected topology is the standard topology used in \gls{pso}. A ring topology limits communication of the best position to two neighbors per particle. The pyramid topology is similar to the ring topology, but there exists one particle that can communicate to all other particles. Neighbors in the topologies can be determined based on pre-defined indices or on the position of the particles in search space. The latter requires more computations. It has been shown that the best topology is highly problem dependent and that the size of the swarm plays a significant role in the choice of the best topology \cite{pso_topologies}. Combinations between the fully connected and ring topology are also possible and show promising results \cite{fc_ring}.
- 
+
+
+
 \begin{figure}
 	\centering
 	\subfloat[Fully connected] {%
@@ -592,53 +644,4 @@ Another approach to prevent the particles of the swarm to converge to local opti
 	}
 	\caption[PSO communication topologies]{Different communication topologies for the \gls{pso} framework. The particles are represented by the nodes and the edges represent the communication channels. Inspired by \cite{pso_topologies}.}
 	\label{fig:pso_topologies}
-\end{figure}
-
-\begin{figure}
-\centering
-\begin{tikzpicture}[x=0.75pt,y=0.75pt,yscale=-1,xscale=1]
-
-%uncomment if require: \path (0,300); %set diagram left start at 0, and has height of 300
-
-%Shape: Circle [id:dp06935534605548432] 
-\draw  [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ,fill opacity=1 ] (100,161) .. controls (100,152.16) and (107.16,145) .. (116,145) .. controls (124.84,145) and (132,152.16) .. (132,161) .. controls (132,169.84) and (124.84,177) .. (116,177) .. controls (107.16,177) and (100,169.84) .. (100,161) -- cycle ;
-%Straight Lines [id:da36297070749556615] 
-\draw [color={rgb, 255:red, 255; green, 0; blue, 0 }  ,draw opacity=1 ][line width=3]    (116,161) -- (109.44,250.02) ;
-\draw [shift={(109,256)}, rotate = 274.21] [fill={rgb, 255:red, 255; green, 0; blue, 0 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
-%Shape: Circle [id:dp2975589876543052] 
-\draw  [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ,fill opacity=1 ] (258,156) .. controls (258,147.16) and (265.16,140) .. (274,140) .. controls (282.84,140) and (290,147.16) .. (290,156) .. controls (290,164.84) and (282.84,172) .. (274,172) .. controls (265.16,172) and (258,164.84) .. (258,156) -- cycle ;
-%Straight Lines [id:da11974704599725938] 
-\draw [color={rgb, 255:red, 255; green, 0; blue, 0 }  ,draw opacity=1 ][line width=3]    (274,156) -- (267.44,245.02) ;
-\draw [shift={(267,251)}, rotate = 274.21] [fill={rgb, 255:red, 255; green, 0; blue, 0 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
-%Straight Lines [id:da34669530870861953] 
-\draw [color={rgb, 255:red, 0; green, 0; blue, 255 }  ,draw opacity=1 ][line width=3]    (267,251) -- (207.74,176.69) ;
-\draw [shift={(204,172)}, rotate = 51.43] [fill={rgb, 255:red, 0; green, 0; blue, 255 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
-%Straight Lines [id:da2944239439562262] 
-\draw [color={rgb, 255:red, 55; green, 158; blue, 54 }  ,draw opacity=1 ][line width=3]    (204,172) -- (217.97,148.18) ;
-\draw [shift={(221,143)}, rotate = 120.38] [fill={rgb, 255:red, 55; green, 158; blue, 54 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
-%Straight Lines [id:da9472051718664152] 
-\draw [color={rgb, 255:red, 243; green, 0; blue, 255 }  ,draw opacity=1 ][line width=2.25]  [dash pattern={on 2.53pt off 3.02pt}]  (274,156) -- (224.88,143.95) ;
-\draw [shift={(221,143)}, rotate = 13.78] [color={rgb, 255:red, 243; green, 0; blue, 255 }  ,draw opacity=1 ][line width=2.25]    (15.74,-7.06) .. controls (10.01,-3.31) and (4.76,-0.96) .. (0,0) .. controls (4.76,0.96) and (10.01,3.31) .. (15.74,7.06)   ;
-%Straight Lines [id:da8503925276289086] 
-\draw [color={rgb, 255:red, 0; green, 0; blue, 255 }  ,draw opacity=1 ][line width=3]    (116,161) -- (56.74,86.69) ;
-\draw [shift={(53,82)}, rotate = 51.43] [fill={rgb, 255:red, 0; green, 0; blue, 255 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
-%Straight Lines [id:da10251717157021911] 
-\draw [color={rgb, 255:red, 55; green, 158; blue, 54 }  ,draw opacity=1 ][line width=3]    (116,161) -- (129.97,137.18) ;
-\draw [shift={(133,132)}, rotate = 120.38] [fill={rgb, 255:red, 55; green, 158; blue, 54 }  ,fill opacity=1 ][line width=0.08]  [draw opacity=0] (16.97,-8.15) -- (0,0) -- (16.97,8.15) -- cycle    ;
-
-% Text Node
-\draw (46,156) node [anchor=north west][inner sep=0.75pt]   [align=left] {Particle};
-% Text Node
-\draw (115,244) node [anchor=north west][inner sep=0.75pt]   [align=left] {\textcolor[rgb]{1,0,0}{Inertia}};
-% Text Node
-\draw (38,65) node [anchor=north west][inner sep=0.75pt]  [color={rgb, 255:red, 0; green, 0; blue, 255 }  ,opacity=1 ] [align=left] {Swarm best};
-% Text Node
-\draw (94,110) node [anchor=north west][inner sep=0.75pt]  [color={rgb, 255:red, 55; green, 158; blue, 54 }  ,opacity=1 ] [align=left] {Individual best};
-% Text Node
-\draw (212,117) node [anchor=north west][inner sep=0.75pt]   [align=left] {\textcolor[rgb]{0.95,0,1}{New position}};
-
-
-\end{tikzpicture}
-\caption[Particle swarm optimization]{Particles move based on a step towards their best known position, the swarm's best known position and a step in the direction of the movement of the previous iteration. The different steps are combined to determine the new position of the particle.}
-\label{fig:pso}
 \end{figure}

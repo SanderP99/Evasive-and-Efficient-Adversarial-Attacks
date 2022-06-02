@@ -1,4 +1,4 @@
-\chapter{Evaluation}
+\chapter{Evaluation}\label{chap:evaluation}
 This chapter will discuss the experiments performed, as well as the ideas and intuitions behind them. The adversarial algorithm will be refined throughout the different subsections and the results of the refinement will be discussed at the end of each subsection.
 
 \section{Evaluation protocol}
@@ -283,9 +283,9 @@ original image
 \begin{tikzpicture}
 \begin{axis}[width=12cm, height=5cm, xmin=0,xmax=25000, xlabel=Calls, ylabel=Detections, tick label style={/pgf/number format/fixed}, scaled ticks=false, enlarge x limits=0.01, xtick={0,5000,10000,15000,20000,25000},legend pos=north west,	legend style={draw=none},]
 \addplot table[blue,col sep=comma,x index=1,y expr=\thisrowno{0},mark=none] {Data/detections_bba_mnist.csv};
-\addlegendentry{\gls{bba}};
+\addlegendentry{BBA};
 \addplot table[color=red,col sep=comma,x index=1,y expr=\thisrowno{0},mark=none] {Data/detections_bba_pso_mnist.csv};
-\addlegendentry{\gls{pso}-\gls{bba}};
+\addlegendentry{PSO-BBA};
 
 \addplot [name path=lower_bba, fill=none, draw=none] table [
     x index=1, y expr=\thisrowno{0} - \thisrow{ci},col sep=comma]{Data/detections_bba_mnist.csv};
@@ -733,7 +733,7 @@ Experiments will be performed using the third strategy. Noise queries will be in
 	\end{tabular}
 \end{table}
 
-The queries inserted in the experiments performed in the previous paragraph are merely noise queries. They have no purpose in progressing the attack, only to evade the detection algorithm. What if the queries that are inserted to evade detection could also serve towards progressing the attack? The attacker would not have to worry about the query budget since all submitted queries would be useful. The idea behind this is based on the assumption that an adversary often interested in multiple adversarial examples instead of just the one. If this is the case, multiple attacks can be performed concurrently and their respective queries can be submitted in an interleaved manner.\\
+The queries inserted in the experiments performed in the previous paragraph are merely noise queries. They have no purpose in progressing the attack, only to evade the detection algorithm. What if the queries that are inserted to evade detection could also serve towards progressing the attack? The attacker would not have to worry about the query budget since all submitted queries would be useful. The idea behind this is based on the assumption that an adversary is often interested in multiple adversarial examples instead of just the one. If this is the case, multiple attacks can be performed concurrently and their respective queries can be submitted in an interleaved manner.\\
 
 The same experiments are performed again. This time experiments are grouped together. Experiments in the same group are executed concurrently and their queries that have be be submitted are interleaved. The query budget per experiment is respected, meaning that a group of size $s$ will submit $s$ times the query budget. The interleaved queries are distributed over different nodes as if they came from a single attack.\\
 
@@ -766,11 +766,11 @@ There are numerous parameters that influence both the efficiency and evasiveness
 
 This section will focus on optimization of a small parameter set. Due to the complexity of this task, the goal is not to find the optimal value for all  parameters in this set. But rather to find any obviously incompatible combinations of parameters if these are present. For the sake of completeness a list of all possible parameters and their respective default values is given in Table \ref{tbl:parameter_table} of appendix \ref{app:parameter_tables}. Table \ref{tbl:parameter_table_defense} of the same appendix shows the list of all parameters of the defensive scheme. The attacker has no knowledge of these values but the optimal values of the attacking parameters will depend on them.\\
 
-The following parameters are chosen to perform the incompatibility search on: the number of particles, the source step~$\epsilon$, the acceleration coefficients $c_p$ and $c_g$ and the starting inertia weight~$w_{start}$. The number of nodes and maximal number of queries are not changed as these are more of a physical limitations instead of attack parameters. Other parameters are deemed less important or influential and are therefore also kept constant.\\
+The following parameters are chosen to perform the incompatibility search on: the number of particles, the source step~$\epsilon$, the acceleration coefficients $c_p$ and $c_g$ and the starting inertia weight~$w_{start}$. The number of nodes and maximal number of queries are not changed as these are more of a physical limitation rather than attack parameters. Other parameters are deemed less important or influential and are therefore also kept constant.\\
 
 Different combinations for the parameter values are tested on a subset of the experiments performed throughout this section. The considered ranges per parameter are shown in Table \ref{tbl:incopatibility_search}. Values are drawn from these ranges and the subset of experiments is performed using these values. The whole process is done using the Optuna framework \cite{optuna}.\\
 
-Figure \ref{fig:optimization_experiments} shows contour plots for the 200 trials performed in the incompatibility study. Every plot shows contours for two parameters used in the study, where the contours are drawn based on the average $L_2$-distance to the original image. Blue regions correspond to a lower distance and indicate a synergy between the parameter values. Red regions indicate the opposite. Some insights that can be drawn from this Figure are the following: The number of particles seems to synergize with all other considered parameters for a value of five. The starting inertia weight $w_{start}$ should be relatively low , meaning that the particles can move more freely from the beginning of the search. There is no real optimal combination for the acceleration coefficients $c_p$ and $c_g$. This is to be expected due to the multi-group approach.\\
+Figure \ref{fig:optimization_experiments} shows contour plots for the 200 trials performed in the incompatibility study. Every plot shows contours for two parameters used in the study, where the contours are drawn based on the average $L_2$-distance to the original image. Blue regions correspond to a lower distance and indicate a synergy between the parameter values. Red regions indicate the opposite. Some insights that can be drawn from this Figure are the following: The number of particles seems to synergize with all other considered parameters for a value of five. The starting inertia weight $w_{start}$ should be relatively low, meaning that the particles can move more freely from the beginning of the search. There is no real optimal combination for the acceleration coefficients $c_p$ and $c_g$. This is to be expected due to the multi-group approach.\\
 
 However, the same trade-off that had to be made for the duration of this work, should also be considered here. The synergies between parameters might cause a lower final distance to the original but this also triggers more detections. This can clearly be seen in Figure \ref{fig:detections_vs_distance}. All trials were performed on the CIFAR dataset.\\
 

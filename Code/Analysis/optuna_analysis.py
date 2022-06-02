@@ -2,6 +2,7 @@ import csv
 import sqlite3
 from sqlite3 import Error
 
+import fiona
 import matplotlib.pyplot as plt
 import numpy as np
 

@@ -1,4 +1,4 @@
-\chapter{Approach}
+\chapter{Approach}\label{chap:approach}
 The research concerning adversarial attacks and defenses is predominantly driven by a game of cat and mouse. Whenever a new attack is proposed, a defensive mechanism countering the novel attack is developed and vice versa. This work aims to create a new family of algorithms that can be used to perform both targeted and untargeted attacks. The goal of these algorithms is to craft adversarial examples comparable to state of the art approaches while remaining undetected by the stateful detection mechanism \cite{chen_stateful_2019} described in section \ref{sec:stateful_detection}.
 
 \section{Distribution}
@@ -11,7 +11,7 @@ As described in section \ref{sec:pso_and_distributed_attacks}, several attempts 
 \section{Optimization} \label{sec:optimization_approach}
 As previously mentioned, reducing the number of submitted queries per adversary by a factor~$1/N$, where $N$ is the number of collaborators, is straightforward. Adversaries can gain knowledge about the search space by cooperating with other adversaries. They can leverage this knowledge in order to reduce the number of submitted queries even more. This idea has been utilized by multiple algorithms that were mentioned in section \ref{sec:pso_and_distributed_attacks}. These algorithms used some form of \gls{pso} to optimize the final adversarial example. However all but the \gls{pso}-\gls{bba} algorithm by Xiang et al \cite{distributed_pso_attack} rely on the confidence score of the model for the fitness value calculation. All attacks discussed use \gls{pso} as an attack in itself. This work will combine the benefits of state of the art black box attacks and \gls{pso}.
 
-\section{Approach}
+\section{Approach}\label{sec:approach}
 The remaining sections of this work will propose a new family of adversarial attacks. First a threat model is defined in section \ref{sec:threat_model}. All remaining experiments will be performed with this threat model in mind. Afterwards the novel adversarial algorithm is proposed in section \ref{sec:combining_pso_bba}. This algorithm is iteratively improved based on the results of the experiments. Finally, the final algorithm will be compared with state of the art decision-based attacks.\\
 
 During the process of creating, improving and optimizing the attack, this work tries to answer the following research questions. 
@@ -19,9 +19,10 @@ During the process of creating, improving and optimizing the attack, this work t
 	\item What are the (dis)advantages of using \gls{pso} in relation to vanilla adversarial attacks?
 	\item How can \gls{pso} be combined with state of the art adversarial attacks?
 	\item What are the (dis)advantages of distributing an adversarial attack?
+	\item How can adversarial attacks be made more evasive?
 \end{itemize} 
 
-This work concludes with an answer on these questions in section \ref{chap:conclusion}.
+This work concludes with an answer on these questions in chapter \ref{chap:conclusion}.
 
 \section{Threat model}\label{sec:threat_model}
 This section will describe the threat model that will be used for the remainder of this work. The first and most impactful assumption is that the model under attack will only output labels for the input. There will be no confidence scores or model parameters available. The proposed attack will have to be a decision-based attack. Most real world \glspl{api} will only expose the final decision to the user, causing decision-based attacks to be the only viable option. Decision-based attacks are the most restricted type of attack. Therefore they can also be applied to score-based and white-box models.\\
