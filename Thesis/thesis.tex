@@ -25,7 +25,8 @@ assistant={I. Tsingenopoulos \and V. Rimmer}
 \usepackage{tikz}
 \usetikzlibrary{positioning, intersections, calc, angles, spath3, quotes, shapes.geometric}
 
-
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage{pgf}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.16}
@@ -43,7 +44,7 @@ assistant={I. Tsingenopoulos \and V. Rimmer}
 %\PreviewSnarfEnvironment[{[]}]{figure}
 
 \newcommand*{\annot}[1]{\tag*{\footnotesize{\textcolor{black!50}{#1}}}}
-\newcommand*{\english}[1]{\textit{#1}}
+\newcommand*{\english}[1]{\textsl{#1}}
 
 \usepackage[acronym]{glossaries}
 \makenoidxglossaries
@@ -72,6 +73,7 @@ assistant={I. Tsingenopoulos \and V. Rimmer}
 \newacronym{dct}{DCT}{Discrete Cosine Transform}
 \newacronym{mgrr}{MGRR}{Multi-Group with Random Redistribution}
 \newacronym{ml}{ML}{Machine Learning}
+\newacronym{pgd}{PGD}{Projected Gradient Descent}
 
 \newcommand{\linespace}{0.3cm}
 
